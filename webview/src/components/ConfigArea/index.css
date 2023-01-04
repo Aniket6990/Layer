@@ -1,5 +1,5 @@
 #container {
-    width: 40%;
+    width: 35%;
     border: 1px solid #EDE3E3;
     border-radius: 10px;
     display: flex;
@@ -7,6 +7,7 @@
     justify-content: flex-start;
     align-items: center;
     padding: 20px;
+    gap: 8px;
 }
 #network, #account, #gaslimit, #value, #contract,#AtAddress {
     font-size: 12px;
@@ -16,6 +17,7 @@
     justify-content: flex-start;
     align-items: flex-start;
     width: 100%;
+    gap: 8px;
 }
 
 #accountselection,#gasSelection {
@@ -49,4 +51,8 @@
     width: 60%;
     font-size: 16px;
     border: 1px solid grey;
+}
+.copyIcon {
+    width: 16px;
+    height: 16px;
 }
