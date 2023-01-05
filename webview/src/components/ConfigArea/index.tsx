@@ -10,7 +10,7 @@ import { FaRegCopy } from "react-icons/fa";
 
 const ConfigArea = () => {
   return (
-    <div id="container">
+    <div id="ConfigContainer">
       {/* dropdown for network selection */}
       <div id="network">
         <span>Network</span>

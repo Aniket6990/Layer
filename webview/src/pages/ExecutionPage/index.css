@@ -4,4 +4,16 @@
 #Assessibilty {
     width: 100%;
     height: fit-content;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0% 2.5% 0% 2.5%;
+    overflow-x: hidden;
+}
+#divider {
+    height: 380px;
+    width: 0;
+    border: 0.5px solid var(--vscode-icon-foreground);
+    margin: 0% 2.5% 0% 2.5%;
+
 }

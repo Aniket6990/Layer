@@ -1,0 +1,49 @@
+#ContractContainer {
+    width: 35%;
+    height: 400px;
+    overflow-y: scroll;
+    border: 1px solid var(--vscode-icon-foreground);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px;
+    gap: 8px;
+}
+#deployedContract {
+    font-size: 12px;
+    color: var(--vscode-icon-foreground);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    gap: 8px;
+}
+
+#contractSelection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.dropdown {
+    width: 90%;
+    font-size: 12px;
+    border: 1px solid var(--vscode-icon-foreground);
+}
+#contractCall{
+    font-size: 12px;
+    color: var(--vscode-icon-foreground);
+    width: 100%;
+    height: 100%;
+    
+}
+#functionArea {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
