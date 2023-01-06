@@ -1,6 +1,7 @@
 // import { vscode } from "./utilities/vscode";
 import styled from "styled-components";
 import ConsoleArea from "./components/ConsoleArea";
+import SideBar from "./components/SideBar";
 import ExecutionPage from "./pages/ExecutionPage";
 
 const Main = styled.div`
@@ -32,6 +33,7 @@ function App() {
         <ExecutionPage />
         <ConsoleArea />
       </Wrapper>
+      <SideBar />
     </Main>
   );
 }
