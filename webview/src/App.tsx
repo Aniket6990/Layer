@@ -10,12 +10,7 @@ function App() {
   //   });
   // }
 
-  return (
-    <main>
-      {/* <VSCodeButton onClick={handleHowdyClick}>Howdy!</VSCodeButton> */}
-      <ExecutionPage />
-    </main>
-  );
+  return <ExecutionPage />;
 }
 
 export default App;

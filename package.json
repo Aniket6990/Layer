@@ -184,6 +184,7 @@
   "dependencies": {
     "@types/glob": "^8.0.0",
     "@types/randombytes": "^2.0.0",
+    "@types/styled-components": "^5.1.26",
     "@types/underscore": "^1.11.4",
     "axios": "^0.27.2",
     "bn.js": "^5.2.1",
@@ -192,6 +193,7 @@
     "number-to-bn": "^1.7.0",
     "randombytes": "^2.1.0",
     "react-icons": "^4.7.1",
+    "styled-components": "^5.3.6",
     "underscore": "^1.13.4",
     "utf8": "^3.0.0"
   },

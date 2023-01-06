@@ -1,6 +1,5 @@
 #ContractContainer {
-    width: 35%;
-    height: 400px;
+    height: 600px;
     overflow-y: scroll;
     border: 1px solid var(--vscode-icon-foreground);
     border-radius: 10px;

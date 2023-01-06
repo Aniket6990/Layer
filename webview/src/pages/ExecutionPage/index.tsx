@@ -1,18 +1,53 @@
 import React from "react";
-import { VSCodeDivider } from "@vscode/webview-ui-toolkit/react";
+import styled from "styled-components";
 import ConfigArea from "../../components/ConfigArea";
 import ContractArea from "../../components/ContractArea";
-import "./index.css";
+
+const Executioncontainer = styled.div`
+  width: 100%;
+  overflow-y: scroll;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-template-rows: 1fr 0.3fr;
+  padding: 20px;
+  row-gap: 20px;
+`;
+
+const Assessibilty = styled.div`
+  height: auto;
+  display: grid;
+  grid-template-columns: 1fr 0.1fr 1fr 0.2fr;
+  grid-template-rows: 1fr;
+  overflow-x: hidden;
+`;
+
+const Divider = styled.div`
+  height: 550px;
+  width: 0;
+  border: 0.5px solid var(--vscode-icon-foreground);
+  justify-self: center;
+  align-self: center;
+`;
+
+const Console = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  border: 1px solid var(--vscode-icon-foreground);
+  border-radius: 10px;
+  padding: 20px;
+`;
 
 const ExecutionPage = () => {
   return (
-    <div id="Executioncontainer">
-      <div id="Assessibilty">
+    <Executioncontainer>
+      <Assessibilty>
         <ConfigArea />
-        <div id="divider"></div>
+        <Divider></Divider>
         <ContractArea />
-      </div>
-    </div>
+      </Assessibilty>
+      <Console></Console>
+    </Executioncontainer>
   );
 };
 
