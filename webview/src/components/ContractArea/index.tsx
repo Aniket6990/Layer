@@ -1,21 +1,73 @@
 import React from "react";
-import {
-  VSCodeButton,
-  VSCodeDropdown,
-  VSCodeOption,
-  VSCodeTextField,
-} from "@vscode/webview-ui-toolkit/react";
-import "./index.css";
+import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
+import styled from "styled-components";
 import { FaRegCopy } from "react-icons/fa";
+
+const ContractContainer = styled.div`
+  height: 600px;
+  overflow-y: scroll;
+  border: 1px solid var(--vscode-icon-foreground);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20px;
+  gap: 8px;
+`;
+
+const DeployedContract = styled.div`
+  font-size: 12px;
+  color: var(--vscode-icon-foreground);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  gap: 8px;
+`;
+
+const ContractSelection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+const DropDown = styled(VSCodeDropdown)`
+  width: 90%;
+  font-size: 12px;
+  border: 1px solid var(--vscode-icon-foreground);
+`;
+
+const ContractCall = styled.div`
+  font-size: 12px;
+  color: var(--vscode-icon-foreground);
+  width: 100%;
+  height: 100%;
+`;
+
+const FunctionArea = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const CopyIcon = styled(FaRegCopy)`
+  width: 16px;
+  height: 16px;
+`;
 
 const ContractArea = () => {
   return (
-    <div id="ContractContainer">
+    <ContractContainer>
       {/* dropdown for account selection */}
-      <div id="deployedContract">
+      <DeployedContract>
         <span>Deployed Contracts</span>
-        <div id="contractSelection">
-          <VSCodeDropdown className="dropdown">
+        <ContractSelection>
+          <DropDown>
             <VSCodeOption>
               0x53871197A0a417F1ab30D64dBd62f72E64D91CA5
             </VSCodeOption>
@@ -28,18 +80,18 @@ const ContractArea = () => {
             <VSCodeOption>
               0x1CA25E2c0A6d64F437c64e1A7B372382f338F5B6
             </VSCodeOption>
-          </VSCodeDropdown>
-          <FaRegCopy className="copyIcon" />
-        </div>
-      </div>
+          </DropDown>
+          <CopyIcon></CopyIcon>
+        </ContractSelection>
+      </DeployedContract>
       {/* Area for contract call */}
-      <div id="contractCall">
+      <ContractCall>
         <span>Contract Call</span>
-        <div id="functionArea">
+        <FunctionArea>
           <span>No Contract selected</span>
-        </div>
-      </div>
-    </div>
+        </FunctionArea>
+      </ContractCall>
+    </ContractContainer>
   );
 };
 
