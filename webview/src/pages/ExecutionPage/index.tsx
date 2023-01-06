@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import ConfigArea from "../../components/ConfigArea";
+import ConsoleArea from "../../components/ConsoleArea";
 import ContractArea from "../../components/ContractArea";
 
 const Executioncontainer = styled.div`
@@ -29,15 +30,6 @@ const Divider = styled.div`
   align-self: center;
 `;
 
-const Console = styled.div`
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-  border: 1px solid var(--vscode-icon-foreground);
-  border-radius: 10px;
-  padding: 20px;
-`;
-
 const ExecutionPage = () => {
   return (
     <Executioncontainer>
@@ -46,7 +38,7 @@ const ExecutionPage = () => {
         <Divider></Divider>
         <ContractArea />
       </Assessibilty>
-      <Console></Console>
+      <ConsoleArea />
     </Executioncontainer>
   );
 };
