@@ -1,9 +1,11 @@
 // import { vscode } from "./utilities/vscode";
 import styled from "styled-components";
+import { Routes, Route } from "react-router-dom";
 import ConsoleArea from "./components/ConsoleArea";
 import SideBar from "./components/SideBar";
 import ExecutionPage from "./pages/ExecutionPage";
 import WalletPage from "./pages/WalletPage";
+import { withRouter } from "./utilities/withRouter";
 
 const Main = styled.div`
   width: 100%;
@@ -23,6 +25,8 @@ const Wrapper = styled.div`
 `;
 
 function App() {
+  const Execution = withRouter(ExecutionPage);
+  const Wallet = withRouter(WalletPage);
   // function handleHowdyClick() {
   //   vscode.postMessage({
   //     command: "hello",
@@ -33,8 +37,10 @@ function App() {
   return (
     <Main>
       <Wrapper>
-        {/* <ExecutionPage /> */}
-        <WalletPage />
+        <Routes>
+          <Route path="/" element={<Execution />} />
+          <Route path="/wallet" element={<Wallet />} />
+        </Routes>
         <ConsoleArea />
       </Wrapper>
       <SideBar />
