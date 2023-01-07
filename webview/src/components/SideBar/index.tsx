@@ -1,5 +1,7 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { IoWalletOutline, IoSettingsOutline } from "react-icons/io5";
+import { BiHomeCircle } from "react-icons/bi";
 import styled from "styled-components";
 
 const MenuContainer = styled.div`
@@ -13,18 +15,46 @@ const MenuContainer = styled.div`
 const WalletIcon = styled(IoWalletOutline)`
   width: 18px;
   height: 18px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const SettingsIcon = styled(IoSettingsOutline)`
   width: 18px;
   height: 18px;
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const HomeIcon = styled(BiHomeCircle)`
+  width: 18px;
+  height: 18px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const SideBar = () => {
+  const navigate = useNavigate();
   return (
     <MenuContainer>
-      <WalletIcon></WalletIcon>
-      <SettingsIcon></SettingsIcon>
+      <HomeIcon
+        onClick={(e) => {
+          navigate("/");
+        }}
+      ></HomeIcon>
+      <WalletIcon
+        onClick={(e) => {
+          navigate("/wallet");
+        }}
+      ></WalletIcon>
+      <SettingsIcon
+        onClick={(e) => {
+          navigate("/");
+        }}
+      ></SettingsIcon>
     </MenuContainer>
   );
 };

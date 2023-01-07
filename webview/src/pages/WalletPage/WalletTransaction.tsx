@@ -11,6 +11,7 @@ import styled from "styled-components";
 const ConfigContainer = styled.div`
   height: 500px;
   overflow-y: scroll;
+  border-radius: 10px;
   border: 1px solid var(--vscode-icon-foreground);
   display: flex;
   flex-direction: column;
