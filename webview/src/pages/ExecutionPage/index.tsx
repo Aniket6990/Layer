@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import ConfigArea from "../../components/ConfigArea";
-import ContractArea from "../../components/ContractArea";
+import ConfigArea from "./ConfigArea";
+import ContractArea from "./ContractArea";
 
 const Executioncontainer = styled.div`
   overflow-y: scroll;
