@@ -3,9 +3,12 @@ import styled from "styled-components";
 import ConsoleArea from "./components/ConsoleArea";
 import SideBar from "./components/SideBar";
 import ExecutionPage from "./pages/ExecutionPage";
+import WalletPage from "./pages/WalletPage";
 
 const Main = styled.div`
   width: 100%;
+  height: 100%;
+  overflow-y: scroll;
   display: grid;
   grid-template-columns: 1fr 0.1fr;
   grid-template-rows: 1fr;
@@ -30,7 +33,8 @@ function App() {
   return (
     <Main>
       <Wrapper>
-        <ExecutionPage />
+        {/* <ExecutionPage /> */}
+        <WalletPage />
         <ConsoleArea />
       </Wrapper>
       <SideBar />
