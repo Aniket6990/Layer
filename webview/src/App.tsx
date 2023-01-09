@@ -1,4 +1,4 @@
-// import { vscode } from "./utilities/vscode";
+import { vscode } from "./utilities/vscode";
 import styled from "styled-components";
 import { Routes, Route } from "react-router-dom";
 import ConsoleArea from "./components/ConsoleArea";
@@ -6,6 +6,10 @@ import SideBar from "./components/SideBar";
 import ExecutionPage from "./pages/ExecutionPage";
 import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
+import { getNetworks } from "./configuration/webviewpostmsg";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "./app/hooks";
+import { setNetwork, setAccounts } from "./store/extensionstore";
 
 const Main = styled.div`
   width: 100%;
@@ -27,12 +31,27 @@ const Wrapper = styled.div`
 function App() {
   const Execution = withRouter(ExecutionPage);
   const Wallet = withRouter(WalletPage);
-  // function handleHowdyClick() {
-  //   vscode.postMessage({
-  //     command: "hello",
-  //     text: "Hey there partner! 🤠",
-  //   });
-  // }
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    getNetworks();
+    const fn = (event: any) => {
+      const eventData = event.data;
+      switch (eventData.command) {
+        case "post-network-list": {
+          dispatch(setNetwork(eventData.data));
+          break;
+        }
+        default: {
+          console.log("Invalid event", event.data);
+        }
+      }
+    };
+    window.addEventListener("message", fn);
+    return () => {
+      window.removeEventListener("message", fn);
+    };
+  }, [dispatch]);
 
   return (
     <Main>

@@ -146,6 +146,11 @@
         "command": "ethcode.rental.create",
         "title": "Create new ERC4907 contract",
         "category": "Ethcode"
+      },
+      {
+        "command": "ethcode.webview.test",
+        "title": "Test webview data",
+        "category": "Ethcode"
       }
     ],
     "keybindings": [

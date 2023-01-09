@@ -35,7 +35,6 @@ class VSCodeAPIWrapper {
       console.log(message);
     }
   }
-
   /**
    * Get the persistent state stored for this webview.
    *

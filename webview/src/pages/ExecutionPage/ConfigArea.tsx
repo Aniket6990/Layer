@@ -7,6 +7,12 @@ import {
 } from "@vscode/webview-ui-toolkit/react";
 import styled from "styled-components";
 import { FaRegCopy } from "react-icons/fa";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  setSelectedNetwork,
+  setSelectedNetworkConfig,
+} from "../../store/extensionstore";
+import { NetworkConfig } from "../../types";
 
 const ConfigContainer = styled.div`
   height: 600px;
@@ -79,18 +85,37 @@ const CopyIcon = styled(FaRegCopy)`
   height: 16px;
 `;
 const ConfigArea = () => {
+  const dispatch = useAppDispatch();
+  const networks = useAppSelector((state) => state.extension.networks);
+
+  const getSelectedConf = (selectedNetwork: string) => {
+    const selectedNetworkConfig = networks[selectedNetwork];
+    const parsedConfig: NetworkConfig = JSON.parse(
+      JSON.stringify(selectedNetworkConfig)
+    );
+    return parsedConfig;
+  };
+
+  const handleDropdownChange = (event: any) => {
+    dispatch(setSelectedNetwork(event.target.value));
+    const selectedNetworkConfig: NetworkConfig = getSelectedConf(
+      event.target.value
+    );
+    dispatch(setSelectedNetworkConfig(selectedNetworkConfig));
+  };
   return (
     <ConfigContainer>
       {/* dropdown for network selection */}
       <ConfigWrapper>
         <span>Network</span>
-        <DropDown>
-          <VSCodeOption>Ethereum mainnet</VSCodeOption>
-          <VSCodeOption>Ganache</VSCodeOption>
-          <VSCodeOption>Hardhat</VSCodeOption>
-          <VSCodeOption>Goerli testnet</VSCodeOption>
-          <VSCodeOption>Polygon mainnet</VSCodeOption>
-          <VSCodeOption>Polygon mumbai</VSCodeOption>
+        <DropDown
+          onChange={(e: any) => {
+            handleDropdownChange(e);
+          }}
+        >
+          {Object.keys(networks).map((network, index) => {
+            return <VSCodeOption key={index}>{network}</VSCodeOption>;
+          })}
         </DropDown>
       </ConfigWrapper>
       {/* dropdown for account selection */}

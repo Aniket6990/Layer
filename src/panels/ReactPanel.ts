@@ -7,6 +7,7 @@ import {
   ViewColumn,
   ExtensionContext,
 } from "vscode";
+import { networkConfig } from "../config";
 import { getUri } from "../utilities/getUri";
 
 export class ReactPanel {
@@ -25,7 +26,7 @@ export class ReactPanel {
     this._panel.webview.html = this._getWebviewContent(context);
 
     // Set an event listener to listen for messages passed from the webview context
-    this._setWebviewMessageListener(this._panel.webview);
+    this._setWebviewMessageListener(this._panel.webview, context);
   }
 
   /**
@@ -81,10 +82,6 @@ export class ReactPanel {
    * are created and inserted into the webview HTML.
    */
   private _getWebviewContent(context: ExtensionContext) {
-    // The CSS file from the React build output
-    const stylesUri = this._panel.webview.asWebviewUri(
-      getUri(context, ["webview", "build", "static", "css", "main.css"])
-    );
     // The JS file from the React build output
     const scriptUri = this._panel.webview.asWebviewUri(
       getUri(context, ["webview", "build", "static", "js", "main.js"])
@@ -97,7 +94,6 @@ export class ReactPanel {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
           <meta name="theme-color" content="#000000">
-          <link rel="stylesheet" type="text/css" href="${stylesUri}">
           <title>ETHcode-layer</title>
         </head>
         <body>
@@ -113,16 +109,20 @@ export class ReactPanel {
    * Sets up an event listener to listen for messages passed from the webview context and
    * executes code based on the message that is recieved.
    */
-  private _setWebviewMessageListener(webview: Webview) {
+  private _setWebviewMessageListener(
+    webview: Webview,
+    context: ExtensionContext
+  ) {
     webview.onDidReceiveMessage(
-      (message: any) => {
+      async (message: any) => {
         const command = message.command;
-        const text = message.text;
-
         switch (command) {
-          case "hello":
-            window.showInformationMessage(text);
-            return;
+          case "get-network-list": {
+            webview.postMessage({
+              command: "post-network-list",
+              data: await networkConfig(context),
+            });
+          }
         }
       },
       undefined,
