@@ -6,6 +6,7 @@ interface extensionState {
   addresses: [];
   selectedNetwork: string | undefined;
   selectedNetworkConfig: any;
+  selectedAccount: string | undefined;
 }
 
 const initialState: extensionState = {
@@ -13,12 +14,13 @@ const initialState: extensionState = {
   addresses: [],
   selectedNetwork: undefined,
   selectedNetworkConfig: {},
+  selectedAccount: undefined,
 };
 export const extensionSlice = createSlice({
   name: "extension",
   initialState,
   reducers: {
-    setNetwork(state, action: PayloadAction<Object>) {
+    setNetworks(state, action: PayloadAction<Object>) {
       state.networks = action.payload;
     },
     setAccounts(state, action) {
@@ -30,14 +32,18 @@ export const extensionSlice = createSlice({
     setSelectedNetworkConfig(state, action: PayloadAction<NetworkConfig>) {
       state.selectedNetworkConfig = action.payload;
     },
+    setSelectedAccount(state, action) {
+      state.selectedAccount = action.payload;
+    },
   },
 });
 
 export const {
-  setNetwork,
+  setNetworks,
   setAccounts,
   setSelectedNetwork,
   setSelectedNetworkConfig,
+  setSelectedAccount,
 } = extensionSlice.actions;
 
 export default extensionSlice.reducer;

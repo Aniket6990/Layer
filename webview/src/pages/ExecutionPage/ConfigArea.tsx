@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { FaRegCopy } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
+  setSelectedAccount,
   setSelectedNetwork,
   setSelectedNetworkConfig,
 } from "../../store/extensionstore";
@@ -87,6 +88,7 @@ const CopyIcon = styled(FaRegCopy)`
 const ConfigArea = () => {
   const dispatch = useAppDispatch();
   const networks = useAppSelector((state) => state.extension.networks);
+  const accounts = useAppSelector((state) => state.extension.addresses);
 
   const getSelectedConf = (selectedNetwork: string) => {
     const selectedNetworkConfig = networks[selectedNetwork];
@@ -96,12 +98,16 @@ const ConfigArea = () => {
     return parsedConfig;
   };
 
-  const handleDropdownChange = (event: any) => {
+  const handleNetworkDropdownChange = (event: any) => {
     dispatch(setSelectedNetwork(event.target.value));
     const selectedNetworkConfig: NetworkConfig = getSelectedConf(
       event.target.value
     );
     dispatch(setSelectedNetworkConfig(selectedNetworkConfig));
+  };
+
+  const handleAccountDropdownChange = (event: any) => {
+    dispatch(setSelectedAccount(event.target.value));
   };
   return (
     <ConfigContainer>
@@ -110,11 +116,16 @@ const ConfigArea = () => {
         <span>Network</span>
         <DropDown
           onChange={(e: any) => {
-            handleDropdownChange(e);
+            handleNetworkDropdownChange(e);
           }}
         >
+          <VSCodeOption>Select Network</VSCodeOption>
           {Object.keys(networks).map((network, index) => {
-            return <VSCodeOption key={index}>{network}</VSCodeOption>;
+            return (
+              <VSCodeOption key={index} value={network}>
+                {network}
+              </VSCodeOption>
+            );
           })}
         </DropDown>
       </ConfigWrapper>
@@ -122,19 +133,19 @@ const ConfigArea = () => {
       <ConfigWrapper>
         <span>Account</span>
         <FullObjectWrapper>
-          <DropDown>
-            <VSCodeOption>
-              0x53871197A0a417F1ab30D64dBd62f72E64D91CA5
-            </VSCodeOption>
-            <VSCodeOption>
-              0xbee5a6b9d30ACdC31F4ad2D2b34BdF0e5a8C4B1d
-            </VSCodeOption>
-            <VSCodeOption>
-              0x40a231a98c960aFA02F9B0162a80E1553443a4a0
-            </VSCodeOption>
-            <VSCodeOption>
-              0x1CA25E2c0A6d64F437c64e1A7B372382f338F5B6
-            </VSCodeOption>
+          <DropDown
+            onChange={(e: any) => {
+              handleAccountDropdownChange(e);
+            }}
+          >
+            <VSCodeOption>Select Account</VSCodeOption>
+            {accounts.map((account, index) => {
+              return (
+                <VSCodeOption key={index} value={account}>
+                  {account}
+                </VSCodeOption>
+              );
+            })}
           </DropDown>
           <CopyIcon></CopyIcon>
         </FullObjectWrapper>

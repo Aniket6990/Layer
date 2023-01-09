@@ -24,7 +24,7 @@ import {
   selectContract,
 } from "./utils";
 import { ReactPanel } from "./panels/ReactPanel";
-import { networkConfig } from "./config";
+import { accountList, networkConfig } from "./config";
 
 // eslint-disable-next-line import/prefer-default-export
 export async function activate(context: vscode.ExtensionContext) {
@@ -115,7 +115,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
     // command for testing
     commands.registerCommand("ethcode.webview.test", async () => {
-      const data = await networkConfig(context);
+      const data = await accountList(context);
       console.log(data);
       console.log("typeof:", typeof data);
     }),
