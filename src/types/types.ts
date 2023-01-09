@@ -117,6 +117,11 @@ export interface ERC4907ContractType {
   contract: string;
   ERC4907Contract: string;
 }
+
+export interface JSONDATA {
+  networks: Object;
+  addresses: Array<string>;
+}
 // Typeguard
 
 export function isConstructorInputValue(

@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useAppSelector } from "../../app/hooks";
 
 const ConsoleContainer = styled.div`
   overflow-y: scroll;
@@ -14,9 +15,25 @@ const ConsoleContainer = styled.div`
 `;
 
 const ConsoleArea = () => {
+  const selectedNetwork = useAppSelector(
+    (state) => state.extension.selectedNetwork
+  );
+  const selectedNetworkConfig = useAppSelector(
+    (state) => state.extension.selectedNetworkConfig
+  );
   return (
     <ConsoleContainer>
       <span>Events Console</span>
+      <span>
+        {selectedNetwork !== undefined
+          ? `selected network is ${selectedNetwork}`
+          : null}
+      </span>
+      <span>
+        {selectedNetworkConfig !== undefined
+          ? `selected network config: ${selectedNetworkConfig}`
+          : null}
+      </span>
     </ConsoleContainer>
   );
 };
