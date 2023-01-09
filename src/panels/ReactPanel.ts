@@ -7,7 +7,7 @@ import {
   ViewColumn,
   ExtensionContext,
 } from "vscode";
-import { networkConfig } from "../config";
+import { accountList, networkConfig } from "../config";
 import { getUri } from "../utilities/getUri";
 
 export class ReactPanel {
@@ -120,7 +120,13 @@ export class ReactPanel {
           case "get-network-list": {
             webview.postMessage({
               command: "post-network-list",
-              data: await networkConfig(context),
+              data: await networkConfig(),
+            });
+          }
+          case "get-account-list": {
+            webview.postMessage({
+              command: "post-account-list",
+              data: await accountList(context),
             });
           }
         }

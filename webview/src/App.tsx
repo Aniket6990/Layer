@@ -6,10 +6,10 @@ import SideBar from "./components/SideBar";
 import ExecutionPage from "./pages/ExecutionPage";
 import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
-import { getNetworks } from "./configuration/webviewpostmsg";
+import { getAccounts, getNetworks } from "./configuration/webviewpostmsg";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
-import { setNetwork, setAccounts } from "./store/extensionstore";
+import { setNetworks, setAccounts } from "./store/extensionstore";
 
 const Main = styled.div`
   width: 100%;
@@ -35,11 +35,19 @@ function App() {
 
   useEffect(() => {
     getNetworks();
+    getAccounts();
+  }, []);
+
+  useEffect(() => {
     const fn = (event: any) => {
       const eventData = event.data;
       switch (eventData.command) {
         case "post-network-list": {
-          dispatch(setNetwork(eventData.data));
+          dispatch(setNetworks(eventData.data));
+          break;
+        }
+        case "post-account-list": {
+          dispatch(setAccounts(eventData.data));
           break;
         }
         default: {

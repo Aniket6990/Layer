@@ -21,6 +21,9 @@ const ConsoleArea = () => {
   const selectedNetworkConfig = useAppSelector(
     (state) => state.extension.selectedNetworkConfig
   );
+  const selectedAccount = useAppSelector(
+    (state) => state.extension.selectedAccount
+  );
   return (
     <ConsoleContainer>
       <span>Events Console</span>
@@ -32,6 +35,11 @@ const ConsoleArea = () => {
       <span>
         {selectedNetworkConfig !== undefined
           ? `selected network config: ${selectedNetworkConfig}`
+          : null}
+      </span>
+      <span>
+        {selectedAccount !== undefined
+          ? `selected Account: ${selectedAccount}`
           : null}
       </span>
     </ConsoleContainer>

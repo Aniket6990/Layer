@@ -5,3 +5,9 @@ export const getNetworks = () => {
     command: "get-network-list",
   });
 };
+
+export const getAccounts = () => {
+  vscode.postMessage({
+    command: "get-account-list",
+  });
+};
