@@ -7,7 +7,7 @@ import {
   ViewColumn,
   ExtensionContext,
 } from "vscode";
-import { accountList, networkConfig } from "../config";
+import { accountList, createNewKeyPair, networkConfig } from "../config";
 import { getUri } from "../utilities/getUri";
 
 export class ReactPanel {
@@ -122,12 +122,22 @@ export class ReactPanel {
               command: "post-network-list",
               data: await networkConfig(),
             });
+            break;
           }
           case "get-account-list": {
             webview.postMessage({
               command: "post-account-list",
               data: await accountList(context),
             });
+            break;
+          }
+          case "create-new-keypair": {
+            const password = message.data;
+            webview.postMessage({
+              command: "new-keypair-created",
+              data: createNewKeyPair(context, password),
+            });
+            break;
           }
         }
       },

@@ -11,3 +11,10 @@ export const getAccounts = () => {
     command: "get-account-list",
   });
 };
+
+export const createNewKeyPairAccount = (password: string) => {
+  vscode.postMessage({
+    command: "create-new-keypair",
+    data: password,
+  });
+};

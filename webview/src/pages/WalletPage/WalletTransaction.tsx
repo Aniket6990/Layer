@@ -7,6 +7,7 @@ import {
 import React from "react";
 import { FaRegCopy } from "react-icons/fa";
 import styled from "styled-components";
+import { useAppSelector } from "../../app/hooks";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -67,6 +68,7 @@ const ErrorMessage = styled.span`
 `;
 
 const WalletTransaction = () => {
+  const networks = useAppSelector((state) => state.extension.networks);
   return (
     <ConfigContainer>
       {/* Network selection field */}
@@ -74,12 +76,14 @@ const WalletTransaction = () => {
         <span>Network</span>
         <FullObjectWrapper>
           <DropDown>
-            <VSCodeOption>Ethereum mainnet</VSCodeOption>
-            <VSCodeOption>Ganache</VSCodeOption>
-            <VSCodeOption>Hardhat</VSCodeOption>
-            <VSCodeOption>Goerli testnet</VSCodeOption>
-            <VSCodeOption>Polygon mainnet</VSCodeOption>
-            <VSCodeOption>Polygon mumbai</VSCodeOption>
+            <VSCodeOption>Select Network</VSCodeOption>
+            {Object.keys(networks).map((network, index) => {
+              return (
+                <VSCodeOption key={index} value={network}>
+                  {network}
+                </VSCodeOption>
+              );
+            })}
           </DropDown>
         </FullObjectWrapper>
       </ConfigWrapper>
