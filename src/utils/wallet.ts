@@ -84,6 +84,7 @@ const createKeyPair = (
   }
   keythereum.exportToFile(keyObject, `${path}/keystore`);
   listAddresses(context, path);
+  return account.checksumAddr;
 };
 
 // delete privateKey against address
@@ -94,10 +95,11 @@ const deleteKeyPair = async (context: vscode.ExtensionContext) => {
       placeHolder: "Public key",
     };
     const publicKey = await window.showInputBox(pubkeyInp);
-    if(publicKey === undefined) {
+    if (publicKey === undefined) {
       logger.log("Please input public address");
       return;
-    }1
+    }
+    1;
     fs.readdir(`${context.extensionPath}/keystore`, (err, files) => {
       if (err) throw new Error(`Unable to scan directory: ${err}`);
 
@@ -135,10 +137,12 @@ const importKeyPair = async (context: vscode.ExtensionContext) => {
         const arr = file.split("--");
         const address = toChecksumAddress(`0x${arr[arr.length - 1]}`);
 
-        const already = addresses.find((element: string) => toChecksumAddress(element) === address)
+        const already = addresses.find(
+          (element: string) => toChecksumAddress(element) === address
+        );
 
-        if(already !== undefined) {
-          logger.log(`Account ${address} is already exist.`)
+        if (already !== undefined) {
+          logger.log(`Account ${address} is already exist.`);
         } else {
           fs.copyFile(
             fileUri[0].fsPath,
@@ -147,7 +151,7 @@ const importKeyPair = async (context: vscode.ExtensionContext) => {
               if (err) throw err;
             }
           );
-  
+
           logger.success(`Account ${address} is successfully imported!`);
           listAddresses(context, context.extensionPath);
         }
@@ -286,5 +290,5 @@ export {
   deleteKeyPair,
   extractPvtKey,
   selectAccount,
-  importKeyPair
-}
+  importKeyPair,
+};

@@ -1,4 +1,3 @@
-import { vscode } from "./utilities/vscode";
 import styled from "styled-components";
 import { Routes, Route } from "react-router-dom";
 import ConsoleArea from "./components/ConsoleArea";
@@ -8,7 +7,7 @@ import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
 import { getAccounts, getNetworks } from "./configuration/webviewpostmsg";
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "./app/hooks";
+import { useAppDispatch } from "./app/hooks";
 import { setNetworks, setAccounts } from "./store/extensionstore";
 
 const Main = styled.div`
@@ -50,8 +49,13 @@ function App() {
           dispatch(setAccounts(eventData.data));
           break;
         }
+        case "new-keypair-created": {
+          console.log(`new account created: ${eventData.data}`);
+          break;
+        }
         default: {
           console.log("Invalid event", event.data);
+          break;
         }
       }
     };

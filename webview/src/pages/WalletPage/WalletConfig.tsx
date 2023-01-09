@@ -4,9 +4,14 @@ import {
   VSCodeOption,
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react";
-import React from "react";
+import React, { useState } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import styled from "styled-components";
+import { useAppSelector } from "../../app/hooks";
+import {
+  createNewKeyPairAccount,
+  getAccounts,
+} from "../../configuration/webviewpostmsg";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -64,6 +69,8 @@ const CopyIcon = styled(FaRegCopy)`
 `;
 
 const WalletConfig = () => {
+  const [password, setPassword] = useState("");
+  const accounts = useAppSelector((state) => state.extension.addresses);
   return (
     <ConfigContainer>
       {/* Account selection dropdown */}
@@ -71,18 +78,14 @@ const WalletConfig = () => {
         <span>Account</span>
         <FullObjectWrapper>
           <DropDown>
-            <VSCodeOption>
-              0x53871197A0a417F1ab30D64dBd62f72E64D91CA5
-            </VSCodeOption>
-            <VSCodeOption>
-              0xbee5a6b9d30ACdC31F4ad2D2b34BdF0e5a8C4B1d
-            </VSCodeOption>
-            <VSCodeOption>
-              0x40a231a98c960aFA02F9B0162a80E1553443a4a0
-            </VSCodeOption>
-            <VSCodeOption>
-              0x1CA25E2c0A6d64F437c64e1A7B372382f338F5B6
-            </VSCodeOption>
+            <VSCodeOption>Select Account</VSCodeOption>
+            {accounts.map((account, index) => {
+              return (
+                <VSCodeOption key={index} value={account}>
+                  {account}
+                </VSCodeOption>
+              );
+            })}
           </DropDown>
           <CopyIcon></CopyIcon>
         </FullObjectWrapper>
@@ -122,8 +125,22 @@ const WalletConfig = () => {
         <span>Create account</span>
         <FullObjectWrapper>
           <PartialObjectWrapper>
-            <TextField placeholder="password"></TextField>
-            <VSCodeButton>Create</VSCodeButton>
+            <TextField
+              placeholder="password"
+              type="password"
+              value={password}
+              onChange={(e: any) => {
+                setPassword(e.target.value);
+              }}
+            ></TextField>
+            <VSCodeButton
+              onClick={(e) => {
+                createNewKeyPairAccount(password);
+                getAccounts();
+              }}
+            >
+              Create
+            </VSCodeButton>
           </PartialObjectWrapper>
         </FullObjectWrapper>
       </ConfigWrapper>
