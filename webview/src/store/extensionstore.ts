@@ -7,6 +7,11 @@ interface extensionState {
   selectedNetwork: string | undefined;
   selectedNetworkConfig: any;
   selectedAccount: string | undefined;
+  configBalance: string;
+  walletAccount: string | undefined;
+  walletNetwork: string | undefined;
+  walletNetworkConfig: any;
+  walletAccountBalance: string;
 }
 
 const initialState: extensionState = {
@@ -15,6 +20,11 @@ const initialState: extensionState = {
   selectedNetwork: undefined,
   selectedNetworkConfig: {},
   selectedAccount: undefined,
+  configBalance: "0",
+  walletAccount: undefined,
+  walletNetwork: undefined,
+  walletNetworkConfig: {},
+  walletAccountBalance: "0",
 };
 export const extensionSlice = createSlice({
   name: "extension",
@@ -35,6 +45,21 @@ export const extensionSlice = createSlice({
     setSelectedAccount(state, action) {
       state.selectedAccount = action.payload;
     },
+    setConfigBalance(state, action) {
+      state.configBalance = action.payload;
+    },
+    setWalletAccount(state, action) {
+      state.walletAccount = action.payload;
+    },
+    setWalletNetwork(state, action) {
+      state.walletNetwork = action.payload;
+    },
+    setWalletNetworkConfig(state, action: PayloadAction<NetworkConfig>) {
+      state.walletNetworkConfig = action.payload;
+    },
+    setWalletAccountBalance(state, action) {
+      state.walletAccountBalance = action.payload;
+    },
   },
 });
 
@@ -44,6 +69,11 @@ export const {
   setSelectedNetwork,
   setSelectedNetworkConfig,
   setSelectedAccount,
+  setConfigBalance,
+  setWalletAccount,
+  setWalletNetwork,
+  setWalletNetworkConfig,
+  setWalletAccountBalance,
 } = extensionSlice.actions;
 
 export default extensionSlice.reducer;

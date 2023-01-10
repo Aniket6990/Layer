@@ -7,7 +7,12 @@ import {
   ViewColumn,
   ExtensionContext,
 } from "vscode";
-import { accountList, createNewKeyPair, networkConfig } from "../config";
+import {
+  accountList,
+  createNewKeyPair,
+  displayAccountBalance,
+  networkConfig,
+} from "../config";
 import { getUri } from "../utilities/getUri";
 
 export class ReactPanel {
@@ -132,10 +137,32 @@ export class ReactPanel {
             break;
           }
           case "create-new-keypair": {
-            const password = message.data;
+            const password: string = message.data;
             webview.postMessage({
               command: "new-keypair-created",
               data: createNewKeyPair(context, password),
+            });
+            break;
+          }
+          case "get-account-balance": {
+            const { selectedAccount, selectedNetworkRpcUrl } = message.data;
+            webview.postMessage({
+              command: "post-account-balance",
+              data: await displayAccountBalance(
+                selectedAccount,
+                selectedNetworkRpcUrl
+              ),
+            });
+            break;
+          }
+          case "get-wallet-balance": {
+            const { selectedAccount, selectedNetworkRpcUrl } = message.data;
+            webview.postMessage({
+              command: "post-wallet-balance",
+              data: await displayAccountBalance(
+                selectedAccount,
+                selectedNetworkRpcUrl
+              ),
             });
             break;
           }

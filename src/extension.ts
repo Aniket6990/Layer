@@ -24,7 +24,7 @@ import {
   selectContract,
 } from "./utils";
 import { ReactPanel } from "./panels/ReactPanel";
-import { accountList, networkConfig } from "./config";
+import { accountList, displayAccountBalance, networkConfig } from "./config";
 
 // eslint-disable-next-line import/prefer-default-export
 export async function activate(context: vscode.ExtensionContext) {
@@ -115,7 +115,10 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
     // command for testing
     commands.registerCommand("ethcode.webview.test", async () => {
-      const data = await accountList(context);
+      const data = await displayAccountBalance(
+        "0x329107021C38ceF5d7778C0edF6c9610B5C5E395",
+        "https://rpc-mumbai.maticvigil.com"
+      );
       console.log(data);
       console.log("typeof:", typeof data);
     }),

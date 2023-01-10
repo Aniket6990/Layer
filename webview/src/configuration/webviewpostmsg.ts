@@ -18,3 +18,29 @@ export const createNewKeyPairAccount = (password: string) => {
     data: password,
   });
 };
+
+export const displayAccountBalance = (
+  selectedAccount: string,
+  selectedNetworkRpcUrl: string
+) => {
+  vscode.postMessage({
+    command: "get-account-balance",
+    data: {
+      selectedAccount: selectedAccount,
+      selectedNetworkRpcUrl: selectedNetworkRpcUrl,
+    },
+  });
+};
+
+export const displayWalletAccountBalance = (
+  selectedAccount: string,
+  selectedNetworkRpcUrl: string
+) => {
+  vscode.postMessage({
+    command: "get-wallet-balance",
+    data: {
+      selectedAccount: selectedAccount,
+      selectedNetworkRpcUrl: selectedNetworkRpcUrl,
+    },
+  });
+};

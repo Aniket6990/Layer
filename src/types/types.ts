@@ -96,7 +96,7 @@ export interface TxReceipt {
 interface NativeCurrencyType {
   name: string;
   symbol: string;
-  decimal: string;
+  decimals: string;
 }
 
 export interface NetworkConfig {
