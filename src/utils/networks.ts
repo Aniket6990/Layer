@@ -86,8 +86,7 @@ const getSelectedProvider = (context: vscode.ExtensionContext) => {
 
 // Contract function calls
 const displayBalance = async (context: vscode.ExtensionContext) => {
-  
-  if(getSelectedNetwork(context) === undefined) {
+  if (getSelectedNetwork(context) === undefined) {
     logger.log("No network selected. Please select a network.");
     return;
   }
@@ -95,8 +94,8 @@ const displayBalance = async (context: vscode.ExtensionContext) => {
   const address: any = await context.workspaceState.get("account");
   const nativeCurrencySymbol =
     getSelectedNetConf(context).nativeCurrency.symbol;
-  
-    try {
+
+  try {
     getSelectedProvider(context)
       .getBalance(address)
       .then(async (value) => {
@@ -349,4 +348,5 @@ export {
   deployContract,
   isTestingNetwork,
   setTransactionGas,
+  isValidHttpUrl,
 };

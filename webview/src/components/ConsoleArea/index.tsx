@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useAppSelector } from "../../app/hooks";
+import { NetworkConfig } from "../../types";
 
 const ConsoleContainer = styled.div`
   overflow-y: scroll;
@@ -18,11 +19,14 @@ const ConsoleArea = () => {
   const selectedNetwork = useAppSelector(
     (state) => state.extension.selectedNetwork
   );
-  const selectedNetworkConfig = useAppSelector(
+  const selectedNetworkConfig: NetworkConfig = useAppSelector(
     (state) => state.extension.selectedNetworkConfig
   );
   const selectedAccount = useAppSelector(
     (state) => state.extension.selectedAccount
+  );
+  const configBalance = useAppSelector(
+    (state) => state.extension.configBalance
   );
   return (
     <ConsoleContainer>
@@ -40,6 +44,11 @@ const ConsoleArea = () => {
       <span>
         {selectedAccount !== undefined
           ? `selected Account: ${selectedAccount}`
+          : null}
+      </span>
+      <span>
+        {configBalance !== "0"
+          ? `${selectedAccount} has balance ${configBalance} ${selectedNetworkConfig.nativeCurrency.symbol} on ${selectedNetwork}`
           : null}
       </span>
     </ConsoleContainer>

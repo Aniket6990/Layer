@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   VSCodeButton,
   VSCodeDropdown,
@@ -14,6 +14,7 @@ import {
   setSelectedNetworkConfig,
 } from "../../store/extensionstore";
 import { NetworkConfig } from "../../types";
+import { displayAccountBalance } from "../../configuration/webviewpostmsg";
 
 const ConfigContainer = styled.div`
   height: 600px;
@@ -89,12 +90,25 @@ const ConfigArea = () => {
   const dispatch = useAppDispatch();
   const networks = useAppSelector((state) => state.extension.networks);
   const accounts = useAppSelector((state) => state.extension.addresses);
+  const selectedAccount = useAppSelector(
+    (state) => state.extension.selectedAccount
+  );
+  const selectedNetConfig: NetworkConfig = useAppSelector(
+    (state) => state.extension.selectedNetworkConfig
+  );
+  const configBalance = useAppSelector(
+    (state) => state.extension.configBalance
+  );
+
+  useEffect(() => {
+    if (selectedAccount !== undefined && selectedNetConfig.rpc !== undefined) {
+      displayAccountBalance(selectedAccount, selectedNetConfig.rpc);
+    }
+  }, [selectedAccount, selectedNetConfig]);
 
   const getSelectedConf = (selectedNetwork: string) => {
     const selectedNetworkConfig = networks[selectedNetwork];
-    const parsedConfig: NetworkConfig = JSON.parse(
-      JSON.stringify(selectedNetworkConfig)
-    );
+    const parsedConfig: NetworkConfig = JSON.parse(selectedNetworkConfig);
     return parsedConfig;
   };
 
@@ -147,6 +161,22 @@ const ConfigArea = () => {
               );
             })}
           </DropDown>
+          <CopyIcon></CopyIcon>
+        </FullObjectWrapper>
+      </ConfigWrapper>
+      {/* selected account balance on selected network */}
+      <ConfigWrapper>
+        <span>Balance</span>
+        <FullObjectWrapper>
+          <GasLimitTextField
+            placeholder="Balance"
+            value={`${configBalance} ${
+              selectedNetConfig.nativeCurrency !== undefined
+                ? selectedNetConfig.nativeCurrency.symbol
+                : ""
+            }`}
+            disabled
+          ></GasLimitTextField>
           <CopyIcon></CopyIcon>
         </FullObjectWrapper>
       </ConfigWrapper>

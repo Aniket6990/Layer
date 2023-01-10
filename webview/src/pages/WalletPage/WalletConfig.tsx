@@ -7,11 +7,12 @@ import {
 import React, { useState } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import styled from "styled-components";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   createNewKeyPairAccount,
   getAccounts,
 } from "../../configuration/webviewpostmsg";
+import { setWalletAccount } from "../../store/extensionstore";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -71,13 +72,22 @@ const CopyIcon = styled(FaRegCopy)`
 const WalletConfig = () => {
   const [password, setPassword] = useState("");
   const accounts = useAppSelector((state) => state.extension.addresses);
+  const dispatch = useAppDispatch();
+
+  const handleAccountDropdownChange = (event: any) => {
+    dispatch(setWalletAccount(event.target.value));
+  };
   return (
     <ConfigContainer>
       {/* Account selection dropdown */}
       <ConfigWrapper>
         <span>Account</span>
         <FullObjectWrapper>
-          <DropDown>
+          <DropDown
+            onChange={(e: any) => {
+              handleAccountDropdownChange(e);
+            }}
+          >
             <VSCodeOption>Select Account</VSCodeOption>
             {accounts.map((account, index) => {
               return (

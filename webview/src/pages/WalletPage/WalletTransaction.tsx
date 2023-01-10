@@ -4,10 +4,15 @@ import {
   VSCodeOption,
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react";
-import React from "react";
-import { FaRegCopy } from "react-icons/fa";
+import React, { useEffect } from "react";
 import styled from "styled-components";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { displayWalletAccountBalance } from "../../configuration/webviewpostmsg";
+import {
+  setWalletNetwork,
+  setWalletNetworkConfig,
+} from "../../store/extensionstore";
+import { NetworkConfig } from "../../types";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -68,14 +73,48 @@ const ErrorMessage = styled.span`
 `;
 
 const WalletTransaction = () => {
+  const dispatch = useAppDispatch();
   const networks = useAppSelector((state) => state.extension.networks);
+  const walletAccount = useAppSelector(
+    (state) => state.extension.walletAccount
+  );
+  const walletNetConfig: NetworkConfig = useAppSelector(
+    (state) => state.extension.walletNetworkConfig
+  );
+  const walletAccountBalance = useAppSelector(
+    (state) => state.extension.walletAccountBalance
+  );
+
+  useEffect(() => {
+    if (walletAccount !== undefined && walletNetConfig.rpc !== undefined) {
+      displayWalletAccountBalance(walletAccount, walletNetConfig.rpc);
+    }
+  }, [walletAccount, walletNetConfig]);
+
+  const getSelectedConf = (selectedNetwork: string) => {
+    const selectedNetworkConfig = networks[selectedNetwork];
+    const parsedConfig: NetworkConfig = JSON.parse(selectedNetworkConfig);
+    return parsedConfig;
+  };
+
+  const handleNetworkDropdownChange = (event: any) => {
+    dispatch(setWalletNetwork(event.target.value));
+    const selectedNetworkConfig: NetworkConfig = getSelectedConf(
+      event.target.value
+    );
+    dispatch(setWalletNetworkConfig(selectedNetworkConfig));
+  };
   return (
     <ConfigContainer>
       {/* Network selection field */}
       <ConfigWrapper>
         <span>Network</span>
         <FullObjectWrapper>
-          <DropDown>
+          <DropDown
+            onChange={(e: any) => {
+              handleNetworkDropdownChange(e);
+            }}
+          >
             <VSCodeOption>Select Network</VSCodeOption>
             {Object.keys(networks).map((network, index) => {
               return (
@@ -91,7 +130,14 @@ const WalletTransaction = () => {
       <ConfigWrapper>
         <span>Balance</span>
         <FullObjectWrapper>
-          <TextField value="100.022020303" disabled></TextField>
+          <TextField
+            value={`${walletAccountBalance} ${
+              walletNetConfig.nativeCurrency !== undefined
+                ? walletNetConfig.nativeCurrency.symbol
+                : ""
+            }`}
+            disabled
+          ></TextField>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* Transaction menu area */}

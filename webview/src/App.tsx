@@ -8,7 +8,12 @@ import { withRouter } from "./utilities/withRouter";
 import { getAccounts, getNetworks } from "./configuration/webviewpostmsg";
 import { useEffect } from "react";
 import { useAppDispatch } from "./app/hooks";
-import { setNetworks, setAccounts } from "./store/extensionstore";
+import {
+  setNetworks,
+  setAccounts,
+  setConfigBalance,
+  setWalletAccountBalance,
+} from "./store/extensionstore";
 
 const Main = styled.div`
   width: 100%;
@@ -51,6 +56,14 @@ function App() {
         }
         case "new-keypair-created": {
           console.log(`new account created: ${eventData.data}`);
+          break;
+        }
+        case "post-account-balance": {
+          dispatch(setConfigBalance(eventData.data));
+          break;
+        }
+        case "post-wallet-balance": {
+          dispatch(setWalletAccountBalance(eventData.data));
           break;
         }
         default: {
