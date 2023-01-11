@@ -8,10 +8,11 @@ import {
   ExtensionContext,
 } from "vscode";
 import {
-  accountList,
+  listAddresses,
   createNewKeyPair,
   displayAccountBalance,
   networkConfig,
+  createAccountFromKey,
 } from "../config";
 import { getUri } from "../utilities/getUri";
 
@@ -132,7 +133,7 @@ export class ReactPanel {
           case "get-account-list": {
             webview.postMessage({
               command: "post-account-list",
-              data: await accountList(context),
+              data: await listAddresses(context, context.extensionPath),
             });
             break;
           }
@@ -140,7 +141,7 @@ export class ReactPanel {
             const password: string = message.data;
             webview.postMessage({
               command: "new-keypair-created",
-              data: createNewKeyPair(context, password),
+              data: createNewKeyPair(context, context.extensionPath, password),
             });
             break;
           }
@@ -162,6 +163,19 @@ export class ReactPanel {
               data: await displayAccountBalance(
                 selectedAccount,
                 selectedNetworkRpcUrl
+              ),
+            });
+            break;
+          }
+          case "import-account-key": {
+            const { pvtKey, password } = message.data;
+            webview.postMessage({
+              command: "imported-account-key",
+              data: createAccountFromKey(
+                context,
+                context.extensionPath,
+                password,
+                pvtKey
               ),
             });
             break;

@@ -6,11 +6,13 @@ import {
 } from "@vscode/webview-ui-toolkit/react";
 import React, { useState } from "react";
 import { FaRegCopy } from "react-icons/fa";
+import { GrAdd } from "react-icons/gr";
 import styled from "styled-components";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   createNewKeyPairAccount,
   getAccounts,
+  importAccountFromKey,
 } from "../../configuration/webviewpostmsg";
 import { setWalletAccount } from "../../store/extensionstore";
 
@@ -67,15 +69,62 @@ const TextField = styled(VSCodeTextField)`
 const CopyIcon = styled(FaRegCopy)`
   width: 16px;
   height: 16px;
+  &:hover {
+    cursor: pointer;
+  }
+`;
+const AddIcon = styled(GrAdd)`
+  width: 16px;
+  height: 16px;
+  background-color: var(--vscode-icon-foreground);
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const ErrorMessage = styled.span`
+  color: red;
+  font-size: 12px;
+  justify-self: center;
 `;
 
 const WalletConfig = () => {
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState<string>("");
+  const [importPvtKey, setImportPvtKey] = useState<string>("");
+  const [importPswd, setImportPswd] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string>("");
   const accounts = useAppSelector((state) => state.extension.addresses);
   const dispatch = useAppDispatch();
 
   const handleAccountDropdownChange = (event: any) => {
     dispatch(setWalletAccount(event.target.value));
+  };
+
+  const handleImportFromPvtKey = () => {
+    const pvtKey =
+      importPvtKey.length === 66 ? importPvtKey.slice(2) : importPvtKey;
+    console.log("passed pvtkey:", pvtKey);
+    if (importPswd.length >= 6 && pvtKey.length === 64) {
+      setErrorMsg("");
+      setImportPswd("");
+      setImportPvtKey("");
+      importAccountFromKey(pvtKey, importPswd);
+    }
+    if (importPswd.length < 6) {
+      setErrorMsg("Password must be 6 characters long.");
+    }
+    if (importPvtKey.length < 64 || importPvtKey.length > 66) {
+      setErrorMsg("Private key is not valid.");
+    }
+  };
+
+  const handleCreateNewKeyPair = () => {
+    if (password.length >= 6) {
+      createNewKeyPairAccount(password);
+      setPassword("");
+    } else {
+      setErrorMsg("Password must be 6 characters long.");
+    }
   };
   return (
     <ConfigContainer>
@@ -105,10 +154,29 @@ const WalletConfig = () => {
         <span>Import Account</span>
         <FullObjectWrapper>
           <PartialObjectWrapper>
-            <TextField placeholder="Private Key"></TextField>
-            <TextField placeholder="Password"></TextField>
+            <TextField
+              placeholder="Private Key"
+              type="text"
+              value={importPvtKey}
+              onChange={(e: any) => {
+                setImportPvtKey(e.target.value);
+              }}
+            ></TextField>
+            <TextField
+              placeholder="Password"
+              type="password"
+              value={importPswd}
+              onChange={(e: any) => {
+                setImportPswd(e.target.value);
+              }}
+            ></TextField>
           </PartialObjectWrapper>
-          <CopyIcon></CopyIcon>
+          <AddIcon
+            onClick={(e) => {
+              handleImportFromPvtKey();
+              getAccounts();
+            }}
+          ></AddIcon>
         </FullObjectWrapper>
         <span>OR</span>
         <FullObjectWrapper>
@@ -145,7 +213,7 @@ const WalletConfig = () => {
             ></TextField>
             <VSCodeButton
               onClick={(e) => {
-                createNewKeyPairAccount(password);
+                handleCreateNewKeyPair();
                 getAccounts();
               }}
             >
@@ -154,6 +222,7 @@ const WalletConfig = () => {
           </PartialObjectWrapper>
         </FullObjectWrapper>
       </ConfigWrapper>
+      {errorMsg !== "" ? <ErrorMessage>{errorMsg}</ErrorMessage> : null}
     </ConfigContainer>
   );
 };

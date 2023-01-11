@@ -44,3 +44,13 @@ export const displayWalletAccountBalance = (
     },
   });
 };
+
+export const importAccountFromKey = (pvtKey: string, password: string) => {
+  vscode.postMessage({
+    command: "import-account-key",
+    data: {
+      pvtKey: pvtKey,
+      password: password,
+    },
+  });
+};

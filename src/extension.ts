@@ -24,7 +24,7 @@ import {
   selectContract,
 } from "./utils";
 import { ReactPanel } from "./panels/ReactPanel";
-import { accountList, displayAccountBalance, networkConfig } from "./config";
+import { displayAccountBalance, networkConfig } from "./config";
 
 // eslint-disable-next-line import/prefer-default-export
 export async function activate(context: vscode.ExtensionContext) {
