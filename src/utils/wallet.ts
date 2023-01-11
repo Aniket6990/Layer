@@ -76,8 +76,6 @@ const createKeyPair = (
     pubAddr: keyObject.address,
     checksumAddr: toChecksumAddress(keyObject.address),
   };
-  logger.success("Account created!");
-  logger.log(JSON.stringify(account));
 
   if (!fs.existsSync(`${path}/keystore`)) {
     fs.mkdirSync(`${path}/keystore`);

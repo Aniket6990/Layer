@@ -66,6 +66,10 @@ function App() {
           dispatch(setWalletAccountBalance(eventData.data));
           break;
         }
+        case "imported-account-key": {
+          console.log(`new account created from pvt key: ${eventData.data}`);
+          break;
+        }
         default: {
           console.log("Invalid event", event.data);
           break;
