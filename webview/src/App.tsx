@@ -68,6 +68,12 @@ function App() {
         }
         case "imported-account-key": {
           console.log(`new account created from pvt key: ${eventData.data}`);
+          getAccounts();
+          break;
+        }
+        case "imported-account": {
+          console.log(`${eventData.data}`);
+          getAccounts();
           break;
         }
         default: {

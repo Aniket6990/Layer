@@ -1,9 +1,9 @@
 {
-  "name": "ethcode",
-  "displayName": "ETHcode",
+  "name": "layer",
+  "displayName": "ETHcode-layer",
   "description": "Ethereum IDE for VS Code",
-  "version": "0.4.2",
-  "publisher": "7finney",
+  "version": "0.0.1",
+  "publisher": "Aniket6990",
   "categories": [
     "Debuggers",
     "Programming Languages"
@@ -17,7 +17,7 @@
   "icon": "images/ethcode.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/7fny/ethcode"
+    "url": "https://github.com/Aniket6990/ETHcode-layer"
   },
   "engines": {
     "vscode": "^1.38.1",
@@ -214,13 +214,9 @@
     "install:all": "yarn install && cd webview && yarn install",
     "start:webview": "cd webview && yarn run start",
     "build:webview": "cd webview && yarn run build",
-    "vscode:prepublish": "yarn run build && yarn run build:webview",
+    "build:all": "yarn run build && yarn run build:webview",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -watch -p ./"
-  },
-  "author": {
-    "name": "0mkara",
-    "email": "0mkar@protonmail.com"
   }
 }

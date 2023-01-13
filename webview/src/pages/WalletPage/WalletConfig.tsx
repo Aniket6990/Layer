@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   createNewKeyPairAccount,
   getAccounts,
+  importAccount,
   importAccountFromKey,
 } from "../../configuration/webviewpostmsg";
 import { setWalletAccount } from "../../store/extensionstore";
@@ -174,13 +175,18 @@ const WalletConfig = () => {
           <AddIcon
             onClick={(e) => {
               handleImportFromPvtKey();
-              getAccounts();
             }}
           ></AddIcon>
         </FullObjectWrapper>
         <span>OR</span>
         <FullObjectWrapper>
-          <VSCodeButton>From JSON</VSCodeButton>
+          <VSCodeButton
+            onClick={(e) => {
+              importAccount();
+            }}
+          >
+            From JSON
+          </VSCodeButton>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* Export account field */}

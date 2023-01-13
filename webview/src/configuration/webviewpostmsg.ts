@@ -54,3 +54,9 @@ export const importAccountFromKey = (pvtKey: string, password: string) => {
     },
   });
 };
+
+export const importAccount = () => {
+  vscode.postMessage({
+    command: "import-account",
+  });
+};

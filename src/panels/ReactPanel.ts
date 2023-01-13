@@ -13,6 +13,7 @@ import {
   displayAccountBalance,
   networkConfig,
   createAccountFromKey,
+  importNewKeyPair,
 } from "../config";
 import { getUri } from "../utilities/getUri";
 
@@ -177,6 +178,14 @@ export class ReactPanel {
                 password,
                 pvtKey
               ),
+            });
+            break;
+          }
+          case "import-account": {
+            const importData = await importNewKeyPair(context);
+            webview.postMessage({
+              command: "imported-account",
+              data: importData as string,
             });
             break;
           }

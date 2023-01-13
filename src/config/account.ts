@@ -125,6 +125,50 @@ export const createAccountFromKey = (
   }
 };
 
+export const importNewKeyPair = async (context: ExtensionContext) => {
+  try {
+    var msg: string = "";
+    const options: vscode.OpenDialogOptions = {
+      canSelectMany: false,
+      openLabel: "Open",
+      filters: {
+        "All files": ["*"],
+      },
+    };
+
+    const addresses = await listAddresses(context, context.extensionPath);
+
+    await vscode.window.showOpenDialog(options).then((fileUri) => {
+      if (fileUri && fileUri[0]) {
+        const arrFilePath = fileUri[0].fsPath.split("\\");
+        const file = arrFilePath[arrFilePath.length - 1];
+        const arr = file.split("--");
+        const address = toChecksumAddress(`0x${arr[arr.length - 1]}`);
+
+        const already = addresses.find(
+          (element: string) => toChecksumAddress(element) === address
+        );
+
+        if (already !== undefined) {
+          msg = `Account ${address} is already exist.`;
+        } else {
+          fs.copyFile(
+            fileUri[0].fsPath,
+            `${context.extensionPath}/keystore/${file}`,
+            (err) => {
+              if (err) throw err;
+            }
+          );
+          msg = `Account ${address} is successfully imported!`;
+        }
+      }
+    });
+    return msg;
+  } catch (error) {
+    return "Error occoured while importing new account.";
+  }
+};
+
 const getSelectedNetworkProvider = (rpcUrl: string) => {
   if (isValidHttpUrl(rpcUrl)) return new provider.JsonRpcProvider(rpcUrl);
 
