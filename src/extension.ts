@@ -137,7 +137,6 @@ export async function activate(context: vscode.ExtensionContext) {
     // Activate
     commands.registerCommand("ethcode.activate", async () => {
       ReactPanel.render(context);
-      logger.success("Welcome to Ethcode!");
     })
   );
 }
