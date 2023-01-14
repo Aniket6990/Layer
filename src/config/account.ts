@@ -192,3 +192,44 @@ export const displayAccountBalance = async (
     console.log("Selected network RPC isn't supported.");
   }
 };
+
+//extract private key of selected address
+export const extractPvtKeyPair = async (
+  keyStorePath: string,
+  address: string,
+  password: string
+) => {
+  try {
+  } catch (e) {
+    console.log(
+      "Password is wrong or such address doesn't exist in wallet lists"
+    );
+  }
+};
+
+export const exportPvtKeyPair = async (
+  context: ExtensionContext,
+  address: string,
+  pswd: string
+) => {
+  let returnMsg = {
+    msgType: "",
+    msg: "",
+  };
+  try {
+    const keyObject = keythereum.importFromFile(address, context.extensionPath);
+    const bufferPvtKey = keythereum.recover(
+      Buffer.from(pswd, "utf-8"),
+      keyObject
+    );
+    const pvtKey = new ethers.Wallet(bufferPvtKey).privateKey;
+    returnMsg = { msgType: "success", msg: pvtKey };
+    return returnMsg;
+  } catch (error) {
+    returnMsg = {
+      msgType: "error",
+      msg: "Password is wrong, please enter a correct password.",
+    };
+    return returnMsg;
+  }
+};

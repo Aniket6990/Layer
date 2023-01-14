@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import {
   VSCodeButton,
   VSCodeDropdown,
@@ -93,6 +93,9 @@ const ConfigArea = () => {
   const selectedAccount = useAppSelector(
     (state) => state.extension.selectedAccount
   );
+  const selectedNetwork = useAppSelector(
+    (state) => state.extension.selectedNetwork
+  );
   const selectedNetConfig: NetworkConfig = useAppSelector(
     (state) => state.extension.selectedNetworkConfig
   );
@@ -101,7 +104,10 @@ const ConfigArea = () => {
   );
 
   useEffect(() => {
-    if (selectedAccount !== undefined && selectedNetConfig.rpc !== undefined) {
+    if (
+      selectedAccount !== "Select Account" &&
+      selectedNetConfig.rpc !== undefined
+    ) {
       displayAccountBalance(selectedAccount, selectedNetConfig.rpc);
     }
   }, [selectedAccount, selectedNetConfig]);
@@ -129,11 +135,12 @@ const ConfigArea = () => {
       <ConfigWrapper>
         <span>Network</span>
         <DropDown
+          value={selectedNetwork}
           onChange={(e: any) => {
             handleNetworkDropdownChange(e);
           }}
         >
-          <VSCodeOption>Select Network</VSCodeOption>
+          <VSCodeOption value="Select Network">Select Network</VSCodeOption>
           {Object.keys(networks).map((network, index) => {
             return (
               <VSCodeOption key={index} value={network}>
@@ -148,11 +155,12 @@ const ConfigArea = () => {
         <span>Account</span>
         <FullObjectWrapper>
           <DropDown
+            value={selectedAccount}
             onChange={(e: any) => {
               handleAccountDropdownChange(e);
             }}
           >
-            <VSCodeOption>Select Account</VSCodeOption>
+            <VSCodeOption value="Select Account">Select Account</VSCodeOption>
             {accounts.map((account, index) => {
               return (
                 <VSCodeOption key={index} value={account}>

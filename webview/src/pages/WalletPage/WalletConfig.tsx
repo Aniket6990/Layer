@@ -4,13 +4,15 @@ import {
   VSCodeOption,
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaRegCopy } from "react-icons/fa";
 import { GrAdd } from "react-icons/gr";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styled from "styled-components";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   createNewKeyPairAccount,
+  exportAccountPvtKey,
   getAccounts,
   importAccount,
   importAccountFromKey,
@@ -74,6 +76,21 @@ const CopyIcon = styled(FaRegCopy)`
     cursor: pointer;
   }
 `;
+
+const ShowPvtKey = styled(AiOutlineEye)`
+  width: 16px;
+  height: 16px;
+  &:hover {
+    cursor: pointer;
+  }
+`;
+const HidePvtKey = styled(AiOutlineEyeInvisible)`
+  width: 16px;
+  height: 16px;
+  &:hover {
+    cursor: pointer;
+  }
+`;
 const AddIcon = styled(GrAdd)`
   width: 16px;
   height: 16px;
@@ -90,11 +107,18 @@ const ErrorMessage = styled.span`
 `;
 
 const WalletConfig = () => {
+  const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
   const [password, setPassword] = useState<string>("");
   const [importPvtKey, setImportPvtKey] = useState<string>("");
   const [importPswd, setImportPswd] = useState<string>("");
+  const [exportPvtKey, setExportPvtKey] = useState<string>(ZERO_ADDRESS);
+  const [exportPvtKeyPswd, setExportPvtKeyPswd] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [showPvtKey, setShowPvtKey] = useState<boolean>(false);
   const accounts = useAppSelector((state) => state.extension.addresses);
+  const walletSelectedAccount = useAppSelector(
+    (state) => state.extension.walletAccount
+  );
   const dispatch = useAppDispatch();
 
   const handleAccountDropdownChange = (event: any) => {
@@ -127,6 +151,61 @@ const WalletConfig = () => {
       setErrorMsg("Password must be 6 characters long.");
     }
   };
+
+  const handleViewPvtKey = () => {
+    if (exportPvtKeyPswd.length < 6 && exportPvtKey === ZERO_ADDRESS) {
+      setErrorMsg("Please enter a password to view private key.");
+    }
+    if (
+      exportPvtKeyPswd.length >= 6 &&
+      walletSelectedAccount !== "Select Account"
+    ) {
+      setErrorMsg("");
+      exportAccountPvtKey(walletSelectedAccount, exportPvtKeyPswd);
+      setExportPvtKeyPswd("");
+    }
+    if (exportPvtKey !== ZERO_ADDRESS) {
+      setShowPvtKey((prev) => !prev);
+    }
+    if (walletSelectedAccount === "Select Account") {
+      setErrorMsg("No Account selected.");
+    }
+  };
+  // useEffect hook to check when account is changing
+  useEffect(() => {
+    setExportPvtKey(ZERO_ADDRESS);
+    setExportPvtKeyPswd("");
+    setErrorMsg("");
+    setShowPvtKey(false);
+  }, [walletSelectedAccount]);
+
+  // useEffect hook to listen to window event sent by the extension
+  useEffect(() => {
+    const fn = (event: any) => {
+      const eventData = event.data;
+      switch (eventData.command) {
+        case "exported-account-key": {
+          if (eventData.data.msgType !== "error") {
+            setErrorMsg("");
+            setExportPvtKey(eventData.data.msg);
+            setShowPvtKey(true);
+          } else {
+            setErrorMsg(eventData.data.msg);
+          }
+          break;
+        }
+        default: {
+          console.log("Invalid event", event.data);
+          break;
+        }
+      }
+    };
+    window.addEventListener("message", fn);
+    return () => {
+      window.removeEventListener("message", fn);
+    };
+  }, []);
+
   return (
     <ConfigContainer>
       {/* Account selection dropdown */}
@@ -134,11 +213,12 @@ const WalletConfig = () => {
         <span>Account</span>
         <FullObjectWrapper>
           <DropDown
+            value={walletSelectedAccount}
             onChange={(e: any) => {
               handleAccountDropdownChange(e);
             }}
           >
-            <VSCodeOption>Select Account</VSCodeOption>
+            <VSCodeOption value="Select Account">Select Account</VSCodeOption>
             {accounts.map((account, index) => {
               return (
                 <VSCodeOption key={index} value={account}>
@@ -194,10 +274,32 @@ const WalletConfig = () => {
         <span>Export Account</span>
         <FullObjectWrapper>
           <PartialObjectWrapper>
-            <TextField placeholder="******************"></TextField>
-            <TextField placeholder="Password"></TextField>
+            <TextField
+              type={showPvtKey ? "text" : "password"}
+              value={exportPvtKey}
+            ></TextField>
+            <TextField
+              placeholder="Password"
+              type="password"
+              value={exportPvtKeyPswd}
+              onChange={(e: any) => {
+                setExportPvtKeyPswd(e.target.value);
+              }}
+            ></TextField>
           </PartialObjectWrapper>
-          <CopyIcon></CopyIcon>
+          {showPvtKey ? (
+            <ShowPvtKey
+              onClick={(e) => {
+                handleViewPvtKey();
+              }}
+            ></ShowPvtKey>
+          ) : (
+            <HidePvtKey
+              onClick={(e) => {
+                handleViewPvtKey();
+              }}
+            ></HidePvtKey>
+          )}
         </FullObjectWrapper>
         <span>OR</span>
         <FullObjectWrapper>

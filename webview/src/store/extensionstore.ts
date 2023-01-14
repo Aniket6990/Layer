@@ -3,12 +3,12 @@ import { NetworkConfig } from "../types";
 
 interface extensionState {
   networks: any;
-  addresses: [];
-  selectedNetwork: string | undefined;
+  addresses: Array<string>;
+  selectedNetwork: string;
   selectedNetworkConfig: any;
-  selectedAccount: string | undefined;
+  selectedAccount: string;
   configBalance: string;
-  walletAccount: string | undefined;
+  walletAccount: string;
   walletNetwork: string | undefined;
   walletNetworkConfig: any;
   walletAccountBalance: string;
@@ -17,11 +17,11 @@ interface extensionState {
 const initialState: extensionState = {
   networks: {},
   addresses: [],
-  selectedNetwork: undefined,
+  selectedNetwork: "Select Network",
   selectedNetworkConfig: {},
-  selectedAccount: undefined,
+  selectedAccount: "Select Account",
   configBalance: "0",
-  walletAccount: undefined,
+  walletAccount: "Select Account",
   walletNetwork: undefined,
   walletNetworkConfig: {},
   walletAccountBalance: "0",
