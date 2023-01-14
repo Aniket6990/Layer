@@ -60,3 +60,16 @@ export const importAccount = () => {
     command: "import-account",
   });
 };
+
+export const exportAccountPvtKey = (
+  walletSelectedAddress: string,
+  pswd: string
+) => {
+  vscode.postMessage({
+    command: "export-account-key",
+    data: {
+      walletSelectedAccount: walletSelectedAddress,
+      pswd: pswd,
+    },
+  });
+};

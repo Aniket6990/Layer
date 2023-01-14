@@ -32,7 +32,7 @@ const ConsoleArea = () => {
     <ConsoleContainer>
       <span>Events Console</span>
       <span>
-        {selectedNetwork !== undefined
+        {selectedNetwork !== "Select Network"
           ? `selected network is ${selectedNetwork}`
           : null}
       </span>
@@ -42,7 +42,7 @@ const ConsoleArea = () => {
           : null}
       </span>
       <span>
-        {selectedAccount !== undefined
+        {selectedAccount !== "Select Account"
           ? `selected Account: ${selectedAccount}`
           : null}
       </span>

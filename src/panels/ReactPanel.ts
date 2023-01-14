@@ -14,6 +14,8 @@ import {
   networkConfig,
   createAccountFromKey,
   importNewKeyPair,
+  extractPvtKeyPair,
+  exportPvtKeyPair,
 } from "../config";
 import { getUri } from "../utilities/getUri";
 
@@ -186,6 +188,19 @@ export class ReactPanel {
             webview.postMessage({
               command: "imported-account",
               data: importData as string,
+            });
+            break;
+          }
+          case "export-account-key": {
+            const { walletSelectedAccount, pswd } = message.data;
+            const pvtKey = await exportPvtKeyPair(
+              context,
+              walletSelectedAccount,
+              pswd
+            );
+            webview.postMessage({
+              command: "exported-account-key",
+              data: pvtKey,
             });
             break;
           }
