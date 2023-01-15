@@ -73,3 +73,12 @@ export const exportAccountPvtKey = (
     },
   });
 };
+
+export const exportAccountPvtKeyFile = (walletSelectedAddress: string) => {
+  vscode.postMessage({
+    command: "export-account",
+    data: {
+      walletSelectedAccount: walletSelectedAddress,
+    },
+  });
+};

@@ -16,6 +16,7 @@ import {
   importNewKeyPair,
   extractPvtKeyPair,
   exportPvtKeyPair,
+  exportPvtKeyPairFile,
 } from "../config";
 import { getUri } from "../utilities/getUri";
 
@@ -201,6 +202,18 @@ export class ReactPanel {
             webview.postMessage({
               command: "exported-account-key",
               data: pvtKey,
+            });
+            break;
+          }
+          case "export-account": {
+            const { walletSelectedAccount } = message.data;
+            const msg = await exportPvtKeyPairFile(
+              context,
+              walletSelectedAccount
+            );
+            webview.postMessage({
+              command: "exported-account",
+              data: msg,
             });
             break;
           }

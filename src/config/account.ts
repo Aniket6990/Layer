@@ -233,3 +233,56 @@ export const exportPvtKeyPair = async (
     return returnMsg;
   }
 };
+
+export const exportPvtKeyPairFile = async (
+  context: vscode.ExtensionContext,
+  selectedAddress: string
+) => {
+  let returnMsg = {
+    msgType: "",
+    msg: "",
+  };
+  try {
+    const files = fs.readdirSync(`${context.extensionPath}/keystore`);
+    const address = selectedAddress.slice(2, selectedAddress.length);
+    let selectedFile = "";
+    files.map((file: string) => {
+      const arr = file.split("--");
+      if (address === arr[arr.length - 1]) {
+        selectedFile = file;
+      }
+    });
+
+    const options: vscode.OpenDialogOptions = {
+      canSelectMany: false,
+      canSelectFolders: true,
+      openLabel: "Save",
+      filters: {
+        "All files": ["*"],
+      },
+    };
+
+    await vscode.window.showOpenDialog(options).then((fileUri) => {
+      if (fileUri && fileUri[0]) {
+        fs.copyFile(
+          `${context.extensionPath}\\keystore\\${selectedFile}`,
+          `${fileUri[0].fsPath}\\${selectedFile}`,
+          (err) => {
+            if (err) throw err;
+          }
+        );
+        returnMsg = {
+          msgType: "success",
+          msg: `Account ${selectedAddress} exported successfully to ${fileUri[0].fsPath}`,
+        };
+      }
+    });
+    return returnMsg;
+  } catch (error) {
+    returnMsg = {
+      msgType: "error",
+      msg: `Error occoured while exporting account ${selectedAddress}`,
+    };
+    return returnMsg;
+  }
+};

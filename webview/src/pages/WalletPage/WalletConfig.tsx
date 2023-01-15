@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   createNewKeyPairAccount,
   exportAccountPvtKey,
+  exportAccountPvtKeyFile,
   getAccounts,
   importAccount,
   importAccountFromKey,
@@ -128,7 +129,6 @@ const WalletConfig = () => {
   const handleImportFromPvtKey = () => {
     const pvtKey =
       importPvtKey.length === 66 ? importPvtKey.slice(2) : importPvtKey;
-    console.log("passed pvtkey:", pvtKey);
     if (importPswd.length >= 6 && pvtKey.length === 64) {
       setErrorMsg("");
       setImportPswd("");
@@ -189,6 +189,14 @@ const WalletConfig = () => {
             setErrorMsg("");
             setExportPvtKey(eventData.data.msg);
             setShowPvtKey(true);
+          } else {
+            setErrorMsg(eventData.data.msg);
+          }
+          break;
+        }
+        case "exported-account": {
+          if (eventData.data.msgType !== "error") {
+            setErrorMsg(eventData.data.msg);
           } else {
             setErrorMsg(eventData.data.msg);
           }
@@ -303,7 +311,18 @@ const WalletConfig = () => {
         </FullObjectWrapper>
         <span>OR</span>
         <FullObjectWrapper>
-          <VSCodeButton>Export JSON</VSCodeButton>
+          <VSCodeButton
+            onClick={(e) => {
+              if (walletSelectedAccount !== "Select Account") {
+                setErrorMsg("");
+                exportAccountPvtKeyFile(walletSelectedAccount);
+              } else {
+                setErrorMsg("Please select account to export.");
+              }
+            }}
+          >
+            Export JSON
+          </VSCodeButton>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* Create new account field */}
