@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 const keythereum = require("keythereum");
 import { ExtensionContext } from "vscode";
 import { logger } from "../lib";
-import { NetworkConfig } from "../types";
+import { NetworkConfig, ReturnDataType } from "../types";
 import {
   getSelectedProvider,
   isTestingNetwork,
@@ -58,6 +58,7 @@ export const createNewKeyPair = (
   path: string,
   pswd: string
 ) => {
+  let returnMsg: ReturnDataType;
   try {
     const params = { keyBytes: 32, ivBytes: 16 };
     const bareKey = keythereum.create(params);
@@ -82,9 +83,19 @@ export const createNewKeyPair = (
     }
     keythereum.exportToFile(keyObject, `${path}/keystore`);
     listAddresses(context, path);
-    return account.checksumAddr;
+    returnMsg = {
+      msgType: "success",
+      eventType: "string",
+      msg: `New Account ${account.checksumAddr} created successfully.`,
+    };
+    return returnMsg;
   } catch (error) {
-    console.log("Error while creating key pair");
+    returnMsg = {
+      msgType: "error",
+      eventType: "string",
+      msg: `Error occured while creating a new account`,
+    };
+    return returnMsg;
   }
 };
 
@@ -95,6 +106,7 @@ export const createAccountFromKey = (
   pswd: string,
   pvtKey: string
 ) => {
+  let returnMsg: ReturnDataType;
   try {
     const params = { keyBytes: 32, ivBytes: 16 };
     const bareKey = keythereum.create(params);
@@ -119,15 +131,26 @@ export const createAccountFromKey = (
     }
     keythereum.exportToFile(keyObject, `${path}/keystore`);
     listAddresses(context, path);
-    return account.checksumAddr;
+    returnMsg = {
+      msgType: "success",
+      eventType: "string",
+      msg: `New Account ${account.checksumAddr} created successfully.`,
+    };
+    return returnMsg;
   } catch (error) {
-    console.log("Error while creating key pair");
+    returnMsg = {
+      msgType: "error",
+      eventType: "string",
+      msg: `Error occured while creating a new account`,
+    };
+    return returnMsg;
   }
 };
 
 export const importNewKeyPair = async (context: ExtensionContext) => {
+  let returnMsg: ReturnDataType;
   try {
-    var msg: string = "";
+    let msg: any;
     const options: vscode.OpenDialogOptions = {
       canSelectMany: false,
       openLabel: "Open",
@@ -150,7 +173,11 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
         );
 
         if (already !== undefined) {
-          msg = `Account ${address} is already exist.`;
+          msg = {
+            msgType: "error",
+            eventType: "string",
+            msg: `Account ${address} is already exist.`,
+          };
         } else {
           fs.copyFile(
             fileUri[0].fsPath,
@@ -159,13 +186,23 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
               if (err) throw err;
             }
           );
-          msg = `Account ${address} is successfully imported!`;
+          msg = {
+            msgType: "success",
+            eventType: "string",
+            msg: `Account ${address} is successfully imported!`,
+          };
         }
       }
     });
-    return msg;
+    returnMsg = msg;
+    return returnMsg;
   } catch (error) {
-    return "Error occoured while importing new account.";
+    returnMsg = {
+      msgType: "error",
+      eventType: "string",
+      msg: `Error occured while importing a account.`,
+    };
+    return returnMsg;
   }
 };
 
@@ -214,6 +251,7 @@ export const exportPvtKeyPair = async (
 ) => {
   let returnMsg = {
     msgType: "",
+    eventType: "",
     msg: "",
   };
   try {
@@ -223,11 +261,12 @@ export const exportPvtKeyPair = async (
       keyObject
     );
     const pvtKey = new ethers.Wallet(bufferPvtKey).privateKey;
-    returnMsg = { msgType: "success", msg: pvtKey };
+    returnMsg = { msgType: "success", eventType: "string", msg: pvtKey };
     return returnMsg;
   } catch (error) {
     returnMsg = {
       msgType: "error",
+      eventType: "string",
       msg: "Password is wrong, please enter a correct password.",
     };
     return returnMsg;
@@ -240,6 +279,7 @@ export const exportPvtKeyPairFile = async (
 ) => {
   let returnMsg = {
     msgType: "",
+    eventType: "",
     msg: "",
   };
   try {
@@ -273,6 +313,7 @@ export const exportPvtKeyPairFile = async (
         );
         returnMsg = {
           msgType: "success",
+          eventType: "string",
           msg: `Account ${selectedAddress} exported successfully to ${fileUri[0].fsPath}`,
         };
       }
@@ -281,6 +322,7 @@ export const exportPvtKeyPairFile = async (
   } catch (error) {
     returnMsg = {
       msgType: "error",
+      eventType: "string",
       msg: `Error occoured while exporting account ${selectedAddress}`,
     };
     return returnMsg;

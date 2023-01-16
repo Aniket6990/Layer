@@ -6,13 +6,14 @@ import ExecutionPage from "./pages/ExecutionPage";
 import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
 import { getAccounts, getNetworks } from "./configuration/webviewpostmsg";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch } from "./app/hooks";
 import {
   setNetworks,
   setAccounts,
   setConfigBalance,
   setWalletAccountBalance,
+  setEventMsg,
 } from "./store/extensionstore";
 
 const Main = styled.div`
@@ -55,7 +56,7 @@ function App() {
           break;
         }
         case "new-keypair-created": {
-          console.log(`new account created: ${eventData.data}`);
+          dispatch(setEventMsg(eventData.data));
           break;
         }
         case "post-account-balance": {
@@ -67,12 +68,12 @@ function App() {
           break;
         }
         case "imported-account-key": {
-          console.log(`new account created from pvt key: ${eventData.data}`);
+          dispatch(setEventMsg(eventData.data));
           getAccounts();
           break;
         }
         case "imported-account": {
-          console.log(`${eventData.data}`);
+          dispatch(setEventMsg(eventData.data));
           getAccounts();
           break;
         }

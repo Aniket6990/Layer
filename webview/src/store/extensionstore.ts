@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { NetworkConfig } from "../types";
+import { EventType, NetworkConfig } from "../types";
 
 interface extensionState {
   networks: any;
@@ -12,6 +12,7 @@ interface extensionState {
   walletNetwork: string | undefined;
   walletNetworkConfig: any;
   walletAccountBalance: string;
+  eventMsg: EventType | undefined;
 }
 
 const initialState: extensionState = {
@@ -25,6 +26,11 @@ const initialState: extensionState = {
   walletNetwork: undefined,
   walletNetworkConfig: {},
   walletAccountBalance: "0",
+  eventMsg: {
+    msgType: "success",
+    eventType: "string",
+    msg: "Welcome to ETHcode-layer",
+  },
 };
 export const extensionSlice = createSlice({
   name: "extension",
@@ -60,6 +66,9 @@ export const extensionSlice = createSlice({
     setWalletAccountBalance(state, action) {
       state.walletAccountBalance = action.payload;
     },
+    setEventMsg(state, action) {
+      state.eventMsg = action.payload;
+    },
   },
 });
 
@@ -74,6 +83,7 @@ export const {
   setWalletNetwork,
   setWalletNetworkConfig,
   setWalletAccountBalance,
+  setEventMsg,
 } = extensionSlice.actions;
 
 export default extensionSlice.reducer;
