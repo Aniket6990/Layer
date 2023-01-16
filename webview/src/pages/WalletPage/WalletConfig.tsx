@@ -18,7 +18,7 @@ import {
   importAccount,
   importAccountFromKey,
 } from "../../configuration/webviewpostmsg";
-import { setWalletAccount } from "../../store/extensionstore";
+import { setEventMsg, setWalletAccount } from "../../store/extensionstore";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -188,16 +188,20 @@ const WalletConfig = () => {
           if (eventData.data.msgType !== "error") {
             setErrorMsg("");
             setExportPvtKey(eventData.data.msg);
+            dispatch(setEventMsg(eventData.data));
             setShowPvtKey(true);
           } else {
+            dispatch(setEventMsg(eventData.data));
             setErrorMsg(eventData.data.msg);
           }
           break;
         }
         case "exported-account": {
           if (eventData.data.msgType !== "error") {
+            dispatch(setEventMsg(eventData.data));
             setErrorMsg(eventData.data.msg);
           } else {
+            dispatch(setEventMsg(eventData.data));
             setErrorMsg(eventData.data.msg);
           }
           break;

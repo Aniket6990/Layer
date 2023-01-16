@@ -1,7 +1,9 @@
-import React from "react";
+import { EventType } from "../../types/index";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useAppSelector } from "../../app/hooks";
-import { NetworkConfig } from "../../types";
+import { AiFillCheckCircle } from "react-icons/ai";
+import { MdCancel } from "react-icons/md";
 
 const ConsoleContainer = styled.div`
   overflow-y: scroll;
@@ -15,42 +17,47 @@ const ConsoleContainer = styled.div`
   align-items: flex-start;
 `;
 
+const TransactionSuccessIcon = styled(AiFillCheckCircle)`
+  height: 14px;
+  width: 14px;
+  color: #0af0ab;
+`;
+
+const TransactionFailureIcon = styled(MdCancel)`
+  height: 14px;
+  width: 14px;
+  color: #fc652d;
+`;
+
 const ConsoleArea = () => {
-  const selectedNetwork = useAppSelector(
-    (state) => state.extension.selectedNetwork
-  );
-  const selectedNetworkConfig: NetworkConfig = useAppSelector(
-    (state) => state.extension.selectedNetworkConfig
-  );
-  const selectedAccount = useAppSelector(
-    (state) => state.extension.selectedAccount
-  );
-  const configBalance = useAppSelector(
-    (state) => state.extension.configBalance
-  );
+  const [consoleMsg, setConsoleMsg] = useState<Array<EventType>>([]);
+  const eventMsg = useAppSelector((state) => state.extension.eventMsg);
+
+  useEffect(() => {
+    setConsoleMsg([...consoleMsg, eventMsg as EventType]);
+    console.log("I ran", eventMsg);
+  }, [eventMsg]);
   return (
     <ConsoleContainer>
       <span>Events Console</span>
-      <span>
-        {selectedNetwork !== "Select Network"
-          ? `selected network is ${selectedNetwork}`
-          : null}
-      </span>
-      <span>
-        {selectedNetworkConfig !== undefined
-          ? `selected network config: ${selectedNetworkConfig}`
-          : null}
-      </span>
-      <span>
-        {selectedAccount !== "Select Account"
-          ? `selected Account: ${selectedAccount}`
-          : null}
-      </span>
-      <span>
-        {configBalance !== "0"
-          ? `${selectedAccount} has balance ${configBalance} ${selectedNetworkConfig.nativeCurrency.symbol} on ${selectedNetwork}`
-          : null}
-      </span>
+
+      {consoleMsg.map((message) => {
+        if (message.msgType === "success" && message.eventType === "string") {
+          return (
+            <span>
+              <TransactionSuccessIcon></TransactionSuccessIcon>
+              {message.msg}
+            </span>
+          );
+        } else {
+          return (
+            <span>
+              <TransactionFailureIcon></TransactionFailureIcon>
+              {message.msg}
+            </span>
+          );
+        }
+      })}
     </ConsoleContainer>
   );
 };

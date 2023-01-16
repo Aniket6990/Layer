@@ -122,6 +122,12 @@ export interface JSONDATA {
   networks: Object;
   addresses: Array<string>;
 }
+
+export interface ReturnDataType {
+  msgType: "success" | "error";
+  eventType: "string" | "txObject";
+  msg: any;
+}
 // Typeguard
 
 export function isConstructorInputValue(

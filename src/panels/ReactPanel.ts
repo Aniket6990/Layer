@@ -188,7 +188,7 @@ export class ReactPanel {
             const importData = await importNewKeyPair(context);
             webview.postMessage({
               command: "imported-account",
-              data: importData as string,
+              data: importData,
             });
             break;
           }

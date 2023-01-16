@@ -10,3 +10,9 @@ export interface NetworkConfig {
   chainID: string;
   nativeCurrency: NativeCurrencyType;
 }
+
+export interface EventType {
+  msgType: string;
+  eventType: string;
+  msg: any;
+}
