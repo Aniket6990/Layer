@@ -6,7 +6,7 @@ import ExecutionPage from "./pages/ExecutionPage";
 import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
 import { getAccounts, getNetworks } from "./configuration/webviewpostmsg";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAppDispatch } from "./app/hooks";
 import {
   setNetworks,
@@ -75,6 +75,10 @@ function App() {
         case "imported-account": {
           dispatch(setEventMsg(eventData.data));
           getAccounts();
+          break;
+        }
+        case "send-token-result": {
+          dispatch(setEventMsg(eventData.data));
           break;
         }
         default: {

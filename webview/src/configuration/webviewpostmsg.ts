@@ -1,3 +1,4 @@
+import { TxObjecttype } from "../types";
 import { vscode } from "../utilities/vscode";
 
 export const getNetworks = () => {
@@ -79,6 +80,16 @@ export const exportAccountPvtKeyFile = (walletSelectedAddress: string) => {
     command: "export-account",
     data: {
       walletSelectedAccount: walletSelectedAddress,
+    },
+  });
+};
+
+export const sendTokenTransaction = (txObject: TxObjecttype) => {
+  console.log("sending transaction");
+  vscode.postMessage({
+    command: "send-token",
+    data: {
+      txObject: txObject,
     },
   });
 };

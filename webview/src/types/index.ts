@@ -16,3 +16,12 @@ export interface EventType {
   eventType: string;
   msg: any;
 }
+
+export interface TxObjecttype {
+  ownerAddress: string;
+  recipientAddress: string;
+  selectedNetworkRpcUrl: string;
+  value: string;
+  gasLimit: string;
+  pswd: string;
+}

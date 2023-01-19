@@ -14,9 +14,9 @@ import {
   networkConfig,
   createAccountFromKey,
   importNewKeyPair,
-  extractPvtKeyPair,
   exportPvtKeyPair,
   exportPvtKeyPairFile,
+  sendTransaction,
 } from "../config";
 import { getUri } from "../utilities/getUri";
 
@@ -213,6 +213,15 @@ export class ReactPanel {
             );
             webview.postMessage({
               command: "exported-account",
+              data: msg,
+            });
+            break;
+          }
+          case "send-token": {
+            const { txObject } = message.data;
+            const msg = await sendTransaction(context, txObject);
+            webview.postMessage({
+              command: "send-token-result",
               data: msg,
             });
             break;
