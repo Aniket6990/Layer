@@ -9,10 +9,12 @@ interface extensionState {
   selectedAccount: string;
   configBalance: string;
   walletAccount: string;
-  walletNetwork: string | undefined;
+  walletNetwork: string;
   walletNetworkConfig: any;
   walletAccountBalance: string;
   eventMsg: EventType | undefined;
+  isHomeTx: boolean;
+  isWalletTx: boolean;
 }
 
 const initialState: extensionState = {
@@ -23,14 +25,16 @@ const initialState: extensionState = {
   selectedAccount: "Select Account",
   configBalance: "0",
   walletAccount: "Select Account",
-  walletNetwork: undefined,
+  walletNetwork: "Select Network",
   walletNetworkConfig: {},
   walletAccountBalance: "0",
   eventMsg: {
     msgType: "success",
-    eventType: "string",
+    eventType: "regular",
     msg: "Welcome to ETHcode-layer",
   },
+  isHomeTx: false,
+  isWalletTx: false,
 };
 export const extensionSlice = createSlice({
   name: "extension",
@@ -69,6 +73,12 @@ export const extensionSlice = createSlice({
     setEventMsg(state, action) {
       state.eventMsg = action.payload;
     },
+    setIsHomeTx(state, action) {
+      state.isHomeTx = action.payload;
+    },
+    setIsWalletTx(state, action) {
+      state.isWalletTx = action.payload;
+    },
   },
 });
 
@@ -84,6 +94,8 @@ export const {
   setWalletNetworkConfig,
   setWalletAccountBalance,
   setEventMsg,
+  setIsHomeTx,
+  setIsWalletTx,
 } = extensionSlice.actions;
 
 export default extensionSlice.reducer;

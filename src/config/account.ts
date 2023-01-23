@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 const keythereum = require("keythereum");
 import { ExtensionContext } from "vscode";
 import { logger } from "../lib";
-import { NetworkConfig, ReturnDataType } from "../types";
+import { NetworkConfig, ReturnDataType, TxObjecttype } from "../types";
 import {
   getSelectedProvider,
   isTestingNetwork,
@@ -14,7 +14,6 @@ import { toChecksumAddress } from "../lib/hash/util";
 import { Account, LocalAddressType } from "../types";
 
 const provider = ethers.providers;
-
 // list all local addresses
 export const listAddresses = async (
   context: vscode.ExtensionContext,
@@ -230,20 +229,6 @@ export const displayAccountBalance = async (
   }
 };
 
-//extract private key of selected address
-export const extractPvtKeyPair = async (
-  keyStorePath: string,
-  address: string,
-  password: string
-) => {
-  try {
-  } catch (e) {
-    console.log(
-      "Password is wrong or such address doesn't exist in wallet lists"
-    );
-  }
-};
-
 export const exportPvtKeyPair = async (
   context: ExtensionContext,
   address: string,
@@ -324,6 +309,51 @@ export const exportPvtKeyPairFile = async (
       msgType: "error",
       eventType: "string",
       msg: `Error occoured while exporting account ${selectedAddress}`,
+    };
+    return returnMsg;
+  }
+};
+
+// send token transaction
+export const sendTransaction = async (
+  context: ExtensionContext,
+  txObject: TxObjecttype
+) => {
+  let returnMsg: ReturnDataType;
+  try {
+    const provider = getSelectedNetworkProvider(txObject.selectedNetworkRpcUrl);
+    const pvtKey = await exportPvtKeyPair(
+      context,
+      txObject.ownerAddress,
+      txObject.pswd
+    );
+    const txData = {
+      to: txObject.recipientAddress,
+      value: ethers.utils.parseEther(txObject.value),
+      gasLimit: txObject.gasLimit,
+    };
+    if (pvtKey.msgType === "success") {
+      const wallet = new ethers.Wallet(pvtKey.msg, provider);
+      const tx = await wallet.sendTransaction(txData);
+      const sumittedTx = await tx.wait();
+      returnMsg = {
+        msgType: "success",
+        eventType: "txObject",
+        msg: `Transaction successful, Transaction hash: ${sumittedTx.transactionHash}`,
+      };
+    } else {
+      returnMsg = {
+        msgType: "error",
+        eventType: "string",
+        msg: `Please enter a valid password, password is not correct.`,
+      };
+    }
+    return returnMsg;
+  } catch (error: any) {
+    returnMsg = {
+      msgType: "error",
+      eventType: "string",
+      msg: error.body,
     };
     return returnMsg;
   }

@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import * as vscode from "vscode";
 import { InputBoxOptions, window, commands } from "vscode";
-import { GanacheAddressType } from "./types";
+import { GanacheAddressType, TxObjecttype } from "./types";
 import {
   callContractMethod,
   deployContract,
@@ -27,8 +27,8 @@ import { ReactPanel } from "./panels/ReactPanel";
 import {
   displayAccountBalance,
   exportPvtKeyPair,
-  extractPvtKeyPair,
   networkConfig,
+  sendTransaction,
 } from "./config";
 
 // eslint-disable-next-line import/prefer-default-export
@@ -120,11 +120,15 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
     // command for testing
     commands.registerCommand("ethcode.webview.test", async () => {
-      const data = await exportPvtKeyPair(
-        context,
-        "0x329107021C38ceF5d7778C0edF6c9610B5C5E395",
-        ""
-      );
+      const txObject: TxObjecttype = {
+        ownerAddress: "0x94b26bb17c1d1dda9aa731922de782b6119f21f3",
+        recipientAddress: "0x329107021C38ceF5d7778C0edF6c9610B5C5E395",
+        selectedNetworkRpcUrl: "https://rpc-mumbai.maticvigil.com",
+        value: "0.0002",
+        gasLimit: "21000",
+        pswd: "aniket",
+      };
+      const data = await sendTransaction(context, txObject);
       console.log(data);
       console.log("typeof:", typeof data);
     }),

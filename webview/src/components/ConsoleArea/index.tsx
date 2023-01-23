@@ -35,7 +35,6 @@ const ConsoleArea = () => {
 
   useEffect(() => {
     setConsoleMsg([...consoleMsg, eventMsg as EventType]);
-    console.log("I ran", eventMsg);
   }, [eventMsg]);
   return (
     <ConsoleContainer>
@@ -49,6 +48,21 @@ const ConsoleArea = () => {
               {message.msg}
             </span>
           );
+        } else if (
+          message.msgType === "success" &&
+          message.eventType === "txObject"
+        ) {
+          return (
+            <span>
+              <TransactionSuccessIcon></TransactionSuccessIcon>
+              {message.msg}
+            </span>
+          );
+        } else if (
+          message.msgType === "success" &&
+          message.eventType === "regular"
+        ) {
+          return <span>{message.msg}</span>;
         } else {
           return (
             <span>

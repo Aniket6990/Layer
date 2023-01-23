@@ -4,15 +4,21 @@ import {
   VSCodeOption,
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { displayWalletAccountBalance } from "../../configuration/webviewpostmsg";
 import {
+  displayWalletAccountBalance,
+  sendTokenTransaction,
+} from "../../configuration/webviewpostmsg";
+import {
+  setEventMsg,
+  setIsWalletTx,
   setWalletNetwork,
   setWalletNetworkConfig,
 } from "../../store/extensionstore";
-import { NetworkConfig } from "../../types";
+import { NetworkConfig, TxObjecttype } from "../../types";
+import { containOnlyDigits, isValidAddress } from "../../utilities/functions";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -84,9 +90,20 @@ const WalletTransaction = () => {
   const walletAccountBalance = useAppSelector(
     (state) => state.extension.walletAccountBalance
   );
+  const walletSelectedNetwork = useAppSelector(
+    (state) => state.extension.walletNetwork
+  );
+  const [gasLimit, setGasLimit] = useState<string>("21000");
+  const [amount, SetAmount] = useState<string>("");
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
+  const [pswd, setPswd] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   useEffect(() => {
-    if (walletAccount !== undefined && walletNetConfig.rpc !== undefined) {
+    if (
+      walletAccount !== "Select Account" &&
+      walletNetConfig.rpc !== undefined
+    ) {
       displayWalletAccountBalance(walletAccount, walletNetConfig.rpc);
     }
   }, [walletAccount, walletNetConfig]);
@@ -104,6 +121,55 @@ const WalletTransaction = () => {
     );
     dispatch(setWalletNetworkConfig(selectedNetworkConfig));
   };
+
+  const handleSendTransaction = () => {
+    if (
+      walletAccount !== "Select Account" &&
+      walletNetConfig.rpc !== undefined &&
+      parseInt(gasLimit) >= 21000 &&
+      isValidAddress(recipientAddress) &&
+      parseFloat(amount) > 0 &&
+      pswd !== ""
+    ) {
+      setErrorMsg("");
+      setPswd("");
+      const txObject: TxObjecttype = {
+        ownerAddress: walletAccount,
+        recipientAddress: recipientAddress,
+        selectedNetworkRpcUrl: walletNetConfig.rpc,
+        gasLimit: gasLimit,
+        value: amount,
+        pswd: pswd,
+      };
+      dispatch(setIsWalletTx(true));
+      dispatch(
+        setEventMsg({
+          msgType: "success",
+          eventType: "regular",
+          msg: `Transferring ${amount} ${walletNetConfig.nativeCurrency.symbol} to ${recipientAddress}`,
+        })
+      );
+      sendTokenTransaction(txObject);
+    }
+    if (walletAccount === "Select Account") {
+      setErrorMsg("Please select an account.");
+    }
+    if (walletNetConfig.rpc === undefined) {
+      setErrorMsg("Please select an Network.");
+    }
+    if (parseInt(gasLimit) < 21000) {
+      setErrorMsg("Gaslimit should be more than 21000");
+    }
+    if (!isValidAddress(recipientAddress)) {
+      setErrorMsg("Recipient address is not valid.");
+    }
+    if (parseFloat(amount) <= 0) {
+      setErrorMsg("Amount should be more than 0.");
+    }
+    if (pswd === "") {
+      setErrorMsg("Please enter password.");
+    }
+  };
   return (
     <ConfigContainer>
       {/* Network selection field */}
@@ -111,11 +177,12 @@ const WalletTransaction = () => {
         <span>Network</span>
         <FullObjectWrapper>
           <DropDown
+            value={walletSelectedNetwork}
             onChange={(e: any) => {
               handleNetworkDropdownChange(e);
             }}
           >
-            <VSCodeOption>Select Network</VSCodeOption>
+            <VSCodeOption value="Select Network">Select Network</VSCodeOption>
             {Object.keys(networks).map((network, index) => {
               return (
                 <VSCodeOption key={index} value={network}>
@@ -152,7 +219,13 @@ const WalletTransaction = () => {
       <ConfigWrapper>
         <span>Recipient Address</span>
         <FullObjectWrapper>
-          <TextField placeholder="0x53..."></TextField>
+          <TextField
+            placeholder="0x53..."
+            value={recipientAddress}
+            onChange={(e: any) => {
+              setRecipientAddress(e.target.value);
+            }}
+          ></TextField>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* Transaction amount and gaslimit area */}
@@ -160,18 +233,58 @@ const WalletTransaction = () => {
         <SemiWrapper>
           <ConfigWrapper>
             <span>Amount</span>
-            <TextField placeholder="1"></TextField>
+            <TextField
+              placeholder="1"
+              value={amount}
+              onChange={(e: any) => {
+                if (containOnlyDigits(e.target.value)) {
+                  setErrorMsg("");
+                  SetAmount(e.target.value);
+                } else {
+                  setErrorMsg("Amount should be in a digit.");
+                }
+              }}
+            ></TextField>
           </ConfigWrapper>
           <ConfigWrapper>
             <span>Gas Limit</span>
-            <TextField value="21000"></TextField>
+            <TextField
+              value={gasLimit}
+              onChange={(e: any) => {
+                if (containOnlyDigits(e.target.value)) {
+                  setErrorMsg("");
+                  setGasLimit(e.target.value);
+                } else {
+                  setErrorMsg("Gaslimit should be in a digit.");
+                }
+              }}
+            ></TextField>
           </ConfigWrapper>
         </SemiWrapper>
       </ConfigWrapper>
+      {/* password input field */}
+      <ConfigWrapper>
+        <span>Password</span>
+        <FullObjectWrapper>
+          <TextField
+            type="password"
+            value={pswd}
+            onChange={(e: any) => {
+              setPswd(e.target.value);
+            }}
+          ></TextField>
+        </FullObjectWrapper>
+      </ConfigWrapper>
       {/* send transaction button */}
       <ConfigWrapper>
-        <ErrorMessage>Transaction Error message</ErrorMessage>
-        <VSCodeButton>Send</VSCodeButton>
+        <ErrorMessage>{errorMsg}</ErrorMessage>
+        <VSCodeButton
+          onClick={(e) => {
+            handleSendTransaction();
+          }}
+        >
+          Send
+        </VSCodeButton>
       </ConfigWrapper>
     </ConfigContainer>
   );
