@@ -132,6 +132,7 @@ const WalletTransaction = () => {
       pswd !== ""
     ) {
       setErrorMsg("");
+      setPswd("");
       const txObject: TxObjecttype = {
         ownerAddress: walletAccount,
         recipientAddress: recipientAddress,

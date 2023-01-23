@@ -333,17 +333,15 @@ export const sendTransaction = async (
       gasLimit: txObject.gasLimit,
     };
     if (pvtKey.msgType === "success") {
-      console.log("password is correct ji.");
       const wallet = new ethers.Wallet(pvtKey.msg, provider);
       const tx = await wallet.sendTransaction(txData);
       const sumittedTx = await tx.wait();
       returnMsg = {
         msgType: "success",
         eventType: "txObject",
-        msg: sumittedTx.transactionHash,
+        msg: `Transaction successful, Transaction hash: ${sumittedTx.transactionHash}`,
       };
     } else {
-      console.log("password is wrong ji.");
       returnMsg = {
         msgType: "error",
         eventType: "string",
