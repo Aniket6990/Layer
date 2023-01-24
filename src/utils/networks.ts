@@ -23,7 +23,7 @@ import { selectContract } from "./contracts";
 const provider = ethers.providers;
 
 const getConfiguration = () => {
-  return vscode.workspace.getConfiguration("ethcode");
+  return vscode.workspace.getConfiguration("layer");
 };
 
 const getNetworkNames = (): Array<string> => {

@@ -99,7 +99,7 @@ export const createNewKeyPair = (
 };
 
 // create new key pair using pvtKey
-export const createAccountFromKey = (
+export const createAccountFromKey = async (
   context: vscode.ExtensionContext,
   path: string,
   pswd: string,
@@ -124,17 +124,31 @@ export const createAccountFromKey = (
       pubAddr: keyObject.address,
       checksumAddr: toChecksumAddress(keyObject.address),
     };
+    const accounts = await listAddresses(context, context.extensionPath);
 
-    if (!fs.existsSync(`${path}/keystore`)) {
-      fs.mkdirSync(`${path}/keystore`);
+    const alreadyExist = accounts.find(
+      (acc: string) => toChecksumAddress(acc) === account.checksumAddr
+    );
+
+    if (alreadyExist !== undefined) {
+      returnMsg = {
+        msgType: "error",
+        eventType: "string",
+        msg: `Account ${account.checksumAddr} is already exist.`,
+      };
+    } else {
+      if (!fs.existsSync(`${path}/keystore`)) {
+        fs.mkdirSync(`${path}/keystore`);
+      }
+      keythereum.exportToFile(keyObject, `${path}/keystore`);
+      listAddresses(context, path);
+      returnMsg = {
+        msgType: "success",
+        eventType: "string",
+        msg: `New Account ${account.checksumAddr} created successfully.`,
+      };
     }
-    keythereum.exportToFile(keyObject, `${path}/keystore`);
-    listAddresses(context, path);
-    returnMsg = {
-      msgType: "success",
-      eventType: "string",
-      msg: `New Account ${account.checksumAddr} created successfully.`,
-    };
+
     return returnMsg;
   } catch (error) {
     returnMsg = {
@@ -167,12 +181,12 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
         const arr = file.split("--");
         const address = toChecksumAddress(`0x${arr[arr.length - 1]}`);
 
-        const already = addresses.find(
+        const alreadyExist = addresses.find(
           (element: string) => toChecksumAddress(element) === address
         );
 
-        if (already !== undefined) {
-          msg = {
+        if (alreadyExist !== undefined) {
+          returnMsg = {
             msgType: "error",
             eventType: "string",
             msg: `Account ${address} is already exist.`,
