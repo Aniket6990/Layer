@@ -188,7 +188,6 @@ const WalletConfig = () => {
           if (eventData.data.msgType !== "error") {
             setErrorMsg("");
             setExportPvtKey(eventData.data.msg);
-            dispatch(setEventMsg(eventData.data));
             setShowPvtKey(true);
           } else {
             dispatch(setEventMsg(eventData.data));
@@ -287,8 +286,11 @@ const WalletConfig = () => {
         <FullObjectWrapper>
           <PartialObjectWrapper>
             <TextField
+              placeHolder="Private Key"
               type={showPvtKey ? "text" : "password"}
-              value={exportPvtKey}
+              value={
+                walletSelectedAccount !== "Select Account" ? exportPvtKey : null
+              }
             ></TextField>
             <TextField
               placeholder="Password"

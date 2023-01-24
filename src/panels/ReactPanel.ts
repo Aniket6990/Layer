@@ -173,14 +173,15 @@ export class ReactPanel {
           }
           case "import-account-key": {
             const { pvtKey, password } = message.data;
+            const importData = await createAccountFromKey(
+              context,
+              context.extensionPath,
+              password,
+              pvtKey
+            );
             webview.postMessage({
               command: "imported-account-key",
-              data: createAccountFromKey(
-                context,
-                context.extensionPath,
-                password,
-                pvtKey
-              ),
+              data: importData,
             });
             break;
           }
