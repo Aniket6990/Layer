@@ -85,11 +85,16 @@ export const exportAccountPvtKeyFile = (walletSelectedAddress: string) => {
 };
 
 export const sendTokenTransaction = (txObject: TxObjecttype) => {
-  console.log("sending transaction");
   vscode.postMessage({
     command: "send-token",
     data: {
       txObject: txObject,
     },
+  });
+};
+
+export const loadAllContracts = () => {
+  vscode.postMessage({
+    command: "load-contracts",
   });
 };

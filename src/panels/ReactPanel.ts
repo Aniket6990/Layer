@@ -227,6 +227,12 @@ export class ReactPanel {
             });
             break;
           }
+          case "load-contracts": {
+            webview.postMessage({
+              command: "loaded-contracts",
+              data: "",
+            });
+          }
         }
       },
       undefined,

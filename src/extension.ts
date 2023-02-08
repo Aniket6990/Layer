@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import * as vscode from "vscode";
 import { InputBoxOptions, window, commands } from "vscode";
-import { GanacheAddressType, TxObjecttype } from "./types";
+import { CompiledJSONOutput, GanacheAddressType, TxObjecttype } from "./types";
 import {
   callContractMethod,
   deployContract,
@@ -30,23 +30,22 @@ import {
   networkConfig,
   sendTransaction,
 } from "./config";
+import { loadAllCompiledContracts } from "./config/contract";
+import { createGlobalStyle } from "styled-components";
 
 // eslint-disable-next-line import/prefer-default-export
 export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     // command for testing
     commands.registerCommand("layer.webview.test", async () => {
-      const txObject: TxObjecttype = {
-        ownerAddress: "0x94b26bb17c1d1dda9aa731922de782b6119f21f3",
-        recipientAddress: "0x329107021C38ceF5d7778C0edF6c9610B5C5E395",
-        selectedNetworkRpcUrl: "https://rpc-mumbai.maticvigil.com",
-        value: "0.0002",
-        gasLimit: "21000",
-        pswd: "aniket",
+      loadAllCompiledContracts(context);
+      const contracts = context.workspaceState.get("contracts") as {
+        [name: string]: CompiledJSONOutput;
       };
-      const data = await sendTransaction(context, txObject);
+      let data = Object.keys(contracts).map((contract) => {
+        return contract;
+      });
       console.log(data);
-      console.log("typeof:", typeof data);
     }),
 
     // Activate
