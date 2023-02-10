@@ -5,11 +5,7 @@ import SideBar from "./components/SideBar";
 import ExecutionPage from "./pages/ExecutionPage";
 import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
-import {
-  getAccounts,
-  getNetworks,
-  loadAllContracts,
-} from "./configuration/webviewpostmsg";
+import { getAccounts, getNetworks } from "./configuration/webviewpostmsg";
 import { useEffect } from "react";
 import { useAppDispatch } from "./app/hooks";
 import {
@@ -18,7 +14,6 @@ import {
   setConfigBalance,
   setWalletAccountBalance,
   setEventMsg,
-  setCompiledContracts,
 } from "./store/extensionstore";
 
 const Main = styled.div`
@@ -46,7 +41,6 @@ function App() {
   useEffect(() => {
     getNetworks();
     getAccounts();
-    loadAllContracts();
   }, []);
 
   useEffect(() => {
@@ -85,10 +79,6 @@ function App() {
         }
         case "send-token-result": {
           dispatch(setEventMsg(eventData.data));
-          break;
-        }
-        case "post-compiled-contracts": {
-          dispatch(setCompiledContracts(eventData.data));
           break;
         }
         default: {

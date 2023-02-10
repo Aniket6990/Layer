@@ -24,7 +24,7 @@
     "node": ">=16.15.0"
   },
   "activationEvents": [
-    "onCommand: layer.activate"
+    "onCommand:layer.activate"
   ],
   "main": "./build/src/extension.js",
   "extensionDependencies": [

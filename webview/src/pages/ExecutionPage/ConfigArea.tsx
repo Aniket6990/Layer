@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import {
   VSCodeButton,
   VSCodeDropdown,
@@ -7,7 +7,6 @@ import {
 } from "@vscode/webview-ui-toolkit/react";
 import styled from "styled-components";
 import { FaRegCopy } from "react-icons/fa";
-import { VscRefresh } from "react-icons/vsc";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   setSelectedAccount,
@@ -15,10 +14,7 @@ import {
   setSelectedNetworkConfig,
 } from "../../store/extensionstore";
 import { NetworkConfig } from "../../types";
-import {
-  displayAccountBalance,
-  loadAllContracts,
-} from "../../configuration/webviewpostmsg";
+import { displayAccountBalance } from "../../configuration/webviewpostmsg";
 
 const ConfigContainer = styled.div`
   height: 600px;
@@ -89,19 +85,6 @@ const AtAddressButton = styled(VSCodeButton)`
 const CopyIcon = styled(FaRegCopy)`
   width: 16px;
   height: 16px;
-  color: var(--vscode-icon-foreground);
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-const RefreshIcon = styled(VscRefresh)`
-  width: 16px;
-  height: 16px;
-  color: var(--vscode-icon-foreground);
-  &:hover {
-    cursor: pointer;
-  }
 `;
 const ConfigArea = () => {
   const dispatch = useAppDispatch();
@@ -119,9 +102,7 @@ const ConfigArea = () => {
   const configBalance = useAppSelector(
     (state) => state.extension.configBalance
   );
-  const compiledContracts = useAppSelector(
-    (state) => state.extension.compiledContracts
-  );
+
   useEffect(() => {
     if (
       selectedAccount !== "Select Account" &&
@@ -233,23 +214,10 @@ const ConfigArea = () => {
       {/* dropdown for selecting a compiled contract */}
       <ConfigWrapper>
         <span>contract</span>
-        <FullObjectWrapper>
-          <DropDown>
-            <VSCodeOption value="Select Contract">Select Contract</VSCodeOption>
-            {compiledContracts.map((contract, index) => {
-              return (
-                <VSCodeOption key={index} value={contract}>
-                  {`${contract}.sol`}
-                </VSCodeOption>
-              );
-            })}
-          </DropDown>
-          <RefreshIcon
-            onClick={(e) => {
-              loadAllContracts();
-            }}
-          ></RefreshIcon>
-        </FullObjectWrapper>
+        <DropDown>
+          <VSCodeOption>Payment.sol</VSCodeOption>
+          <VSCodeOption>SimpleAccount.sol</VSCodeOption>
+        </DropDown>
       </ConfigWrapper>
       <div>OR</div>
       <ConfigWrapper>
