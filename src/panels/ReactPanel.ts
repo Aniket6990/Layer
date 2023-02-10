@@ -18,6 +18,7 @@ import {
   exportPvtKeyPairFile,
   sendTransaction,
 } from "../config";
+import { loadAllCompiledContracts } from "../config/contract";
 import { getUri } from "../utilities/getUri";
 
 export class ReactPanel {
@@ -227,11 +228,14 @@ export class ReactPanel {
             });
             break;
           }
-          case "load-contracts": {
-            webview.postMessage({
-              command: "loaded-contracts",
-              data: "",
-            });
+          case "get-compiled-contracts": {
+            const compiledContracts = loadAllCompiledContracts(context);
+            if (compiledContracts !== undefined) {
+              webview.postMessage({
+                command: "post-compiled-contracts",
+                data: compiledContracts,
+              });
+            }
           }
         }
       },

@@ -38,14 +38,8 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     // command for testing
     commands.registerCommand("layer.webview.test", async () => {
-      loadAllCompiledContracts(context);
-      const contracts = context.workspaceState.get("contracts") as {
-        [name: string]: CompiledJSONOutput;
-      };
-      let data = Object.keys(contracts).map((contract) => {
-        return contract;
-      });
-      console.log(data);
+      const compiledContracts = loadAllCompiledContracts(context);
+      console.log(compiledContracts);
     }),
 
     // Activate

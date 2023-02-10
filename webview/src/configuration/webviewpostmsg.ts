@@ -95,6 +95,6 @@ export const sendTokenTransaction = (txObject: TxObjecttype) => {
 
 export const loadAllContracts = () => {
   vscode.postMessage({
-    command: "load-contracts",
+    command: "get-compiled-contracts",
   });
 };

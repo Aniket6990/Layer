@@ -12,7 +12,6 @@ export const loadAllCompiledContracts = (context: ExtensionContext) => {
     return;
   }
 
-  logger.log("Loading all compiled jsons...");
   context.workspaceState.update("contracts", ""); // Initialize contracts storage
 
   const path_ = workspace.workspaceFolders[0].uri.fsPath;
@@ -22,8 +21,6 @@ export const loadAllCompiledContracts = (context: ExtensionContext) => {
     let name = path.parse(e).base;
     name = name.substring(0, name.length - 5);
 
-    logger.log(`Trying to parse ${name} contract output...`);
-
     const data = fs.readFileSync(e);
     const output: CompiledJSONOutput = getCompiledJsonObject(data);
 
@@ -31,7 +28,6 @@ export const loadAllCompiledContracts = (context: ExtensionContext) => {
     output.path = path.dirname(e);
     output.name = name;
 
-    logger.success(`Loaded ${name} contract into workspace.`);
     let contracts = context.workspaceState.get("contracts") as any;
 
     if (contracts === undefined || contracts === "") contracts = new Map();
@@ -39,6 +35,13 @@ export const loadAllCompiledContracts = (context: ExtensionContext) => {
     contracts[name] = output;
     context.workspaceState.update("contracts", contracts);
   });
+  const contracts = context.workspaceState.get("contracts") as {
+    [name: string]: CompiledJSONOutput;
+  };
+  let compiledContracts = Object.keys(contracts).map((contract) => {
+    return contract;
+  });
+  return compiledContracts;
 };
 
 const getCompiledJsonObject = (_jsonPayload: any): CompiledJSONOutput => {
@@ -52,13 +55,11 @@ const getCompiledJsonObject = (_jsonPayload: any): CompiledJSONOutput => {
 
       output.contractType = 1;
       output.hardhatOutput = data;
-      logger.log("Loaded Hardhat compiled json outputs.");
     } else if (data.data !== undefined) {
       // Remix format
 
       output.contractType = 2;
       output.remixOutput = data;
-      logger.log("Loaded Remix compiled json output.");
     }
   } catch (e) {
     // eslint-disable-next-line no-console
