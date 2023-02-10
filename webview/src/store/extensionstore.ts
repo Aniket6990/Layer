@@ -15,6 +15,7 @@ interface extensionState {
   eventMsg: EventType | undefined;
   isHomeTx: boolean;
   isWalletTx: boolean;
+  compiledContracts: Array<string>;
 }
 
 const initialState: extensionState = {
@@ -35,6 +36,7 @@ const initialState: extensionState = {
   },
   isHomeTx: false,
   isWalletTx: false,
+  compiledContracts: [],
 };
 export const extensionSlice = createSlice({
   name: "extension",
@@ -79,6 +81,9 @@ export const extensionSlice = createSlice({
     setIsWalletTx(state, action) {
       state.isWalletTx = action.payload;
     },
+    setCompiledContracts(state, action) {
+      state.compiledContracts = action.payload;
+    },
   },
 });
 
@@ -96,6 +101,7 @@ export const {
   setEventMsg,
   setIsHomeTx,
   setIsWalletTx,
+  setCompiledContracts,
 } = extensionSlice.actions;
 
 export default extensionSlice.reducer;
