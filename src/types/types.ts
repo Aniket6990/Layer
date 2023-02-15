@@ -123,12 +123,6 @@ export interface JSONDATA {
   addresses: Array<string>;
 }
 
-export interface ReturnDataType {
-  msgType: "success" | "error";
-  eventType: "string" | "txObject";
-  msg: any;
-}
-
 export interface TxObjecttype {
   ownerAddress: string;
   recipientAddress: string;
@@ -136,6 +130,26 @@ export interface TxObjecttype {
   value: string;
   gasLimit: string;
   pswd: string;
+}
+
+export interface TxInterface {
+  type: "layer_ImutableCall" | "layer_mutableCall";
+  from: string;
+  to: string;
+  gas?: string;
+  exexutionCost?: string;
+  transactionCost?: string;
+  input: string;
+  decodedInput: string | Object;
+  decodedOutput: string | Object;
+  logs: any;
+  value: string;
+}
+
+export interface ExtensionEventTypes {
+  eventStatus: "success" | "fail";
+  eventType: "layer_extensionCall" | "layer_ImutableCall" | "layer_mutableCall";
+  eventResult: string | TxInterface;
 }
 // Typeguard
 
