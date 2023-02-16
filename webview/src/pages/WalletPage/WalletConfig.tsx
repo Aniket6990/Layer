@@ -185,23 +185,23 @@ const WalletConfig = () => {
       const eventData = event.data;
       switch (eventData.command) {
         case "exported-account-key": {
-          if (eventData.data.msgType !== "error") {
+          if (eventData.data.eventStatus !== "fail") {
             setErrorMsg("");
-            setExportPvtKey(eventData.data.msg);
+            setExportPvtKey(eventData.data.eventResult);
             setShowPvtKey(true);
           } else {
             dispatch(setEventMsg(eventData.data));
-            setErrorMsg(eventData.data.msg);
+            setErrorMsg(eventData.data.eventResult);
           }
           break;
         }
         case "exported-account": {
-          if (eventData.data.msgType !== "error") {
+          if (eventData.data.eventStatus !== "fail") {
             dispatch(setEventMsg(eventData.data));
-            setErrorMsg(eventData.data.msg);
+            setErrorMsg(eventData.data.eventResult);
           } else {
             dispatch(setEventMsg(eventData.data));
-            setErrorMsg(eventData.data.msg);
+            setErrorMsg(eventData.data.eventResult);
           }
           break;
         }

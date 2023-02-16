@@ -1,4 +1,4 @@
-import { EventType } from "../../types/index";
+import { TxInterface, WebViewEventType } from "../../types/index";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useAppSelector } from "../../app/hooks";
@@ -30,44 +30,49 @@ const TransactionFailureIcon = styled(MdCancel)`
 `;
 
 const ConsoleArea = () => {
-  const [consoleMsg, setConsoleMsg] = useState<Array<EventType>>([]);
+  const [consoleMsg, setConsoleMsg] = useState<Array<WebViewEventType>>([]);
   const eventMsg = useAppSelector((state) => state.extension.eventMsg);
 
   useEffect(() => {
-    setConsoleMsg([...consoleMsg, eventMsg as EventType]);
+    setConsoleMsg([...consoleMsg, eventMsg as WebViewEventType]);
   }, [eventMsg]);
   return (
     <ConsoleContainer>
       <span>Events Console</span>
 
       {consoleMsg.map((message) => {
-        if (message.msgType === "success" && message.eventType === "string") {
-          return (
-            <span>
-              <TransactionSuccessIcon></TransactionSuccessIcon>
-              {message.msg}
-            </span>
-          );
-        } else if (
-          message.msgType === "success" &&
-          message.eventType === "txObject"
+        if (
+          message.eventStatus === "success" &&
+          message.eventType === "layer_extensionCall"
         ) {
           return (
             <span>
               <TransactionSuccessIcon></TransactionSuccessIcon>
-              {message.msg}
+              {message.eventResult as string}
             </span>
           );
         } else if (
-          message.msgType === "success" &&
-          message.eventType === "regular"
+          message.eventStatus === "success" &&
+          (message.eventType === "layer_ImutableCall" ||
+            message.eventType === "layer_mutableCall")
         ) {
-          return <span>{message.msg}</span>;
+          return (
+            <span>
+              <TransactionSuccessIcon></TransactionSuccessIcon>
+              {(message.eventResult as TxInterface).txHash}
+            </span>
+          );
+        } else if (
+          message.eventStatus === "fail" &&
+          (message.eventType === "layer_ImutableCall" ||
+            message.eventType === "layer_mutableCall")
+        ) {
+          return <span>{(message.eventResult as TxInterface).txHash}</span>;
         } else {
           return (
             <span>
               <TransactionFailureIcon></TransactionFailureIcon>
-              {message.msg}
+              {message.eventResult as string}
             </span>
           );
         }

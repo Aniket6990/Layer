@@ -141,12 +141,11 @@ const WalletTransaction = () => {
         value: amount,
         pswd: pswd,
       };
-      dispatch(setIsWalletTx(true));
       dispatch(
         setEventMsg({
           msgType: "success",
-          eventType: "regular",
-          msg: `Transferring ${amount} ${walletNetConfig.nativeCurrency.symbol} to ${recipientAddress}`,
+          eventType: "layer_extensionCall",
+          eventResult: `Transferring ${amount} ${walletNetConfig.nativeCurrency.symbol} to ${recipientAddress}`,
         })
       );
       sendTokenTransaction(txObject);

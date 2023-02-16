@@ -1,4 +1,4 @@
-import { ExtensionContext, window, workspace, InputBoxOptions } from "vscode";
+import { ExtensionContext, workspace } from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 

@@ -134,7 +134,7 @@ export const createAccountFromKey = async (
       extensionEvent = {
         eventStatus: "fail",
         eventType: "layer_extensionCall",
-        eventResult: `Account ${account.checksumAddr} is already exist.`,
+        eventResult: `Account ${account.checksumAddr} already exist.`,
       };
     } else {
       if (!fs.existsSync(`${path}/keystore`)) {
@@ -145,7 +145,7 @@ export const createAccountFromKey = async (
       extensionEvent = {
         eventStatus: "success",
         eventType: "layer_extensionCall",
-        eventResult: `New Account ${account.checksumAddr} created successfully.`,
+        eventResult: `New Account ${account.checksumAddr} added successfully.`,
       };
     }
 
@@ -161,7 +161,11 @@ export const createAccountFromKey = async (
 };
 
 export const importNewKeyPair = async (context: ExtensionContext) => {
-  let extensionEvent: ExtensionEventTypes;
+  let extensionEvent: ExtensionEventTypes = {
+    eventStatus: "fail",
+    eventType: "layer_extensionCall",
+    eventResult: "Error occured while importing a account.",
+  };
   try {
     let msg: any;
     const options: vscode.OpenDialogOptions = {
@@ -189,7 +193,7 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
           extensionEvent = {
             eventStatus: "fail",
             eventType: "layer_extensionCall",
-            eventResult: `Account ${address} is already exist.`,
+            eventResult: `Account ${address} already exist.`,
           };
         } else {
           fs.copyFile(
@@ -199,15 +203,14 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
               if (err) throw err;
             }
           );
-          msg = {
-            eventStatus: "fail",
+          extensionEvent = {
+            eventStatus: "success",
             eventType: "layer_extensionCall",
             eventResult: `Account ${address} is successfully imported!`,
           };
         }
       }
     });
-    extensionEvent = msg;
     return extensionEvent;
   } catch (error) {
     extensionEvent = {
