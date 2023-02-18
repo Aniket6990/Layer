@@ -133,17 +133,17 @@ export interface TxObjecttype {
 }
 
 export interface TxInterface {
-  type: "layer_ImutableCall" | "layer_mutableCall";
   from: string;
   to: string;
+  txHash: string;
   gas?: string;
   exexutionCost?: string;
   transactionCost?: string;
-  input: string;
-  decodedInput: string | Object;
-  decodedOutput: string | Object;
-  logs: any;
-  value: string;
+  input?: string;
+  decodedInput?: string | Object;
+  decodedOutput?: string | Object;
+  logs?: any;
+  value?: string;
 }
 
 export interface ExtensionEventTypes {

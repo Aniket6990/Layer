@@ -6,8 +6,11 @@ import {
 } from "@vscode/webview-ui-toolkit/react";
 import React, { useEffect, useState } from "react";
 import { FaRegCopy } from "react-icons/fa";
-import { GrAdd } from "react-icons/gr";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import {
+  AiOutlineEye,
+  AiOutlineEyeInvisible,
+  AiOutlinePlus,
+} from "react-icons/ai";
 import styled from "styled-components";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
@@ -92,10 +95,9 @@ const HidePvtKey = styled(AiOutlineEyeInvisible)`
     cursor: pointer;
   }
 `;
-const AddIcon = styled(GrAdd)`
+const AddIcon = styled(AiOutlinePlus)`
   width: 16px;
   height: 16px;
-  background-color: var(--vscode-icon-foreground);
   &:hover {
     cursor: pointer;
   }
@@ -269,7 +271,7 @@ const WalletConfig = () => {
             }}
           ></AddIcon>
         </FullObjectWrapper>
-        <span>OR</span>
+        <span style={{ alignSelf: "center", paddingRight: "10%" }}>OR</span>
         <FullObjectWrapper>
           <VSCodeButton
             onClick={(e) => {
@@ -315,7 +317,7 @@ const WalletConfig = () => {
             ></HidePvtKey>
           )}
         </FullObjectWrapper>
-        <span>OR</span>
+        <span style={{ alignSelf: "center", paddingRight: "10%" }}>OR</span>
         <FullObjectWrapper>
           <VSCodeButton
             onClick={(e) => {

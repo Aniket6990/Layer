@@ -14,11 +14,12 @@ import {
   setSelectedNetwork,
   setSelectedNetworkConfig,
 } from "../../store/extensionstore";
-import { NetworkConfig } from "../../types";
+import { NetworkConfig, TxInterface } from "../../types";
 import {
   displayAccountBalance,
   loadAllContracts,
 } from "../../configuration/webviewpostmsg";
+import Toggle from "../../components/UI/Toggle";
 
 const ConfigContainer = styled.div`
   height: 600px;
@@ -103,6 +104,13 @@ const RefreshIcon = styled(VscRefresh)`
     cursor: pointer;
   }
 `;
+
+const DummyTxn: TxInterface = {
+  from: "0x4d1D0a52ca9a69CA4a1Ecd808B51A5E52562156D",
+  to: "0x4d1D0a52ca9a69CA4a1Ecd808B51A5E52562156D",
+  txHash: "0x4d1D0a52ca9a69CA4a1Ecd808B51A5E52562156D",
+  gas: "439434",
+};
 const ConfigArea = () => {
   const dispatch = useAppDispatch();
   const networks = useAppSelector((state) => state.extension.networks);

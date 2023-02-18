@@ -12,6 +12,7 @@ import {
 } from "../utils/networks";
 import { toChecksumAddress } from "../lib/hash/util";
 import { Account, LocalAddressType } from "../types";
+import { generateTxnInterface } from "../utilities/functions";
 
 const provider = ethers.providers;
 // list all local addresses
@@ -352,16 +353,16 @@ export const sendTransaction = async (
     if (pvtKey.eventStatus === "success") {
       const wallet = new ethers.Wallet(pvtKey.eventResult as string, provider);
       const tx = await wallet.sendTransaction(txData);
-      const sumittedTx = await tx.wait();
+      const submittedTx = await tx.wait();
       extensionEvent = {
         eventStatus: "success",
         eventType: "layer_mutableCall",
-        eventResult: `Transaction successful, Transaction hash: ${sumittedTx.transactionHash}`,
+        eventResult: generateTxnInterface(submittedTx),
       };
     } else {
       extensionEvent = {
         eventStatus: "fail",
-        eventType: "layer_mutableCall",
+        eventType: "layer_extensionCall",
         eventResult: `Please enter a valid password, password is not correct.`,
       };
     }

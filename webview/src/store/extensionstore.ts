@@ -31,7 +31,7 @@ const initialState: extensionState = {
   walletAccountBalance: "0",
   eventMsg: {
     eventStatus: "success",
-    eventType: "layer_extensionCall",
+    eventType: "layer_msg",
     eventResult: "Welcome to ETHcode-layer",
   },
   isHomeTx: false,

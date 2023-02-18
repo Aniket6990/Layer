@@ -143,8 +143,8 @@ const WalletTransaction = () => {
       };
       dispatch(
         setEventMsg({
-          msgType: "success",
-          eventType: "layer_extensionCall",
+          eventStatus: "success",
+          eventType: "layer_msg",
           eventResult: `Transferring ${amount} ${walletNetConfig.nativeCurrency.symbol} to ${recipientAddress}`,
         })
       );

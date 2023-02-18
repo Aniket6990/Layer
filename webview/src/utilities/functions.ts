@@ -8,4 +8,7 @@ const isValidAddress = (address: string) => {
   return ethers.utils.isAddress(address);
 };
 
-export { containOnlyDigits, isValidAddress };
+const shortenText = (text: string, charStart: number, charEnd: number) => {
+  return `${text.slice(0, charStart + 2)}...${text.slice(-charEnd)}`;
+};
+export { containOnlyDigits, isValidAddress, shortenText };
