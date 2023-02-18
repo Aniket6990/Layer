@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 const keythereum = require("keythereum");
 import { ExtensionContext } from "vscode";
 import { logger } from "../lib";
-import { NetworkConfig, ReturnDataType, TxObjecttype } from "../types";
+import { NetworkConfig, ExtensionEventTypes, TxObjecttype } from "../types";
 import {
   getSelectedProvider,
   isTestingNetwork,
@@ -12,6 +12,7 @@ import {
 } from "../utils/networks";
 import { toChecksumAddress } from "../lib/hash/util";
 import { Account, LocalAddressType } from "../types";
+import { generateTxnInterface } from "../utilities/functions";
 
 const provider = ethers.providers;
 // list all local addresses
@@ -57,7 +58,7 @@ export const createNewKeyPair = (
   path: string,
   pswd: string
 ) => {
-  let returnMsg: ReturnDataType;
+  let extensionEvent: ExtensionEventTypes;
   try {
     const params = { keyBytes: 32, ivBytes: 16 };
     const bareKey = keythereum.create(params);
@@ -82,19 +83,19 @@ export const createNewKeyPair = (
     }
     keythereum.exportToFile(keyObject, `${path}/keystore`);
     listAddresses(context, path);
-    returnMsg = {
-      msgType: "success",
-      eventType: "string",
-      msg: `New Account ${account.checksumAddr} created successfully.`,
+    extensionEvent = {
+      eventStatus: "success",
+      eventType: "layer_extensionCall",
+      eventResult: `New Account ${account.checksumAddr} created successfully.`,
     };
-    return returnMsg;
+    return extensionEvent;
   } catch (error) {
-    returnMsg = {
-      msgType: "error",
-      eventType: "string",
-      msg: `Error occured while creating a new account`,
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_extensionCall",
+      eventResult: `Error occured while creating a new account`,
     };
-    return returnMsg;
+    return extensionEvent;
   }
 };
 
@@ -105,7 +106,7 @@ export const createAccountFromKey = async (
   pswd: string,
   pvtKey: string
 ) => {
-  let returnMsg: ReturnDataType;
+  let extensionEvent: ExtensionEventTypes;
   try {
     const params = { keyBytes: 32, ivBytes: 16 };
     const bareKey = keythereum.create(params);
@@ -131,10 +132,10 @@ export const createAccountFromKey = async (
     );
 
     if (alreadyExist !== undefined) {
-      returnMsg = {
-        msgType: "error",
-        eventType: "string",
-        msg: `Account ${account.checksumAddr} is already exist.`,
+      extensionEvent = {
+        eventStatus: "fail",
+        eventType: "layer_extensionCall",
+        eventResult: `Account ${account.checksumAddr} already exist.`,
       };
     } else {
       if (!fs.existsSync(`${path}/keystore`)) {
@@ -142,26 +143,30 @@ export const createAccountFromKey = async (
       }
       keythereum.exportToFile(keyObject, `${path}/keystore`);
       listAddresses(context, path);
-      returnMsg = {
-        msgType: "success",
-        eventType: "string",
-        msg: `New Account ${account.checksumAddr} created successfully.`,
+      extensionEvent = {
+        eventStatus: "success",
+        eventType: "layer_extensionCall",
+        eventResult: `New Account ${account.checksumAddr} added successfully.`,
       };
     }
 
-    return returnMsg;
+    return extensionEvent;
   } catch (error) {
-    returnMsg = {
-      msgType: "error",
-      eventType: "string",
-      msg: `Error occured while creating a new account`,
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_extensionCall",
+      eventResult: `Error occured while creating a new account`,
     };
-    return returnMsg;
+    return extensionEvent;
   }
 };
 
 export const importNewKeyPair = async (context: ExtensionContext) => {
-  let returnMsg: ReturnDataType;
+  let extensionEvent: ExtensionEventTypes = {
+    eventStatus: "fail",
+    eventType: "layer_extensionCall",
+    eventResult: "Error occured while importing a account.",
+  };
   try {
     let msg: any;
     const options: vscode.OpenDialogOptions = {
@@ -186,10 +191,10 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
         );
 
         if (alreadyExist !== undefined) {
-          returnMsg = {
-            msgType: "error",
-            eventType: "string",
-            msg: `Account ${address} is already exist.`,
+          extensionEvent = {
+            eventStatus: "fail",
+            eventType: "layer_extensionCall",
+            eventResult: `Account ${address} already exist.`,
           };
         } else {
           fs.copyFile(
@@ -199,23 +204,22 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
               if (err) throw err;
             }
           );
-          msg = {
-            msgType: "success",
-            eventType: "string",
-            msg: `Account ${address} is successfully imported!`,
+          extensionEvent = {
+            eventStatus: "success",
+            eventType: "layer_extensionCall",
+            eventResult: `Account ${address} is successfully imported!`,
           };
         }
       }
     });
-    returnMsg = msg;
-    return returnMsg;
+    return extensionEvent;
   } catch (error) {
-    returnMsg = {
-      msgType: "error",
-      eventType: "string",
-      msg: `Error occured while importing a account.`,
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_extensionCall",
+      eventResult: `Error occured while importing a account.`,
     };
-    return returnMsg;
+    return extensionEvent;
   }
 };
 
@@ -248,11 +252,7 @@ export const exportPvtKeyPair = async (
   address: string,
   pswd: string
 ) => {
-  let returnMsg = {
-    msgType: "",
-    eventType: "",
-    msg: "",
-  };
+  let extensionEvent: ExtensionEventTypes;
   try {
     const keyObject = keythereum.importFromFile(address, context.extensionPath);
     const bufferPvtKey = keythereum.recover(
@@ -260,15 +260,19 @@ export const exportPvtKeyPair = async (
       keyObject
     );
     const pvtKey = new ethers.Wallet(bufferPvtKey).privateKey;
-    returnMsg = { msgType: "success", eventType: "string", msg: pvtKey };
-    return returnMsg;
-  } catch (error) {
-    returnMsg = {
-      msgType: "error",
-      eventType: "string",
-      msg: "Password is wrong, please enter a correct password.",
+    extensionEvent = {
+      eventStatus: "success",
+      eventType: "layer_extensionCall",
+      eventResult: pvtKey,
     };
-    return returnMsg;
+    return extensionEvent;
+  } catch (error) {
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_extensionCall",
+      eventResult: "Password is wrong, please enter a correct password.",
+    };
+    return extensionEvent;
   }
 };
 
@@ -276,10 +280,10 @@ export const exportPvtKeyPairFile = async (
   context: vscode.ExtensionContext,
   selectedAddress: string
 ) => {
-  let returnMsg = {
-    msgType: "",
-    eventType: "",
-    msg: "",
+  let extensionEvent: ExtensionEventTypes = {
+    eventStatus: "fail",
+    eventType: "layer_extensionCall",
+    eventResult: "",
   };
   try {
     const files = fs.readdirSync(`${context.extensionPath}/keystore`);
@@ -310,21 +314,21 @@ export const exportPvtKeyPairFile = async (
             if (err) throw err;
           }
         );
-        returnMsg = {
-          msgType: "success",
-          eventType: "string",
-          msg: `Account ${selectedAddress} exported successfully to ${fileUri[0].fsPath}`,
+        extensionEvent = {
+          eventStatus: "success",
+          eventType: "layer_extensionCall",
+          eventResult: `Account ${selectedAddress} exported successfully to ${fileUri[0].fsPath}`,
         };
       }
     });
-    return returnMsg;
+    return extensionEvent;
   } catch (error) {
-    returnMsg = {
-      msgType: "error",
-      eventType: "string",
-      msg: `Error occoured while exporting account ${selectedAddress}`,
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_extensionCall",
+      eventResult: `Error occoured while exporting account ${selectedAddress}`,
     };
-    return returnMsg;
+    return extensionEvent;
   }
 };
 
@@ -333,7 +337,7 @@ export const sendTransaction = async (
   context: ExtensionContext,
   txObject: TxObjecttype
 ) => {
-  let returnMsg: ReturnDataType;
+  let extensionEvent: ExtensionEventTypes;
   try {
     const provider = getSelectedNetworkProvider(txObject.selectedNetworkRpcUrl);
     const pvtKey = await exportPvtKeyPair(
@@ -346,29 +350,29 @@ export const sendTransaction = async (
       value: ethers.utils.parseEther(txObject.value),
       gasLimit: txObject.gasLimit,
     };
-    if (pvtKey.msgType === "success") {
-      const wallet = new ethers.Wallet(pvtKey.msg, provider);
+    if (pvtKey.eventStatus === "success") {
+      const wallet = new ethers.Wallet(pvtKey.eventResult as string, provider);
       const tx = await wallet.sendTransaction(txData);
-      const sumittedTx = await tx.wait();
-      returnMsg = {
-        msgType: "success",
-        eventType: "txObject",
-        msg: `Transaction successful, Transaction hash: ${sumittedTx.transactionHash}`,
+      const submittedTx = await tx.wait();
+      extensionEvent = {
+        eventStatus: "success",
+        eventType: "layer_mutableCall",
+        eventResult: generateTxnInterface(submittedTx),
       };
     } else {
-      returnMsg = {
-        msgType: "error",
-        eventType: "string",
-        msg: `Please enter a valid password, password is not correct.`,
+      extensionEvent = {
+        eventStatus: "fail",
+        eventType: "layer_extensionCall",
+        eventResult: `Please enter a valid password, password is not correct.`,
       };
     }
-    return returnMsg;
+    return extensionEvent;
   } catch (error: any) {
-    returnMsg = {
-      msgType: "error",
-      eventType: "string",
-      msg: error.body,
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_mutableCall",
+      eventResult: error.body,
     };
-    return returnMsg;
+    return extensionEvent;
   }
 };

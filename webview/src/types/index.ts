@@ -11,10 +11,28 @@ export interface NetworkConfig {
   nativeCurrency: NativeCurrencyType;
 }
 
-export interface EventType {
-  msgType: string;
-  eventType: string;
-  msg: any;
+export interface TxInterface {
+  from: string;
+  to: string;
+  txHash: string;
+  gas?: string;
+  exexutionCost?: string;
+  transactionCost?: string;
+  input?: string;
+  decodedInput?: string | Object;
+  decodedOutput?: string | Object;
+  logs?: any;
+  value?: string;
+}
+
+export interface WebViewEventType {
+  eventStatus: "success" | "fail";
+  eventType:
+    | "layer_extensionCall"
+    | "layer_ImutableCall"
+    | "layer_mutableCall"
+    | "layer_msg";
+  eventResult: string | TxInterface;
 }
 
 export interface TxObjecttype {

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { EventType, NetworkConfig } from "../types";
+import { WebViewEventType, NetworkConfig } from "../types";
 
 interface extensionState {
   networks: any;
@@ -12,7 +12,7 @@ interface extensionState {
   walletNetwork: string;
   walletNetworkConfig: any;
   walletAccountBalance: string;
-  eventMsg: EventType | undefined;
+  eventMsg: WebViewEventType | undefined;
   isHomeTx: boolean;
   isWalletTx: boolean;
   compiledContracts: Array<string>;
@@ -30,9 +30,9 @@ const initialState: extensionState = {
   walletNetworkConfig: {},
   walletAccountBalance: "0",
   eventMsg: {
-    msgType: "success",
-    eventType: "regular",
-    msg: "Welcome to ETHcode-layer",
+    eventStatus: "success",
+    eventType: "layer_msg",
+    eventResult: "Welcome to ETHcode-layer",
   },
   isHomeTx: false,
   isWalletTx: false,

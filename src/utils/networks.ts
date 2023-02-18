@@ -113,9 +113,9 @@ const displayBalance = async (context: vscode.ExtensionContext) => {
 };
 
 const isTestingNetwork = (context: vscode.ExtensionContext) => {
-  if (getSelectedNetwork(context) === "Ganache Testnet") return true;
+  if (getSelectedNetwork(context) === "Ganache Network") return true;
 
-  if (getSelectedNetwork(context) === "Hardhat Testnet") return true;
+  if (getSelectedNetwork(context) === "Hardhat Network") return true;
 
   return false;
 };
