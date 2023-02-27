@@ -3,9 +3,20 @@ import * as path from "path";
 import * as fs from "fs";
 
 import { logger } from "../lib";
-import { CompiledJSONOutput, IFunctionQP, isHardhatProject } from "../types";
+import {
+  CompiledJSONOutput,
+  ConstructorInputValue,
+  ExtensionEventTypes,
+  FunctionObjectType,
+  IFunctionQP,
+  isHardhatProject,
+  JsonFragmentType,
+} from "../types";
 import { getDirectoriesRecursive } from "../lib/file";
+import { getABIType } from "../utilities/functions";
+import { JsonFragment } from "@ethersproject/abi";
 
+// load all compiled contracts
 export const loadAllCompiledContracts = (context: ExtensionContext) => {
   if (workspace.workspaceFolders === undefined) {
     logger.error(new Error("Please open your solidity project to vscode"));
@@ -87,4 +98,47 @@ const loadAllCompiledJsonOutputs = (path_: string) => {
   });
 
   return changedFiles;
+};
+
+export const getContractConstructor = (
+  context: ExtensionContext,
+  contract: string
+): FunctionObjectType[] | undefined => {
+  const contracts = context.workspaceState.get("contracts") as {
+    [name: string]: CompiledJSONOutput;
+  };
+  if (contracts === undefined || Object.keys(contracts).length === 0) return;
+  if (contract === undefined) return;
+
+  const contractName = Object.keys(contracts).filter(
+    (i: string) => i === contract
+  );
+  const contractJSONOutput: CompiledJSONOutput = contracts[contractName[0]];
+  const contractConstructor = getABIType(contractJSONOutput)?.filter(
+    (i: JsonFragment) => i.type === "constructor"
+  );
+
+  if (contractConstructor === undefined || contractConstructor.length === 0) {
+    return;
+  }
+
+  const constInps = contractConstructor[0].inputs;
+  if (constInps == null || constInps.length === 0) {
+    return;
+  }
+
+  const constructorObject: FunctionObjectType[] = contractConstructor.map(
+    (e: {
+      name: string;
+      stateMutability: string;
+      inputs: JsonFragmentType[];
+      type: string;
+    }) => ({
+      stateMutability: e.stateMutability,
+      type: e.type,
+      inputs: e.inputs?.map((c) => ({ ...c, value: "" })),
+    })
+  );
+
+  return constructorObject;
 };

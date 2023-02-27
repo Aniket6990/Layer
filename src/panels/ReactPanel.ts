@@ -18,7 +18,11 @@ import {
   exportPvtKeyPairFile,
   sendTransaction,
 } from "../config";
-import { loadAllCompiledContracts } from "../config/contract";
+import {
+  getContractConstructor,
+  loadAllCompiledContracts,
+} from "../config/contract";
+import { ConstructorInputValue, JsonFragmentType } from "../types";
 import { getUri } from "../utilities/getUri";
 
 export class ReactPanel {
@@ -236,6 +240,19 @@ export class ReactPanel {
                 data: compiledContracts,
               });
             }
+            break;
+          }
+          case "get-contract-constructor": {
+            const { contractTitle } = message.data;
+            const constructorInputs = getContractConstructor(
+              context,
+              contractTitle
+            );
+            webview.postMessage({
+              command: "post-contract-constructor",
+              data: constructorInputs,
+            });
+            break;
           }
         }
       },

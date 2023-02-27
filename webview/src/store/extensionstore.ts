@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { WebViewEventType, NetworkConfig } from "../types";
+import { WebViewEventType, NetworkConfig, JsonFragmentType } from "../types";
 
 interface extensionState {
   networks: any;
@@ -16,6 +16,9 @@ interface extensionState {
   isHomeTx: boolean;
   isWalletTx: boolean;
   compiledContracts: Array<string>;
+  selectedContract: string;
+  selectedContractConstructor: any;
+  gasLimit: string;
 }
 
 const initialState: extensionState = {
@@ -37,6 +40,9 @@ const initialState: extensionState = {
   isHomeTx: false,
   isWalletTx: false,
   compiledContracts: [],
+  selectedContract: "Select Contract",
+  selectedContractConstructor: undefined,
+  gasLimit: "3000000",
 };
 export const extensionSlice = createSlice({
   name: "extension",
@@ -84,6 +90,15 @@ export const extensionSlice = createSlice({
     setCompiledContracts(state, action) {
       state.compiledContracts = action.payload;
     },
+    setSelectedContract(state, action) {
+      state.selectedContract = action.payload;
+    },
+    setSelectedContractConstructor(state, action) {
+      state.selectedContractConstructor = action.payload;
+    },
+    setGasLimit(state, action) {
+      state.gasLimit = action.payload;
+    },
   },
 });
 
@@ -102,6 +117,9 @@ export const {
   setIsHomeTx,
   setIsWalletTx,
   setCompiledContracts,
+  setSelectedContract,
+  setSelectedContractConstructor,
+  setGasLimit,
 } = extensionSlice.actions;
 
 export default extensionSlice.reducer;

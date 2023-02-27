@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   VSCodeButton,
   VSCodeDropdown,
@@ -10,16 +10,19 @@ import { FaRegCopy } from "react-icons/fa";
 import { VscRefresh } from "react-icons/vsc";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
+  setGasLimit,
   setSelectedAccount,
+  setSelectedContract,
   setSelectedNetwork,
   setSelectedNetworkConfig,
 } from "../../store/extensionstore";
 import { NetworkConfig, TxInterface } from "../../types";
 import {
   displayAccountBalance,
+  listContractConstructor,
   loadAllContracts,
 } from "../../configuration/webviewpostmsg";
-import Toggle from "../../components/UI/Toggle";
+import ParameterInput from "../../components/UI/ParameterInput";
 
 const ConfigContainer = styled.div`
   height: 600px;
@@ -31,7 +34,7 @@ const ConfigContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
   padding: 20px;
-  gap: 8px;
+  gap: 20px;
 `;
 
 const ConfigWrapper = styled.div`
@@ -105,12 +108,6 @@ const RefreshIcon = styled(VscRefresh)`
   }
 `;
 
-const DummyTxn: TxInterface = {
-  from: "0x4d1D0a52ca9a69CA4a1Ecd808B51A5E52562156D",
-  to: "0x4d1D0a52ca9a69CA4a1Ecd808B51A5E52562156D",
-  txHash: "0x4d1D0a52ca9a69CA4a1Ecd808B51A5E52562156D",
-  gas: "439434",
-};
 const ConfigArea = () => {
   const dispatch = useAppDispatch();
   const networks = useAppSelector((state) => state.extension.networks);
@@ -130,6 +127,16 @@ const ConfigArea = () => {
   const compiledContracts = useAppSelector(
     (state) => state.extension.compiledContracts
   );
+
+  const selectedContract = useAppSelector(
+    (state) => state.extension.selectedContract
+  );
+
+  const gasLimit = useAppSelector((state) => state.extension.gasLimit);
+
+  const selectedContractConstructor = useAppSelector(
+    (state) => state.extension.selectedContractConstructor
+  );
   useEffect(() => {
     if (
       selectedAccount !== "Select Account" &&
@@ -138,6 +145,13 @@ const ConfigArea = () => {
       displayAccountBalance(selectedAccount, selectedNetConfig.rpc);
     }
   }, [selectedAccount, selectedNetConfig]);
+
+  // list all constructor parameters
+  useEffect(() => {
+    if (selectedContract !== "Select Contract") {
+      listContractConstructor(selectedContract);
+    }
+  }, [selectedContract]);
 
   const getSelectedConf = (selectedNetwork: string) => {
     const selectedNetworkConfig = networks[selectedNetwork];
@@ -155,6 +169,11 @@ const ConfigArea = () => {
 
   const handleAccountDropdownChange = (event: any) => {
     dispatch(setSelectedAccount(event.target.value));
+  };
+
+  const DeployContract = (contractParams: string[]) => {
+    if (selectedContractConstructor === undefined) {
+    }
   };
   return (
     <ConfigContainer>
@@ -221,7 +240,10 @@ const ConfigArea = () => {
         <FullObjectWrapper>
           <GasLimitTextField
             placeholder="Gas limit"
-            value={"3000000"}
+            value={gasLimit}
+            onChange={(e: any) => {
+              dispatch(setGasLimit(e.target.value));
+            }}
           ></GasLimitTextField>
           <CopyIcon></CopyIcon>
         </FullObjectWrapper>
@@ -242,7 +264,12 @@ const ConfigArea = () => {
       <ConfigWrapper>
         <span>contract</span>
         <FullObjectWrapper>
-          <DropDown>
+          <DropDown
+            value={selectedContract}
+            onChange={(e: any) => {
+              dispatch(setSelectedContract(e.target.value));
+            }}
+          >
             <VSCodeOption value="Select Contract">Select Contract</VSCodeOption>
             {compiledContracts.map((contract, index) => {
               return (
@@ -269,6 +296,23 @@ const ConfigArea = () => {
           ></AtAddressTextField>
         </PartialObjectWrapper>
       </ConfigWrapper>
+      {selectedContract !== "Select Contract" ? (
+        <span>{selectedContract}</span>
+      ) : null}
+      {selectedContractConstructor !== undefined ? (
+        <ParameterInput
+          title="Deploy"
+          buttonSize={1}
+          inputSize={3}
+          functionObject={selectedContractConstructor[0]}
+        >
+          Deploy
+        </ParameterInput>
+      ) : (
+        <ParameterInput title="Deploy" buttonSize={1}>
+          Deploy
+        </ParameterInput>
+      )}
     </ConfigContainer>
   );
 };

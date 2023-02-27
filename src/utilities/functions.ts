@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { TxInterface } from "../types";
+import { CompiledJSONOutput, TxInterface } from "../types";
 
 export const generateTxnInterface = (
   receipt: ethers.providers.TransactionReceipt
@@ -11,4 +11,12 @@ export const generateTxnInterface = (
     gas: ethers.utils.formatUnits(receipt.gasUsed, "wei"),
   };
   return txnReceipt;
+};
+
+export const getABIType = (contract: CompiledJSONOutput): any => {
+  if (contract.contractType === 0) return [];
+
+  if (contract.contractType === 1) return contract.hardhatOutput?.abi;
+
+  return contract.remixOutput?.abi;
 };

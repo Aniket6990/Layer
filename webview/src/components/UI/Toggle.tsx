@@ -124,7 +124,10 @@ const Toggle = (props: {
   const [open, setOpen] = useState(false);
   return (
     <Container>
-      <ToggleHeader defaultChecked={open} onClick={(e) => setOpen(!open)}>
+      <ToggleHeader
+        defaultChecked={open}
+        onClick={(e) => setOpen((open) => !open)}
+      >
         {txnStatus === "success" ? (
           <TransactionSuccessIcon></TransactionSuccessIcon>
         ) : (

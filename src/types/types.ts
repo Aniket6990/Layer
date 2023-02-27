@@ -151,6 +151,22 @@ export interface ExtensionEventTypes {
   eventType: "layer_extensionCall" | "layer_ImutableCall" | "layer_mutableCall";
   eventResult: string | TxInterface;
 }
+
+export interface JsonFragmentType {
+  readonly name?: string;
+  readonly indexed?: boolean;
+  readonly type?: string;
+  readonly internalType?: any;
+  readonly components?: ReadonlyArray<JsonFragmentType>;
+  value?: string;
+}
+
+export interface FunctionObjectType {
+  name?: string;
+  stateMutability?: string;
+  type?: string;
+  inputs: Array<JsonFragmentType>;
+}
 // Typeguard
 
 export function isConstructorInputValue(

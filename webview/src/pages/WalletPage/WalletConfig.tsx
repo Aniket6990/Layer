@@ -33,7 +33,7 @@ const ConfigContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
   padding: 20px 0px 20px 20px;
-  gap: 8px;
+  gap: 20px;
 `;
 
 const ConfigWrapper = styled.div`

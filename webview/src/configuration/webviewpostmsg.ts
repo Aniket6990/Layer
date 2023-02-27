@@ -98,3 +98,12 @@ export const loadAllContracts = () => {
     command: "get-compiled-contracts",
   });
 };
+
+export const listContractConstructor = (contractName: string) => {
+  vscode.postMessage({
+    command: "get-contract-constructor",
+    data: {
+      contractTitle: contractName,
+    },
+  });
+};
