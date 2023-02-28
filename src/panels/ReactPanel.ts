@@ -19,10 +19,15 @@ import {
   sendTransaction,
 } from "../config";
 import {
+  deploySelectedContract,
   getContractConstructor,
   loadAllCompiledContracts,
 } from "../config/contract";
-import { ConstructorInputValue, JsonFragmentType } from "../types";
+import {
+  ConstructorInputValue,
+  ExtensionEventTypes,
+  JsonFragmentType,
+} from "../types";
 import { getUri } from "../utilities/getUri";
 
 export class ReactPanel {
@@ -254,10 +259,37 @@ export class ReactPanel {
             });
             break;
           }
+          case "deploy-contract": {
+            const { contractName, params, password, selectedAccount, rpcURL } =
+              message.data;
+            const deploymentResult = await deploySelectedContract(
+              context,
+              contractName,
+              params,
+              password,
+              selectedAccount,
+              rpcURL
+            );
+            if (deploymentResult !== undefined) {
+              webview.postMessage({
+                command: "contract-deployed",
+                data: deploymentResult,
+              });
+            }
+            break;
+          }
         }
       },
       undefined,
       this._disposables
     );
+  }
+
+  public static EmitExtensionEvent(result: ExtensionEventTypes) {
+    let webview = this.currentPanel?._panel.webview as Webview;
+    webview.postMessage({
+      command: "extension-event",
+      data: result,
+    });
   }
 }

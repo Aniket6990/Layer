@@ -107,3 +107,22 @@ export const listContractConstructor = (contractName: string) => {
     },
   });
 };
+
+export const deployContract = (
+  contractName: string,
+  params: string[] | undefined,
+  password: string,
+  selectedAccount: string,
+  rpcURL: string
+) => {
+  vscode.postMessage({
+    command: "deploy-contract",
+    data: {
+      contractName: contractName,
+      params: params,
+      password: password,
+      selectedAccount: selectedAccount,
+      rpcURL: rpcURL,
+    },
+  });
+};

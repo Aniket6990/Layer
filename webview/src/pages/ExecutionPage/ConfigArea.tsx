@@ -18,6 +18,7 @@ import {
 } from "../../store/extensionstore";
 import { NetworkConfig, TxInterface } from "../../types";
 import {
+  deployContract,
   displayAccountBalance,
   listContractConstructor,
   loadAllContracts,
@@ -34,12 +35,13 @@ const ConfigContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
   padding: 20px;
-  gap: 20px;
+  gap: 14px;
 `;
 
 const ConfigWrapper = styled.div`
   font-size: 12px;
   color: var(--vscode-icon-foreground);
+  font-weight: 600;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -108,8 +110,16 @@ const RefreshIcon = styled(VscRefresh)`
   }
 `;
 
+const PasswordTextField = styled(VSCodeTextField)`
+  width: 90%;
+  font-size: 12px;
+  border: 1px solid var(--vscode-icon-foreground);
+  align-self: flex-start;
+`;
+
 const ConfigArea = () => {
   const dispatch = useAppDispatch();
+  const [pswd, setPswd] = useState<string>();
   const networks = useAppSelector((state) => state.extension.networks);
   const accounts = useAppSelector((state) => state.extension.addresses);
   const selectedAccount = useAppSelector(
@@ -171,8 +181,20 @@ const ConfigArea = () => {
     dispatch(setSelectedAccount(event.target.value));
   };
 
-  const DeployContract = (contractParams: string[]) => {
-    if (selectedContractConstructor === undefined) {
+  const handleDeployContract = (contractParams: string[]) => {
+    if (
+      selectedAccount !== "Select Account" &&
+      pswd !== undefined &&
+      selectedNetConfig.rpc !== undefined &&
+      selectedContract !== "Select Contract"
+    ) {
+      deployContract(
+        selectedContract,
+        contractParams,
+        pswd,
+        selectedAccount,
+        selectedNetConfig.rpc
+      );
     }
   };
   return (
@@ -286,7 +308,6 @@ const ConfigArea = () => {
           ></RefreshIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
-      <div>OR</div>
       <ConfigWrapper>
         <PartialObjectWrapper>
           <AtAddressButton>At Address</AtAddressButton>
@@ -296,23 +317,35 @@ const ConfigArea = () => {
           ></AtAddressTextField>
         </PartialObjectWrapper>
       </ConfigWrapper>
-      {selectedContract !== "Select Contract" ? (
-        <span>{selectedContract}</span>
-      ) : null}
       {selectedContractConstructor !== undefined ? (
         <ParameterInput
           title="Deploy"
           buttonSize={1}
           inputSize={3}
           functionObject={selectedContractConstructor[0]}
+          functionToCall={handleDeployContract}
         >
           Deploy
         </ParameterInput>
       ) : (
-        <ParameterInput title="Deploy" buttonSize={1}>
+        <ParameterInput
+          title="Deploy"
+          buttonSize={1}
+          functionToCall={handleDeployContract}
+        >
           Deploy
         </ParameterInput>
       )}
+
+      <ConfigWrapper>
+        <span>Password</span>
+        <PasswordTextField
+          placeholder="password"
+          value={pswd !== undefined ? pswd : ""}
+          onChange={(e: any) => setPswd(e.target.value)}
+          type="password"
+        ></PasswordTextField>
+      </ConfigWrapper>
     </ConfigContainer>
   );
 };

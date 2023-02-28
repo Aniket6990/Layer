@@ -97,6 +97,14 @@ function App() {
           dispatch(setSelectedContractConstructor(eventData.data));
           break;
         }
+        case "contract-deployed": {
+          dispatch(setEventMsg(eventData.data));
+          break;
+        }
+        case "extension-event": {
+          dispatch(setEventMsg(eventData.data));
+          break;
+        }
         default: {
           console.log("Invalid event", event.data);
           break;

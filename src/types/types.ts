@@ -148,7 +148,11 @@ export interface TxInterface {
 
 export interface ExtensionEventTypes {
   eventStatus: "success" | "fail";
-  eventType: "layer_extensionCall" | "layer_ImutableCall" | "layer_mutableCall";
+  eventType:
+    | "layer_extensionCall"
+    | "layer_ImutableCall"
+    | "layer_mutableCall"
+    | "layer_msg";
   eventResult: string | TxInterface;
 }
 

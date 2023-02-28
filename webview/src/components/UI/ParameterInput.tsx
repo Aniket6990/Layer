@@ -44,7 +44,7 @@ const Input = styled.input.attrs((props: { size: any }) => ({
   color: var(--vscode-input-foreground);
   flex-grow: ${(props) => props.size};
   outline: none;
-  border: none;
+  border: 1px solid var(--vscode-icon-foreground);
   &:hover {
     cursor: text;
   }
@@ -92,7 +92,12 @@ const MultiParamsInput = (props: {
           (constructorInput: JsonFragmentType, index: any) => {
             return (
               <Param key={index}>
-                <span style={{ width: "20%" }}>
+                <span
+                  style={{
+                    width: "20%",
+                    color: "var(--vscode-icon-foreground",
+                  }}
+                >
                   {`${constructorInput.name as string}:`}
                 </span>
                 <Input
@@ -117,13 +122,10 @@ const ParameterInput = (props: {
   buttonSize?: Number;
   inputSize?: Number;
   functionObject?: FunctionObjectType;
+  functionToCall: (...params: any[]) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const [paramInput, setParamInput] = useState<Array<string>>([]);
-
-  useEffect(() => {
-    console.log(paramInput);
-  }, [paramInput]);
 
   const enterInputParams = (input: string, index?: any) => {
     if (open) {
@@ -140,7 +142,7 @@ const ParameterInput = (props: {
   const placeHolderValue = () => {
     const inputs = props.functionObject?.inputs.map(
       (input: JsonFragmentType, index) => {
-        return input.name as string;
+        return `${input.type}: ${input.name}`;
       }
     ) as string[];
     return inputs.toString();
@@ -151,7 +153,16 @@ const ParameterInput = (props: {
       <DeployParamsContainer>
         <PartialObjectWrapper>
           <Button
-            onClick={props.onClick}
+            onClick={(e) => {
+              if (open) {
+                const paramValues = Object.values(paramInput);
+                props.functionToCall(paramValues);
+                setParamInput([]);
+              } else {
+                props.functionToCall(paramInput);
+                setParamInput([]);
+              }
+            }}
             title={props.title}
             size={props.buttonSize}
           >
@@ -175,12 +186,14 @@ const ParameterInput = (props: {
           open ? (
             <UpArrow
               onClick={(e) => {
+                setParamInput([]);
                 setOpen((open) => !open);
               }}
             ></UpArrow>
           ) : (
             <DownArrow
               onClick={(e) => {
+                setParamInput([]);
                 setOpen((open) => !open);
               }}
             ></DownArrow>
