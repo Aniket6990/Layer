@@ -19,6 +19,7 @@ import {
   setWalletAccountBalance,
   setEventMsg,
   setCompiledContracts,
+  setSelectedContractConstructor,
 } from "./store/extensionstore";
 
 const Main = styled.div`
@@ -89,6 +90,19 @@ function App() {
         }
         case "post-compiled-contracts": {
           dispatch(setCompiledContracts(eventData.data));
+          break;
+        }
+        case "post-contract-constructor": {
+          console.log("got constructor:", eventData.data);
+          dispatch(setSelectedContractConstructor(eventData.data));
+          break;
+        }
+        case "contract-deployed": {
+          dispatch(setEventMsg(eventData.data));
+          break;
+        }
+        case "extension-event": {
+          dispatch(setEventMsg(eventData.data));
           break;
         }
         default: {

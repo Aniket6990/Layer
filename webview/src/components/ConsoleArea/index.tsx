@@ -13,6 +13,7 @@ const ConsoleContainer = styled.div`
   border-radius: 10px;
   padding: 20px;
   color: var(--vscode-icon-foreground);
+  font-weight: 600;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

@@ -18,7 +18,16 @@ import {
   exportPvtKeyPairFile,
   sendTransaction,
 } from "../config";
-import { loadAllCompiledContracts } from "../config/contract";
+import {
+  deploySelectedContract,
+  getContractConstructor,
+  loadAllCompiledContracts,
+} from "../config/contract";
+import {
+  ConstructorInputValue,
+  ExtensionEventTypes,
+  JsonFragmentType,
+} from "../types";
 import { getUri } from "../utilities/getUri";
 
 export class ReactPanel {
@@ -236,11 +245,51 @@ export class ReactPanel {
                 data: compiledContracts,
               });
             }
+            break;
+          }
+          case "get-contract-constructor": {
+            const { contractTitle } = message.data;
+            const constructorInputs = getContractConstructor(
+              context,
+              contractTitle
+            );
+            webview.postMessage({
+              command: "post-contract-constructor",
+              data: constructorInputs,
+            });
+            break;
+          }
+          case "deploy-contract": {
+            const { contractName, params, password, selectedAccount, rpcURL } =
+              message.data;
+            const deploymentResult = await deploySelectedContract(
+              context,
+              contractName,
+              params,
+              password,
+              selectedAccount,
+              rpcURL
+            );
+            if (deploymentResult !== undefined) {
+              webview.postMessage({
+                command: "contract-deployed",
+                data: deploymentResult,
+              });
+            }
+            break;
           }
         }
       },
       undefined,
       this._disposables
     );
+  }
+
+  public static EmitExtensionEvent(result: ExtensionEventTypes) {
+    let webview = this.currentPanel?._panel.webview as Webview;
+    webview.postMessage({
+      command: "extension-event",
+      data: result,
+    });
   }
 }

@@ -3,9 +3,27 @@ import * as path from "path";
 import * as fs from "fs";
 
 import { logger } from "../lib";
-import { CompiledJSONOutput, IFunctionQP, isHardhatProject } from "../types";
+import {
+  CompiledJSONOutput,
+  ConstructorInputValue,
+  ExtensionEventTypes,
+  FunctionObjectType,
+  IFunctionQP,
+  isHardhatProject,
+  JsonFragmentType,
+} from "../types";
 import { getDirectoriesRecursive } from "../lib/file";
+import {
+  getABIType,
+  getContractByteCode,
+  isTestingNetwork,
+} from "../utilities/functions";
+import { JsonFragment } from "@ethersproject/abi";
+import { ethers } from "ethers";
+import { exportPvtKeyPair, getSelectedNetworkProvider } from "./account";
+import { ReactPanel } from "../panels/ReactPanel";
 
+// load all compiled contracts
 export const loadAllCompiledContracts = (context: ExtensionContext) => {
   if (workspace.workspaceFolders === undefined) {
     logger.error(new Error("Please open your solidity project to vscode"));
@@ -87,4 +105,139 @@ const loadAllCompiledJsonOutputs = (path_: string) => {
   });
 
   return changedFiles;
+};
+
+export const getContractConstructor = (
+  context: ExtensionContext,
+  contract: string
+): FunctionObjectType[] | undefined => {
+  const contracts = context.workspaceState.get("contracts") as {
+    [name: string]: CompiledJSONOutput;
+  };
+  if (contracts === undefined || Object.keys(contracts).length === 0) return;
+  if (contract === undefined) return;
+
+  const contractName = Object.keys(contracts).filter(
+    (i: string) => i === contract
+  );
+  const contractJSONOutput: CompiledJSONOutput = contracts[contractName[0]];
+  const contractConstructor = getABIType(contractJSONOutput)?.filter(
+    (i: JsonFragment) => i.type === "constructor"
+  );
+
+  if (contractConstructor === undefined || contractConstructor.length === 0) {
+    return;
+  }
+
+  const constInps = contractConstructor[0].inputs;
+  if (constInps == null || constInps.length === 0) {
+    return;
+  }
+
+  const constructorObject: FunctionObjectType[] = contractConstructor.map(
+    (e: {
+      name: string;
+      stateMutability: string;
+      inputs: JsonFragmentType[];
+      type: string;
+    }) => ({
+      stateMutability: e.stateMutability,
+      type: e.type,
+      inputs: e.inputs?.map((c) => ({ ...c, value: "" })),
+    })
+  );
+
+  return constructorObject;
+};
+
+const getContractFactoryWithParams = async (
+  context: ExtensionContext,
+  contractName: string,
+  password: string,
+  selectedAccount: string,
+  rpcURL: string
+): Promise<ethers.ContractFactory | undefined> => {
+  const contracts = context.workspaceState.get("contracts") as {
+    [name: string]: CompiledJSONOutput;
+  };
+  const contractJSONOutput: CompiledJSONOutput = contracts[contractName];
+
+  const abi = getABIType(contractJSONOutput);
+  if (abi === undefined) throw new Error("Abi is not defined.");
+
+  const byteCode = getContractByteCode(contractJSONOutput);
+  if (byteCode === undefined) throw new Error("ByteCode is not defined.");
+
+  let myContract;
+  if (isTestingNetwork(context) === true) {
+    // Deploy to ganache network
+    const provider = getSelectedNetworkProvider(
+      rpcURL
+    ) as ethers.providers.JsonRpcProvider;
+    const signer = provider.getSigner();
+    myContract = new ethers.ContractFactory(abi, byteCode, signer);
+  } else {
+    // Deploy to ethereum network
+    const privateKey = await exportPvtKeyPair(
+      context,
+      selectedAccount,
+      password
+    );
+    if (privateKey.eventStatus === "fail") {
+      ReactPanel.EmitExtensionEvent({
+        eventStatus: "fail",
+        eventType: "layer_extensionCall",
+        eventResult: `Password for ${selectedAccount} is wrong.`,
+      });
+      return;
+    }
+    const provider = getSelectedNetworkProvider(rpcURL);
+    const wallet = new ethers.Wallet(privateKey.eventResult as string);
+    const signingAccount = wallet.connect(provider);
+    myContract = new ethers.ContractFactory(abi, byteCode, signingAccount);
+  }
+  return myContract;
+};
+
+export const deploySelectedContract = async (
+  context: ExtensionContext,
+  contractName: string,
+  params: string[],
+  password: string,
+  selectedAccount: string,
+  rpcURL: string
+) => {
+  let extensionEvent: ExtensionEventTypes = {
+    eventStatus: "success",
+    eventType: "layer_msg",
+    eventResult: `Deploying ${contractName}.sol`,
+  };
+  ReactPanel.EmitExtensionEvent(extensionEvent);
+  try {
+    const myContract = await getContractFactoryWithParams(
+      context,
+      contractName,
+      password,
+      selectedAccount,
+      rpcURL
+    );
+    const parameters = !!params.length ? params : [];
+
+    if (myContract !== undefined) {
+      const contract = await myContract.deploy(...parameters);
+      extensionEvent = {
+        eventStatus: "success",
+        eventType: "layer_extensionCall",
+        eventResult: `${contractName}.sol deployed on ${contract.address}`,
+      };
+      return extensionEvent;
+    }
+  } catch (err: any) {
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_extensionCall",
+      eventResult: `Error while deploying ${contractName} ${err.message}`,
+    };
+    return extensionEvent;
+  }
 };

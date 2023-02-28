@@ -30,12 +30,13 @@ const ConfigContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
   padding: 20px 0px 20px 20px;
-  gap: 8px;
+  gap: 14px;
 `;
 
 const ConfigWrapper = styled.div`
   font-size: 12px;
   color: var(--vscode-icon-foreground);
+  font-weight: 600;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

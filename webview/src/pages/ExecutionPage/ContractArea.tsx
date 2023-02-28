@@ -19,6 +19,7 @@ const ContractContainer = styled.div`
 const DeployedContract = styled.div`
   font-size: 12px;
   color: var(--vscode-icon-foreground);
+  font-weight: 600;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -43,6 +44,7 @@ const DropDown = styled(VSCodeDropdown)`
 const ContractCall = styled.div`
   font-size: 12px;
   color: var(--vscode-icon-foreground);
+  font-weight: 600;
   width: 100%;
   height: 100%;
 `;

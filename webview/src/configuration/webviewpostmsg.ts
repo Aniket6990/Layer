@@ -98,3 +98,31 @@ export const loadAllContracts = () => {
     command: "get-compiled-contracts",
   });
 };
+
+export const listContractConstructor = (contractName: string) => {
+  vscode.postMessage({
+    command: "get-contract-constructor",
+    data: {
+      contractTitle: contractName,
+    },
+  });
+};
+
+export const deployContract = (
+  contractName: string,
+  params: string[] | undefined,
+  password: string,
+  selectedAccount: string,
+  rpcURL: string
+) => {
+  vscode.postMessage({
+    command: "deploy-contract",
+    data: {
+      contractName: contractName,
+      params: params,
+      password: password,
+      selectedAccount: selectedAccount,
+      rpcURL: rpcURL,
+    },
+  });
+};

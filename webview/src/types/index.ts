@@ -1,3 +1,4 @@
+import { JsonFragment } from "@ethersproject/abi";
 interface NativeCurrencyType {
   name: string;
   symbol: string;
@@ -42,4 +43,20 @@ export interface TxObjecttype {
   value: string;
   gasLimit: string;
   pswd: string;
+}
+
+export interface JsonFragmentType {
+  readonly name?: string;
+  readonly indexed?: boolean;
+  readonly type?: string;
+  readonly internalType?: any;
+  readonly components?: ReadonlyArray<JsonFragmentType>;
+  value?: string;
+}
+
+export interface FunctionObjectType {
+  name?: string;
+  stateMutability?: string;
+  type?: string;
+  inputs: Array<JsonFragmentType>;
 }

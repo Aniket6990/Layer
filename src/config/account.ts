@@ -75,7 +75,7 @@ export const createNewKeyPair = (
     );
     const account: Account = {
       pubAddr: keyObject.address,
-      checksumAddr: toChecksumAddress(keyObject.address),
+      checksumAddr: ethers.utils.getAddress(keyObject.address),
     };
 
     if (!fs.existsSync(`${path}/keystore`)) {
@@ -123,7 +123,7 @@ export const createAccountFromKey = async (
     );
     const account: Account = {
       pubAddr: keyObject.address,
-      checksumAddr: toChecksumAddress(keyObject.address),
+      checksumAddr: ethers.utils.getAddress(keyObject.address),
     };
     const accounts = await listAddresses(context, context.extensionPath);
 
@@ -184,10 +184,10 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
         const arrFilePath = fileUri[0].fsPath.split("\\");
         const file = arrFilePath[arrFilePath.length - 1];
         const arr = file.split("--");
-        const address = toChecksumAddress(`0x${arr[arr.length - 1]}`);
+        const address = ethers.utils.getAddress(`0x${arr[arr.length - 1]}`);
 
         const alreadyExist = addresses.find(
-          (element: string) => toChecksumAddress(element) === address
+          (element: string) => ethers.utils.getAddress(element) === address
         );
 
         if (alreadyExist !== undefined) {
@@ -223,7 +223,9 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
   }
 };
 
-const getSelectedNetworkProvider = (rpcUrl: string) => {
+export const getSelectedNetworkProvider = (
+  rpcUrl: string
+): ethers.providers.JsonRpcProvider | ethers.providers.BaseProvider => {
   if (isValidHttpUrl(rpcUrl)) return new provider.JsonRpcProvider(rpcUrl);
 
   return provider.getDefaultProvider(rpcUrl);
