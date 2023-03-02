@@ -112,6 +112,7 @@ export const deployContract = (
   contractName: string,
   params: string[] | undefined,
   password: string,
+  selectedNetwork: string,
   selectedAccount: string,
   rpcURL: string
 ) => {
@@ -121,6 +122,7 @@ export const deployContract = (
       contractName: contractName,
       params: params,
       password: password,
+      selectedNetwork: selectedNetwork,
       selectedAccount: selectedAccount,
       rpcURL: rpcURL,
     },
