@@ -22,6 +22,7 @@ import { JsonFragment } from "@ethersproject/abi";
 import { ethers } from "ethers";
 import { exportPvtKeyPair, getSelectedNetworkProvider } from "./account";
 import { ReactPanel } from "../panels/ReactPanel";
+import { config } from "process";
 
 // load all compiled contracts
 export const loadAllCompiledContracts = (context: ExtensionContext) => {
@@ -204,9 +205,14 @@ export const deploySelectedContract = async (
   contractName: string,
   params: string[],
   password: string,
+  selectedNetwork: string,
   selectedAccount: string,
   rpcURL: string
 ) => {
+  const contracts = context.workspaceState.get("contracts") as {
+    [name: string]: CompiledJSONOutput;
+  };
+  const contractJSONOutput: CompiledJSONOutput = contracts[contractName];
   let extensionEvent: ExtensionEventTypes = {
     eventStatus: "success",
     eventType: "layer_msg",
@@ -225,6 +231,10 @@ export const deploySelectedContract = async (
 
     if (myContract !== undefined) {
       const contract = await myContract.deploy(...parameters);
+      addContractAddress(contractJSONOutput, {
+        network: selectedNetwork,
+        address: contract.address,
+      });
       extensionEvent = {
         eventStatus: "success",
         eventType: "layer_extensionCall",
@@ -239,5 +249,74 @@ export const deploySelectedContract = async (
       eventResult: `Error while deploying ${contractName} ${err.message}`,
     };
     return extensionEvent;
+  }
+};
+
+const getContractArtifactPath = (contract: CompiledJSONOutput) => {
+  if (contract.path === undefined) {
+    throw new Error("Contract Path is empty.");
+  }
+
+  return path.join(contract.path, `${contract.name as string}.json`);
+};
+
+export const addContractAddress = (
+  contract: CompiledJSONOutput,
+  deployConfig: { network: string; address: string }
+) => {
+  if (contract === undefined) return Error("No contract available.");
+  const path = getContractArtifactPath(contract);
+  const contractJsonOutput = fs.readFileSync(path, {
+    encoding: "utf-8",
+  });
+
+  const parsedContractJson = JSON.parse(contractJsonOutput);
+  if (parsedContractJson.deployed && !!parsedContractJson.deployed.length) {
+    const isPresent = parsedContractJson.deployed.filter(
+      (config: { network: string; address: string }) =>
+        config.network === deployConfig.network
+    );
+    if (!!isPresent.length) {
+      const dataToAdd = parsedContractJson.deployed.map(
+        (config: { network: string; address: string }) => {
+          if (config.network === deployConfig.network) {
+            return {
+              network: config.network,
+              address: deployConfig.address,
+            };
+          } else {
+            return config;
+          }
+        }
+      );
+      const addDeployedInput = {
+        ...JSON.parse(contractJsonOutput),
+        deployed: dataToAdd,
+      };
+      fs.writeFile(path, JSON.stringify(addDeployedInput), "utf8", () => {
+        console.log("written successfully");
+      });
+    } else {
+      const addDeployedInput = {
+        ...JSON.parse(contractJsonOutput),
+        deployed: [
+          ...JSON.parse(contractJsonOutput).deployed,
+          { network: deployConfig.network, address: deployConfig.address },
+        ],
+      };
+      fs.writeFile(path, JSON.stringify(addDeployedInput), "utf8", () => {
+        console.log("written successfully");
+      });
+    }
+  } else {
+    const addDeployedInput = {
+      ...JSON.parse(contractJsonOutput),
+      deployed: [
+        { network: deployConfig.network, address: deployConfig.address },
+      ],
+    };
+    fs.writeFile(path, JSON.stringify(addDeployedInput), "utf8", () => {
+      console.log("written successfully");
+    });
   }
 };

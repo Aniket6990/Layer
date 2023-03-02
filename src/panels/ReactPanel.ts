@@ -260,13 +260,20 @@ export class ReactPanel {
             break;
           }
           case "deploy-contract": {
-            const { contractName, params, password, selectedAccount, rpcURL } =
-              message.data;
+            const {
+              contractName,
+              params,
+              password,
+              selectedNetwork,
+              selectedAccount,
+              rpcURL,
+            } = message.data;
             const deploymentResult = await deploySelectedContract(
               context,
               contractName,
               params,
               password,
+              selectedNetwork,
               selectedAccount,
               rpcURL
             );

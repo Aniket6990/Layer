@@ -192,6 +192,7 @@ const ConfigArea = () => {
         selectedContract,
         contractParams,
         pswd,
+        selectedNetwork,
         selectedAccount,
         selectedNetConfig.rpc
       );
