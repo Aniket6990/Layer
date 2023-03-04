@@ -128,3 +128,12 @@ export const deployContract = (
     },
   });
 };
+
+export const getDeployedContracts = (selectedNetwork: string) => {
+  vscode.postMessage({
+    command: "get-deployed-contracts",
+    data: {
+      selectedNetwork: selectedNetwork,
+    },
+  });
+};
