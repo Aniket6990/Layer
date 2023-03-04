@@ -234,6 +234,7 @@ export const deploySelectedContract = async (
       addContractAddress(contractJSONOutput, {
         network: selectedNetwork,
         address: contract.address,
+        contractName: contractName,
       });
       extensionEvent = {
         eventStatus: "success",
@@ -260,9 +261,10 @@ const getContractArtifactPath = (contract: CompiledJSONOutput) => {
   return path.join(contract.path, `${contract.name as string}.json`);
 };
 
+// add deployed contract address to the json file
 export const addContractAddress = (
   contract: CompiledJSONOutput,
-  deployConfig: { network: string; address: string }
+  deployConfig: { network: string; address: string; contractName: string }
 ) => {
   if (contract === undefined) return Error("No contract available.");
   const path = getContractArtifactPath(contract);
@@ -273,16 +275,21 @@ export const addContractAddress = (
   const parsedContractJson = JSON.parse(contractJsonOutput);
   if (parsedContractJson.deployed && !!parsedContractJson.deployed.length) {
     const isPresent = parsedContractJson.deployed.filter(
-      (config: { network: string; address: string }) =>
+      (config: { network: string; address: string; contractName: string }) =>
         config.network === deployConfig.network
     );
     if (!!isPresent.length) {
       const dataToAdd = parsedContractJson.deployed.map(
-        (config: { network: string; address: string }) => {
+        (config: {
+          network: string;
+          address: string;
+          contractName: string;
+        }) => {
           if (config.network === deployConfig.network) {
             return {
               network: config.network,
               address: deployConfig.address,
+              contractName: deployConfig.contractName,
             };
           } else {
             return config;
@@ -301,7 +308,11 @@ export const addContractAddress = (
         ...JSON.parse(contractJsonOutput),
         deployed: [
           ...JSON.parse(contractJsonOutput).deployed,
-          { network: deployConfig.network, address: deployConfig.address },
+          {
+            network: deployConfig.network,
+            address: deployConfig.address,
+            contractName: deployConfig.contractName,
+          },
         ],
       };
       fs.writeFile(path, JSON.stringify(addDeployedInput), "utf8", () => {
@@ -312,11 +323,47 @@ export const addContractAddress = (
     const addDeployedInput = {
       ...JSON.parse(contractJsonOutput),
       deployed: [
-        { network: deployConfig.network, address: deployConfig.address },
+        {
+          network: deployConfig.network,
+          address: deployConfig.address,
+          contractName: deployConfig.contractName,
+        },
       ],
     };
     fs.writeFile(path, JSON.stringify(addDeployedInput), "utf8", () => {
       console.log("written successfully");
     });
   }
+};
+
+export const fetchDeployedContract = (
+  context: ExtensionContext,
+  selectedNetwork: string
+) => {
+  const contracts = context.workspaceState.get("contracts") as {
+    [name: string]: CompiledJSONOutput;
+  };
+
+  const contractName = Object.keys(contracts);
+  const deployedContracts: Array<{
+    network: string;
+    address: string;
+    contractName: string;
+  }> = contractName.map((contract) => {
+    const contractJSONOutput: CompiledJSONOutput = contracts[contract];
+    const path = getContractArtifactPath(contractJSONOutput);
+    const contractJsonOutput = fs.readFileSync(path, {
+      encoding: "utf-8",
+    });
+
+    const parsedContractJson = JSON.parse(contractJsonOutput);
+    if (parsedContractJson.deployed && !!parsedContractJson.deployed.length) {
+      const isPresentOnNetwork = parsedContractJson.deployed.filter(
+        (config: { network: string; address: string; contractName: string }) =>
+          config.network === selectedNetwork
+      );
+      return isPresentOnNetwork[0];
+    }
+  });
+  return deployedContracts;
 };

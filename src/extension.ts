@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { commands } from "vscode";
 import { ReactPanel } from "./panels/ReactPanel";
 import {
+  fetchDeployedContract,
   getContractConstructor,
   loadAllCompiledContracts,
 } from "./config/contract";
@@ -11,7 +12,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     // command for testing
     commands.registerCommand("layer.webview.test", async () => {
-      getContractConstructor(context, "NonPayableContract");
+      fetchDeployedContract(context, "Polygon Mumbai");
     }),
 
     // Activate

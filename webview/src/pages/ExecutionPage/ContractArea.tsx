@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import styled from "styled-components";
 import { FaRegCopy } from "react-icons/fa";
+import { useAppSelector } from "../../app/hooks";
+import { getDeployedContracts } from "../../configuration/webviewpostmsg";
 
 const ContractContainer = styled.div`
   height: 600px;
@@ -63,25 +65,54 @@ const CopyIcon = styled(FaRegCopy)`
 `;
 
 const ContractArea = () => {
+  const [selectDeployedContract, setSelectDeployedContract] =
+    useState<string>("Select Contract");
+  const selectedNetwork = useAppSelector(
+    (state) => state.extension.selectedNetwork
+  );
+  const deployedContracts = useAppSelector(
+    (state) => state.extension.deployedContracts
+  );
+
+  useEffect(() => {
+    if (selectedNetwork !== "Select Network") {
+      getDeployedContracts(selectedNetwork);
+      setSelectDeployedContract("Select Contract");
+    }
+  }, [selectedNetwork]);
+
+  const handleSelectContract = (event: any) => {
+    setSelectDeployedContract(event.target.value);
+    console.log(`selected contract: ${event.target.value}`);
+  };
+
   return (
     <ContractContainer>
       {/* dropdown for account selection */}
       <DeployedContract>
         <span>Deployed Contracts</span>
         <ContractSelection>
-          <DropDown>
-            <VSCodeOption>
-              0x53871197A0a417F1ab30D64dBd62f72E64D91CA5
-            </VSCodeOption>
-            <VSCodeOption>
-              0xbee5a6b9d30ACdC31F4ad2D2b34BdF0e5a8C4B1d
-            </VSCodeOption>
-            <VSCodeOption>
-              0x40a231a98c960aFA02F9B0162a80E1553443a4a0
-            </VSCodeOption>
-            <VSCodeOption>
-              0x1CA25E2c0A6d64F437c64e1A7B372382f338F5B6
-            </VSCodeOption>
+          <DropDown
+            value={selectDeployedContract}
+            onChange={(e: any) => {
+              handleSelectContract(e);
+            }}
+          >
+            <VSCodeOption value="Select Contract">Select Contract</VSCodeOption>
+            {deployedContracts.map((contractData, index) => {
+              return (
+                contractData !== null && (
+                  <VSCodeOption key={index} value={contractData.contractName}>
+                    {`${
+                      contractData.contractName
+                    }: ${contractData.address.slice(
+                      0,
+                      15
+                    )}...${contractData.address.slice(-13)}`}
+                  </VSCodeOption>
+                )
+              );
+            })}
           </DropDown>
           <CopyIcon></CopyIcon>
         </ContractSelection>

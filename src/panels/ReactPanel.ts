@@ -20,6 +20,7 @@ import {
 } from "../config";
 import {
   deploySelectedContract,
+  fetchDeployedContract,
   getContractConstructor,
   loadAllCompiledContracts,
 } from "../config/contract";
@@ -284,6 +285,17 @@ export class ReactPanel {
               });
             }
             break;
+          }
+          case "get-deployed-contracts": {
+            const { selectedNetwork } = message.data;
+            const deployedContracts = fetchDeployedContract(
+              context,
+              selectedNetwork
+            );
+            webview.postMessage({
+              command: "post-deployed-contracts",
+              data: deployedContracts,
+            });
           }
         }
       },

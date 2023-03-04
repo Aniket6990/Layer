@@ -20,6 +20,7 @@ import {
   setEventMsg,
   setCompiledContracts,
   setSelectedContractConstructor,
+  setDeployedContracts,
 } from "./store/extensionstore";
 
 const Main = styled.div`
@@ -99,6 +100,10 @@ function App() {
         }
         case "contract-deployed": {
           dispatch(setEventMsg(eventData.data));
+          break;
+        }
+        case "post-deployed-contracts": {
+          dispatch(setDeployedContracts(eventData.data));
           break;
         }
         case "extension-event": {
