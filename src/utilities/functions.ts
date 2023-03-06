@@ -1,5 +1,7 @@
 import { ethers } from "ethers";
-import { Webview, WebviewPanel } from "vscode";
+import { ExtensionContext, Webview, WebviewPanel } from "vscode";
+import { exportPvtKeyPair, getSelectedNetworkProvider } from "../config";
+import { ReactPanel } from "../panels/ReactPanel";
 import { CompiledJSONOutput, TxInterface } from "../types";
 
 export const generateTxnInterface = (
@@ -38,4 +40,103 @@ export const isTestingNetwork: any = (network: string) => {
   if (network === "Hardhat Testnet") return true;
 
   return false;
+};
+
+export const getContractFactoryWithParams = async (
+  context: ExtensionContext,
+  contractName: string,
+  password: string,
+  selectedAccount: string,
+  rpcURL: string
+): Promise<ethers.ContractFactory | undefined> => {
+  const contracts = context.workspaceState.get("contracts") as {
+    [name: string]: CompiledJSONOutput;
+  };
+  const contractJSONOutput: CompiledJSONOutput = contracts[contractName];
+
+  const abi = getABIType(contractJSONOutput);
+  if (abi === undefined) throw new Error("Abi is not defined.");
+
+  const byteCode = getContractByteCode(contractJSONOutput);
+  if (byteCode === undefined) throw new Error("ByteCode is not defined.");
+
+  let myContract;
+  if (isTestingNetwork(context) === true) {
+    // Deploy to ganache network
+    const provider = getSelectedNetworkProvider(
+      rpcURL
+    ) as ethers.providers.JsonRpcProvider;
+    const signer = provider.getSigner();
+    myContract = new ethers.ContractFactory(abi, byteCode, signer);
+  } else {
+    // Deploy to ethereum network
+    const privateKey = await exportPvtKeyPair(
+      context,
+      selectedAccount,
+      password
+    );
+    if (privateKey.eventStatus === "fail") {
+      ReactPanel.EmitExtensionEvent({
+        eventStatus: "fail",
+        eventType: "layer_extensionCall",
+        eventResult: `Password for ${selectedAccount} is wrong.`,
+      });
+      return;
+    }
+    const provider = getSelectedNetworkProvider(rpcURL);
+    const wallet = new ethers.Wallet(privateKey.eventResult as string);
+    const signingAccount = wallet.connect(provider);
+    myContract = new ethers.ContractFactory(abi, byteCode, signingAccount);
+  }
+  return myContract;
+};
+
+export const getSignedContract = async (
+  context: ExtensionContext,
+  contractName: string,
+  contractAddress: string,
+  password: string,
+  selectedAccount: string,
+  rpcURL: string
+): Promise<ethers.Contract | undefined> => {
+  const contracts = context.workspaceState.get("contracts") as {
+    [name: string]: CompiledJSONOutput;
+  };
+  const contractJSONOutput: CompiledJSONOutput = contracts[contractName];
+
+  const abi = getABIType(contractJSONOutput);
+  if (abi === undefined) throw new Error("Abi is not defined.");
+
+  const byteCode = getContractByteCode(contractJSONOutput);
+  if (byteCode === undefined) throw new Error("ByteCode is not defined.");
+
+  let myContract;
+  if (isTestingNetwork(context) === true) {
+    // Deploy to ganache network
+    const provider = getSelectedNetworkProvider(
+      rpcURL
+    ) as ethers.providers.JsonRpcProvider;
+    const signer = provider.getSigner();
+    myContract = new ethers.Contract(contractAddress, abi, signer);
+  } else {
+    // Deploy to ethereum network
+    const privateKey = await exportPvtKeyPair(
+      context,
+      selectedAccount,
+      password
+    );
+    if (privateKey.eventStatus === "fail") {
+      ReactPanel.EmitExtensionEvent({
+        eventStatus: "fail",
+        eventType: "layer_extensionCall",
+        eventResult: `Password for ${selectedAccount} is wrong.`,
+      });
+      return;
+    }
+    const provider = getSelectedNetworkProvider(rpcURL);
+    const wallet = new ethers.Wallet(privateKey.eventResult as string);
+    const signingAccount = wallet.connect(provider);
+    myContract = new ethers.Contract(contractAddress, abi, signingAccount);
+  }
+  return myContract;
 };

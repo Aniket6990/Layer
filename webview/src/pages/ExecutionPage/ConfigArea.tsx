@@ -11,6 +11,7 @@ import { VscRefresh } from "react-icons/vsc";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   setGasLimit,
+  setGlobalPswd,
   setSelectedAccount,
   setSelectedContract,
   setSelectedNetwork,
@@ -144,6 +145,8 @@ const ConfigArea = () => {
 
   const gasLimit = useAppSelector((state) => state.extension.gasLimit);
 
+  const globalPswd = useAppSelector((state) => state.extension.globalPswd);
+
   const selectedContractConstructor = useAppSelector(
     (state) => state.extension.selectedContractConstructor
   );
@@ -184,18 +187,19 @@ const ConfigArea = () => {
   const handleDeployContract = (contractParams: string[]) => {
     if (
       selectedAccount !== "Select Account" &&
-      pswd !== undefined &&
+      globalPswd !== "" &&
       selectedNetConfig.rpc !== undefined &&
       selectedContract !== "Select Contract"
     ) {
       deployContract(
         selectedContract,
         contractParams,
-        pswd,
+        globalPswd,
         selectedNetwork,
         selectedAccount,
         selectedNetConfig.rpc
       );
+      dispatch(setGlobalPswd(""));
     }
   };
   return (
@@ -342,8 +346,8 @@ const ConfigArea = () => {
         <span>Password</span>
         <PasswordTextField
           placeholder="password"
-          value={pswd !== undefined ? pswd : ""}
-          onChange={(e: any) => setPswd(e.target.value)}
+          value={globalPswd}
+          onChange={(e: any) => dispatch(setGlobalPswd(e.target.value))}
           type="password"
         ></PasswordTextField>
       </ConfigWrapper>

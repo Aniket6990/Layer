@@ -2,8 +2,16 @@ import React, { useEffect, useState } from "react";
 import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import styled from "styled-components";
 import { FaRegCopy } from "react-icons/fa";
-import { useAppSelector } from "../../app/hooks";
-import { getDeployedContracts } from "../../configuration/webviewpostmsg";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  deployContract,
+  executeContractFunction,
+  getDeployedContracts,
+  listContractFunctions,
+} from "../../configuration/webviewpostmsg";
+import ParameterInput from "../../components/UI/ParameterInput";
+import { FunctionObjectType, NetworkConfig } from "../../types";
+import { setGlobalPswd } from "../../store/extensionstore";
 
 const ContractContainer = styled.div`
   height: 600px;
@@ -44,6 +52,11 @@ const DropDown = styled(VSCodeDropdown)`
 `;
 
 const ContractCall = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 14px;
   font-size: 12px;
   color: var(--vscode-icon-foreground);
   font-weight: 600;
@@ -65,15 +78,28 @@ const CopyIcon = styled(FaRegCopy)`
 `;
 
 const ContractArea = () => {
+  const dispatch = useAppDispatch();
   const [selectDeployedContract, setSelectDeployedContract] =
     useState<string>("Select Contract");
+  const [selectedContractName, setSelectedContractName] = useState<string>();
+  const [selectedContractAddress, setSelectContractAddress] =
+    useState<string>();
   const selectedNetwork = useAppSelector(
     (state) => state.extension.selectedNetwork
   );
   const deployedContracts = useAppSelector(
     (state) => state.extension.deployedContracts
   );
-
+  const selectedContractFunctions = useAppSelector(
+    (state) => state.extension.selectedContractFunctions
+  );
+  const selectedNetConfig: NetworkConfig = useAppSelector(
+    (state) => state.extension.selectedNetworkConfig
+  );
+  const selectedAccount = useAppSelector(
+    (state) => state.extension.selectedAccount
+  );
+  const globalPswd = useAppSelector((state) => state.extension.globalPswd);
   useEffect(() => {
     if (selectedNetwork !== "Select Network") {
       getDeployedContracts(selectedNetwork);
@@ -82,8 +108,38 @@ const ContractArea = () => {
   }, [selectedNetwork]);
 
   const handleSelectContract = (event: any) => {
+    const eventValue: string = event.target.value;
     setSelectDeployedContract(event.target.value);
-    console.log(`selected contract: ${event.target.value}`);
+    const contractData: string[] = eventValue.split(":");
+    setSelectedContractName(contractData[0]);
+    setSelectContractAddress(contractData[1]);
+    listContractFunctions(contractData[0]);
+  };
+
+  const handleDeployContract = (
+    contractParams: string[],
+    functionObject: FunctionObjectType
+  ) => {
+    if (
+      selectedAccount !== "Select Account" &&
+      globalPswd !== "" &&
+      selectedNetConfig.rpc !== undefined &&
+      selectedContractName !== undefined &&
+      selectedContractAddress !== undefined
+    ) {
+      console.log(`executing function ${functionObject.name}`);
+      console.log("parmaeters Input:", contractParams.toString());
+      executeContractFunction(
+        selectedContractName,
+        selectedContractAddress,
+        functionObject,
+        contractParams,
+        globalPswd,
+        selectedAccount,
+        selectedNetConfig.rpc
+      );
+      dispatch(setGlobalPswd(""));
+    }
   };
 
   return (
@@ -102,7 +158,10 @@ const ContractArea = () => {
             {deployedContracts.map((contractData, index) => {
               return (
                 contractData !== null && (
-                  <VSCodeOption key={index} value={contractData.contractName}>
+                  <VSCodeOption
+                    key={index}
+                    value={`${contractData.contractName}:${contractData.address}`}
+                  >
                     {`${
                       contractData.contractName
                     }: ${contractData.address.slice(
@@ -114,15 +173,38 @@ const ContractArea = () => {
               );
             })}
           </DropDown>
-          <CopyIcon></CopyIcon>
+          <CopyIcon
+            onClick={(e: any) => {
+              if (selectedNetwork !== "Select Network") {
+                getDeployedContracts(selectedNetwork);
+              }
+            }}
+          ></CopyIcon>
         </ContractSelection>
       </DeployedContract>
       {/* Area for contract call */}
       <ContractCall>
-        <span>Contract Call</span>
-        <FunctionArea>
-          <span>No Contract selected</span>
-        </FunctionArea>
+        <span>
+          {selectedContractName !== undefined &&
+          selectedContractAddress !== undefined
+            ? `${selectedContractName}: ${selectedContractAddress}`
+            : `Contract call`}
+        </span>
+        {selectedContractFunctions !== undefined &&
+          selectedContractFunctions.map((func: any, index: any) => {
+            return (
+              <ParameterInput
+                key={index}
+                title={func.name}
+                buttonSize={1}
+                inputSize={3}
+                functionObject={func}
+                functionToCall={handleDeployContract}
+              >
+                {func.name}
+              </ParameterInput>
+            );
+          })}
       </ContractCall>
     </ContractContainer>
   );

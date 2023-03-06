@@ -20,8 +20,10 @@ import {
 } from "../config";
 import {
   deploySelectedContract,
+  executeContractFunction,
   fetchDeployedContract,
   getContractConstructor,
+  getContractFunctions,
   loadAllCompiledContracts,
 } from "../config/contract";
 import {
@@ -296,6 +298,47 @@ export class ReactPanel {
               command: "post-deployed-contracts",
               data: deployedContracts,
             });
+            break;
+          }
+          case "get-contract-functions": {
+            const { contractTitle } = message.data;
+            const contractFunctions = getContractFunctions(
+              context,
+              contractTitle
+            );
+            webview.postMessage({
+              command: "post-contract-functions",
+              data: contractFunctions,
+            });
+            break;
+          }
+          case "execute-function": {
+            const {
+              contractName,
+              contractAddress,
+              functionObject,
+              params,
+              password,
+              selectedAccount,
+              rpcUrl,
+              value,
+            } = message.data;
+            const contractExecution = await executeContractFunction(
+              context,
+              contractName,
+              contractAddress,
+              functionObject,
+              params,
+              password,
+              selectedAccount,
+              rpcUrl,
+              value
+            );
+            webview.postMessage({
+              command: "function-executed",
+              data: contractExecution,
+            });
+            break;
           }
         }
       },

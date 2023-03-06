@@ -14,8 +14,11 @@ import {
 } from "../types";
 import { getDirectoriesRecursive } from "../lib/file";
 import {
+  generateTxnInterface,
   getABIType,
   getContractByteCode,
+  getContractFactoryWithParams,
+  getSignedContract,
   isTestingNetwork,
 } from "../utilities/functions";
 import { JsonFragment } from "@ethersproject/abi";
@@ -149,55 +152,6 @@ export const getContractConstructor = (
   );
 
   return constructorObject;
-};
-
-const getContractFactoryWithParams = async (
-  context: ExtensionContext,
-  contractName: string,
-  password: string,
-  selectedAccount: string,
-  rpcURL: string
-): Promise<ethers.ContractFactory | undefined> => {
-  const contracts = context.workspaceState.get("contracts") as {
-    [name: string]: CompiledJSONOutput;
-  };
-  const contractJSONOutput: CompiledJSONOutput = contracts[contractName];
-
-  const abi = getABIType(contractJSONOutput);
-  if (abi === undefined) throw new Error("Abi is not defined.");
-
-  const byteCode = getContractByteCode(contractJSONOutput);
-  if (byteCode === undefined) throw new Error("ByteCode is not defined.");
-
-  let myContract;
-  if (isTestingNetwork(context) === true) {
-    // Deploy to ganache network
-    const provider = getSelectedNetworkProvider(
-      rpcURL
-    ) as ethers.providers.JsonRpcProvider;
-    const signer = provider.getSigner();
-    myContract = new ethers.ContractFactory(abi, byteCode, signer);
-  } else {
-    // Deploy to ethereum network
-    const privateKey = await exportPvtKeyPair(
-      context,
-      selectedAccount,
-      password
-    );
-    if (privateKey.eventStatus === "fail") {
-      ReactPanel.EmitExtensionEvent({
-        eventStatus: "fail",
-        eventType: "layer_extensionCall",
-        eventResult: `Password for ${selectedAccount} is wrong.`,
-      });
-      return;
-    }
-    const provider = getSelectedNetworkProvider(rpcURL);
-    const wallet = new ethers.Wallet(privateKey.eventResult as string);
-    const signingAccount = wallet.connect(provider);
-    myContract = new ethers.ContractFactory(abi, byteCode, signingAccount);
-  }
-  return myContract;
 };
 
 export const deploySelectedContract = async (
@@ -366,4 +320,125 @@ export const fetchDeployedContract = (
     }
   });
   return deployedContracts;
+};
+
+export const getContractFunctions = (
+  context: ExtensionContext,
+  contractTitle: string
+): FunctionObjectType[] | undefined => {
+  const contracts = context.workspaceState.get("contracts") as {
+    [name: string]: CompiledJSONOutput;
+  };
+  if (contractTitle === undefined) return;
+  if (contracts === undefined || Object.keys(contracts).length === 0) return;
+
+  const contractName = Object.keys(contracts).filter(
+    (i: string) => i === contractTitle
+  );
+  const contractJSONOutput: CompiledJSONOutput = contracts[contractName[0]];
+
+  const functionsAbi = getABIType(contractJSONOutput)?.filter(
+    (i: JsonFragment) => i.type === "function"
+  );
+  if (functionsAbi === undefined || functionsAbi.length === 0) {
+    return;
+  }
+
+  const functions: FunctionObjectType[] = functionsAbi.map(
+    (e: {
+      name: string;
+      stateMutability: string;
+      inputs: JsonFragmentType[];
+      type: string;
+    }) => ({
+      name: e.name,
+      stateMutability: e.stateMutability,
+      type: e.type,
+      inputs: e.inputs?.map((c) => ({ ...c, value: "" })),
+    })
+  );
+  return functions;
+};
+
+export const executeContractFunction = async (
+  context: ExtensionContext,
+  contractName: string,
+  contractAddress: string,
+  functionObject: FunctionObjectType,
+  params: string[],
+  password: string,
+  selectedAccount: string,
+  rpcUrl: string,
+  value?: string
+) => {
+  let extensionEvent: ExtensionEventTypes;
+  try {
+    const contracts = context.workspaceState.get("contracts") as {
+      [name: string]: CompiledJSONOutput;
+    };
+    const contractJSONOutput: CompiledJSONOutput = contracts[contractName];
+
+    const abi = getABIType(contractJSONOutput);
+    if (abi === undefined) throw new Error("Abi is not defined.");
+
+    const params_ = !!params.length ? params : [];
+
+    if (
+      functionObject.stateMutability === "view" ||
+      functionObject.stateMutability === "pure"
+    ) {
+      console.log("view executed");
+      const contract = new ethers.Contract(
+        contractAddress,
+        abi,
+        getSelectedNetworkProvider(rpcUrl)
+      );
+
+      const result = await contract[functionObject.name as string](...params_);
+      extensionEvent = {
+        eventStatus: "success",
+        eventType: "layer_extensionCall",
+        eventResult: "called",
+      };
+    } else {
+      const contract = await getSignedContract(
+        context,
+        contractName,
+        contractAddress,
+        password,
+        selectedAccount,
+        rpcUrl
+      );
+
+      console.log("payable executed");
+      let result;
+
+      if (contract !== undefined) {
+        if (functionObject.stateMutability === "nonpayable") {
+          result = await contract[functionObject.name as string](...params_);
+        }
+        if (functionObject.stateMutability === "payable") {
+          result = await contract[functionObject.name as string](...params_, {
+            value: value,
+          });
+        }
+        const submittedTx = await result.wait();
+        extensionEvent = {
+          eventStatus: "success",
+          eventType: "layer_mutableCall",
+          eventResult: generateTxnInterface(submittedTx),
+        };
+      } else {
+        return;
+      }
+    }
+    return extensionEvent;
+  } catch (error: any) {
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_mutableCall",
+      eventResult: error.body,
+    };
+  }
+  return extensionEvent;
 };

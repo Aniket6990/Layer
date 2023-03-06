@@ -1,4 +1,4 @@
-import { TxObjecttype } from "../types";
+import { FunctionObjectType, TxObjecttype } from "../types";
 import { vscode } from "../utilities/vscode";
 
 export const getNetworks = () => {
@@ -134,6 +134,40 @@ export const getDeployedContracts = (selectedNetwork: string) => {
     command: "get-deployed-contracts",
     data: {
       selectedNetwork: selectedNetwork,
+    },
+  });
+};
+
+export const listContractFunctions = (contractName: string) => {
+  vscode.postMessage({
+    command: "get-contract-functions",
+    data: {
+      contractTitle: contractName,
+    },
+  });
+};
+
+export const executeContractFunction = (
+  contractName: string,
+  contractAddress: string,
+  functionObject: FunctionObjectType,
+  params: string[],
+  password: string,
+  selectedAccount: string,
+  rpcUrl: string,
+  value?: string
+) => {
+  vscode.postMessage({
+    command: "execute-function",
+    data: {
+      contractName: contractName,
+      contractAddress: contractAddress,
+      functionObject: functionObject,
+      params: params,
+      password: password,
+      selectedAccount: selectedAccount,
+      rpcUrl: rpcUrl,
+      value: value,
     },
   });
 };
