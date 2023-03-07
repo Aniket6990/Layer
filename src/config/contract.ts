@@ -179,6 +179,7 @@ export const deploySelectedContract = async (
       contractName,
       password,
       selectedAccount,
+      selectedNetwork,
       rpcURL
     );
     const parameters = !!params.length ? params : [];
@@ -368,6 +369,7 @@ export const executeContractFunction = async (
   params: string[],
   password: string,
   selectedAccount: string,
+  selectedNetwork: string,
   rpcUrl: string,
   value?: string
 ) => {
@@ -423,6 +425,7 @@ export const executeContractFunction = async (
         contractAddress,
         password,
         selectedAccount,
+        selectedNetwork,
         rpcUrl
       );
       let result;

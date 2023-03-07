@@ -34,12 +34,24 @@ export const getContractByteCode = (
   return output.remixOutput?.data.bytecode.object;
 };
 
-export const isTestingNetwork: any = (network: string) => {
-  if (network === "Ganache Testnet") return true;
+export const isTestingNetwork = (network: string) => {
+  if (network === "Ganache Network") return true;
 
-  if (network === "Hardhat Testnet") return true;
+  if (network === "Hardhat Network") return true;
 
   return false;
+};
+
+export const isValidHttpUrl = (url_: string): boolean => {
+  let url;
+
+  try {
+    url = new URL(url_);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
 };
 
 export const getContractFactoryWithParams = async (
@@ -47,6 +59,7 @@ export const getContractFactoryWithParams = async (
   contractName: string,
   password: string,
   selectedAccount: string,
+  selectedNetwork: string,
   rpcURL: string
 ): Promise<ethers.ContractFactory | undefined> => {
   const contracts = context.workspaceState.get("contracts") as {
@@ -61,7 +74,7 @@ export const getContractFactoryWithParams = async (
   if (byteCode === undefined) throw new Error("ByteCode is not defined.");
 
   let myContract;
-  if (isTestingNetwork(context) === true) {
+  if (isTestingNetwork(selectedNetwork) === true) {
     // Deploy to ganache network
     const provider = getSelectedNetworkProvider(
       rpcURL
@@ -97,6 +110,7 @@ export const getSignedContract = async (
   contractAddress: string,
   password: string,
   selectedAccount: string,
+  selectedNetwork: string,
   rpcURL: string
 ): Promise<ethers.Contract | undefined> => {
   const contracts = context.workspaceState.get("contracts") as {
@@ -111,7 +125,7 @@ export const getSignedContract = async (
   if (byteCode === undefined) throw new Error("ByteCode is not defined.");
 
   let myContract;
-  if (isTestingNetwork(context) === true) {
+  if (isTestingNetwork(selectedNetwork) === true) {
     // Deploy to ganache network
     const provider = getSelectedNetworkProvider(
       rpcURL

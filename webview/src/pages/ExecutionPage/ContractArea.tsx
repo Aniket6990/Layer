@@ -127,8 +127,6 @@ const ContractArea = () => {
       selectedContractName !== undefined &&
       selectedContractAddress !== undefined
     ) {
-      console.log(`executing function ${functionObject.name}`);
-      console.log("parmaeters Input:", contractParams.toString());
       executeContractFunction(
         selectedContractName,
         selectedContractAddress,
@@ -136,6 +134,7 @@ const ContractArea = () => {
         contractParams,
         globalPswd,
         selectedAccount,
+        selectedNetwork,
         selectedNetConfig.rpc
       );
       dispatch(setGlobalPswd(""));
