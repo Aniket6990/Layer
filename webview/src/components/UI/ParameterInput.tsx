@@ -103,7 +103,7 @@ const MultiParamsInput = (props: {
                 </span>
                 <Input
                   placeholder={constructorInput.type as string}
-                  value={props.param[index]}
+                  value={props.param[index] ? props.param[index] : ""}
                   onChange={(e) => {
                     props.enterInputParams(e.target.value, index);
                   }}
@@ -127,10 +127,6 @@ const ParameterInput = (props: {
 }) => {
   const [open, setOpen] = useState(false);
   const [paramInput, setParamInput] = useState<Array<string>>([]);
-
-  useEffect(() => {
-    console.log(paramInput);
-  }, [paramInput]);
 
   const enterInputParams = (input: string, index?: any) => {
     if (open) {

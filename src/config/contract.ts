@@ -383,6 +383,22 @@ export const executeContractFunction = async (
 
     const params_ = !!params.length ? params : [];
 
+    if (params_.length !== functionObject.inputs.length) {
+      let extensionEvent: ExtensionEventTypes = {
+        eventStatus: "fail",
+        eventType: "layer_extensionCall",
+        eventResult: `Required parameters not provided.`,
+      };
+      ReactPanel.EmitExtensionEvent(extensionEvent);
+      return;
+    }
+
+    ReactPanel.EmitExtensionEvent({
+      eventStatus: "success",
+      eventType: "layer_msg",
+      eventResult: `Calling ${functionObject.name}`,
+    });
+
     if (
       functionObject.stateMutability === "view" ||
       functionObject.stateMutability === "pure"
@@ -398,7 +414,7 @@ export const executeContractFunction = async (
       extensionEvent = {
         eventStatus: "success",
         eventType: "layer_extensionCall",
-        eventResult: "called",
+        eventResult: JSON.stringify(result),
       };
     } else {
       const contract = await getSignedContract(
@@ -409,8 +425,6 @@ export const executeContractFunction = async (
         selectedAccount,
         rpcUrl
       );
-
-      console.log("payable executed");
       let result;
 
       if (contract !== undefined) {
@@ -436,9 +450,9 @@ export const executeContractFunction = async (
   } catch (error: any) {
     extensionEvent = {
       eventStatus: "fail",
-      eventType: "layer_mutableCall",
+      eventType: "layer_extensionCall",
       eventResult: error.body,
     };
+    return extensionEvent;
   }
-  return extensionEvent;
 };

@@ -74,6 +74,7 @@ export class ReactPanel {
         {
           // Enable JavaScript in the webview
           enableScripts: true,
+          retainContextWhenHidden: true,
         }
       );
 

@@ -85,17 +85,9 @@ const TxDataContainer = (props: {
     <TxData defaultChecked={open}>
       <div
         style={{
-          display: "flex",
           width: "100%",
-          justifyContent: "space-between",
-          alignItems: "center",
         }}
       >
-        <span
-          style={{ color: txnStatus === "success" ? "#3af25f" : "#f23a53" }}
-        >
-          {txnStatus}
-        </span>
         <span>{`txn Hash: ${txn.txHash}`}</span>
       </div>
       <div

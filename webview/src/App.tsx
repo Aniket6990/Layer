@@ -108,7 +108,9 @@ function App() {
           break;
         }
         case "post-deployed-contracts": {
-          console.log(JSON.stringify(eventData.data));
+          console.log(
+            `got deployed contracts: ${JSON.stringify(eventData.data)}`
+          );
           dispatch(setDeployedContracts(eventData.data));
           break;
         }

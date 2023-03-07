@@ -313,6 +313,7 @@ const ConfigArea = () => {
           ></RefreshIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
+      <span style={{ alignSelf: "center", paddingRight: "10%" }}>OR</span>
       <ConfigWrapper>
         <PartialObjectWrapper>
           <AtAddressButton>At Address</AtAddressButton>
