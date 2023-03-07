@@ -5,27 +5,27 @@ const keythereum = require("keythereum");
 import { ExtensionContext } from "vscode";
 import { logger } from "../lib";
 import { NetworkConfig, ExtensionEventTypes, TxObjecttype } from "../types";
-import {
-  getSelectedProvider,
-  isTestingNetwork,
-  isValidHttpUrl,
-} from "../utils/networks";
 import { toChecksumAddress } from "../lib/hash/util";
 import { Account, LocalAddressType } from "../types";
-import { generateTxnInterface } from "../utilities/functions";
+import {
+  generateTxnInterface,
+  isTestingNetwork,
+  isValidHttpUrl,
+} from "../utilities/functions";
 
 const provider = ethers.providers;
 // list all local addresses
 export const listAddresses = async (
-  context: vscode.ExtensionContext,
-  keyStorePath: string
+  keyStorePath: string,
+  networkName?: string,
+  rpcUrl?: string
 ): Promise<string[]> => {
   try {
     let localAddresses: LocalAddressType[];
 
-    if (isTestingNetwork(context)) {
-      const provider = getSelectedProvider(
-        context
+    if (networkName !== undefined && isTestingNetwork(networkName)) {
+      const provider = getSelectedNetworkProvider(
+        rpcUrl as string
       ) as ethers.providers.JsonRpcProvider;
       const account = await provider.listAccounts();
       return account;
@@ -82,7 +82,7 @@ export const createNewKeyPair = (
       fs.mkdirSync(`${path}/keystore`);
     }
     keythereum.exportToFile(keyObject, `${path}/keystore`);
-    listAddresses(context, path);
+    listAddresses(path);
     extensionEvent = {
       eventStatus: "success",
       eventType: "layer_extensionCall",
@@ -125,7 +125,7 @@ export const createAccountFromKey = async (
       pubAddr: keyObject.address,
       checksumAddr: ethers.utils.getAddress(keyObject.address),
     };
-    const accounts = await listAddresses(context, context.extensionPath);
+    const accounts = await listAddresses(context.extensionPath);
 
     const alreadyExist = accounts.find(
       (acc: string) => toChecksumAddress(acc) === account.checksumAddr
@@ -142,7 +142,7 @@ export const createAccountFromKey = async (
         fs.mkdirSync(`${path}/keystore`);
       }
       keythereum.exportToFile(keyObject, `${path}/keystore`);
-      listAddresses(context, path);
+      listAddresses(path);
       extensionEvent = {
         eventStatus: "success",
         eventType: "layer_extensionCall",
@@ -177,7 +177,7 @@ export const importNewKeyPair = async (context: ExtensionContext) => {
       },
     };
 
-    const addresses = await listAddresses(context, context.extensionPath);
+    const addresses = await listAddresses(context.extensionPath);
 
     await vscode.window.showOpenDialog(options).then((fileUri) => {
       if (fileUri && fileUri[0]) {

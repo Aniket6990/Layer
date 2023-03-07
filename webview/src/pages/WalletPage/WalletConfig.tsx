@@ -22,6 +22,7 @@ import {
   importAccountFromKey,
 } from "../../configuration/webviewpostmsg";
 import { setEventMsg, setWalletAccount } from "../../store/extensionstore";
+import { NetworkConfig } from "../../types";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -122,6 +123,12 @@ const WalletConfig = () => {
   const accounts = useAppSelector((state) => state.extension.addresses);
   const walletSelectedAccount = useAppSelector(
     (state) => state.extension.walletAccount
+  );
+  const selectedNetwork = useAppSelector(
+    (state) => state.extension.selectedNetwork
+  );
+  const selectedNetworkConfig: NetworkConfig = useAppSelector(
+    (state) => state.extension.selectedNetworkConfig
   );
   const dispatch = useAppDispatch();
 
@@ -350,7 +357,7 @@ const WalletConfig = () => {
             <VSCodeButton
               onClick={(e) => {
                 handleCreateNewKeyPair();
-                getAccounts();
+                getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
               }}
             >
               Create

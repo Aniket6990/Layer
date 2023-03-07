@@ -7,9 +7,16 @@ export const getNetworks = () => {
   });
 };
 
-export const getAccounts = () => {
+export const getAccounts = (
+  networkName: string | undefined,
+  rpcUrl: string | undefined
+) => {
   vscode.postMessage({
     command: "get-account-list",
+    data: {
+      networkName: networkName,
+      rpcUrl: rpcUrl,
+    },
   });
 };
 
@@ -154,6 +161,7 @@ export const executeContractFunction = (
   params: string[],
   password: string,
   selectedAccount: string,
+  selectedNetwork: string,
   rpcUrl: string,
   value?: string
 ) => {
@@ -166,6 +174,7 @@ export const executeContractFunction = (
       params: params,
       password: password,
       selectedAccount: selectedAccount,
+      selectedNetwork: selectedNetwork,
       rpcUrl: rpcUrl,
       value: value,
     },

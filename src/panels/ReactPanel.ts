@@ -149,10 +149,23 @@ export class ReactPanel {
             break;
           }
           case "get-account-list": {
-            webview.postMessage({
-              command: "post-account-list",
-              data: await listAddresses(context, context.extensionPath),
-            });
+            const { networkName, rpcUrl } = message.data;
+            if (networkName !== undefined && rpcUrl !== undefined) {
+              webview.postMessage({
+                command: "post-account-list",
+                data: await listAddresses(
+                  context.extensionPath,
+                  networkName,
+                  rpcUrl
+                ),
+              });
+            } else {
+              webview.postMessage({
+                command: "post-account-list",
+                data: await listAddresses(context.extensionPath),
+              });
+            }
+
             break;
           }
           case "create-new-keypair": {
@@ -321,6 +334,7 @@ export class ReactPanel {
               params,
               password,
               selectedAccount,
+              selectedNetwork,
               rpcUrl,
               value,
             } = message.data;
@@ -332,6 +346,7 @@ export class ReactPanel {
               params,
               password,
               selectedAccount,
+              selectedNetwork,
               rpcUrl,
               value
             );

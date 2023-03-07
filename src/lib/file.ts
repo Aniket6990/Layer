@@ -3,7 +3,6 @@ import * as path from "path";
 import { JsonFragment } from "@ethersproject/abi";
 import { logger } from "./index";
 import { CompiledJSONOutput } from "../types/output";
-import { fetchERC4907Contracts } from "../utils/functions";
 
 const flatten = (lists: any) => {
   return lists.reduce((a: any, b: any) => a.concat(b), []);
@@ -70,36 +69,9 @@ const createDeployedFile = (
   logger.success(`Created deployed json format of ${contract.name} contract`);
 };
 
-const createUserERC4907ContractFile = async (
-  fileName: string,
-  uri: string,
-  contractName: string
-) => {
-  const resData: string = await fetchERC4907Contracts(uri);
-  const userContractName: string = resData.replace("ERC4907Demo", contractName);
-  fs.writeFileSync(fileName, userContractName);
-  logger.success(`${contractName} file is created successfully.`);
-};
-
-const createERC4907ContractInterface = async (
-  fileName: string,
-  uri: string
-) => {
-  const filedata = await fetchERC4907Contracts(uri);
-  fs.writeFileSync(fileName, filedata);
-  logger.success(`IERC4907 interface is created successfully.`);
-};
-const createERC4907ContractFile = async (fileName: string, uri: string) => {
-  const filedata = await fetchERC4907Contracts(uri);
-  fs.writeFileSync(fileName, filedata);
-  logger.success(`ERC4907 contract file is created successfully.`);
-};
 export {
   writeConstructor,
   writeFunction,
   createDeployedFile,
   getDirectoriesRecursive,
-  createUserERC4907ContractFile,
-  createERC4907ContractInterface,
-  createERC4907ContractFile,
 };

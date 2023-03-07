@@ -24,6 +24,7 @@ import {
   setDeployedContracts,
   setSelectedContractFunctions,
 } from "./store/extensionstore";
+import { NetworkConfig } from "./types";
 
 const Main = styled.div`
   width: 100%;
@@ -49,12 +50,19 @@ function App() {
   const selectedNetwork = useAppSelector(
     (state) => state.extension.selectedNetwork
   );
+  const selectedNetworkConfig: NetworkConfig = useAppSelector(
+    (state) => state.extension.selectedNetworkConfig
+  );
 
   useEffect(() => {
     getNetworks();
-    getAccounts();
+    getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
     loadAllContracts();
   }, []);
+
+  useEffect(() => {
+    getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
+  }, [selectedNetwork, selectedNetworkConfig]);
 
   useEffect(() => {
     const fn = (event: any) => {
@@ -82,12 +90,12 @@ function App() {
         }
         case "imported-account-key": {
           dispatch(setEventMsg(eventData.data));
-          getAccounts();
+          getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
           break;
         }
         case "imported-account": {
           dispatch(setEventMsg(eventData.data));
-          getAccounts();
+          getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
           break;
         }
         case "send-token-result": {
