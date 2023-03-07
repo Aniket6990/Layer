@@ -7,11 +7,12 @@ import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
 import {
   getAccounts,
+  getDeployedContracts,
   getNetworks,
   loadAllContracts,
 } from "./configuration/webviewpostmsg";
 import { useEffect } from "react";
-import { useAppDispatch } from "./app/hooks";
+import { useAppDispatch, useAppSelector } from "./app/hooks";
 import {
   setNetworks,
   setAccounts,
@@ -21,6 +22,7 @@ import {
   setCompiledContracts,
   setSelectedContractConstructor,
   setDeployedContracts,
+  setSelectedContractFunctions,
 } from "./store/extensionstore";
 
 const Main = styled.div`
@@ -44,6 +46,9 @@ function App() {
   const Execution = withRouter(ExecutionPage);
   const Wallet = withRouter(WalletPage);
   const dispatch = useAppDispatch();
+  const selectedNetwork = useAppSelector(
+    (state) => state.extension.selectedNetwork
+  );
 
   useEffect(() => {
     getNetworks();
@@ -94,16 +99,29 @@ function App() {
           break;
         }
         case "post-contract-constructor": {
-          console.log("got constructor:", eventData.data);
           dispatch(setSelectedContractConstructor(eventData.data));
           break;
         }
         case "contract-deployed": {
           dispatch(setEventMsg(eventData.data));
+          getDeployedContracts(selectedNetwork);
           break;
         }
         case "post-deployed-contracts": {
+          console.log(
+            `got deployed contracts: ${JSON.stringify(eventData.data)}`
+          );
           dispatch(setDeployedContracts(eventData.data));
+          break;
+        }
+        case "post-contract-functions": {
+          dispatch(setSelectedContractFunctions(eventData.data));
+          break;
+        }
+        case "function-executed": {
+          if (eventData.data !== undefined) {
+            dispatch(setEventMsg(eventData.data));
+          }
           break;
         }
         case "extension-event": {

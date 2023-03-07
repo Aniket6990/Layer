@@ -18,13 +18,14 @@ const PartialObjectWrapper = styled.div`
   align-items: flex-start;
 `;
 
-const Button = styled.button.attrs((props: { size: any }) => ({
+const Button = styled.button.attrs((props: { size: any; buttonBg: any }) => ({
   size: props.size,
+  buttonBg: props.buttonBg,
 }))`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--vscode-button-background);
+  background-color: ${(props) => props.buttonBg};
   padding: 0.25rem 0.5rem 0.25rem 0.5rem;
   color: var(--vscode-button-foreground);
   flex-grow: ${(props) => props.size};
@@ -95,14 +96,14 @@ const MultiParamsInput = (props: {
                 <span
                   style={{
                     width: "20%",
-                    color: "var(--vscode-icon-foreground",
+                    color: "var(--vscode-icon-foreground)",
                   }}
                 >
                   {`${constructorInput.name as string}:`}
                 </span>
                 <Input
                   placeholder={constructorInput.type as string}
-                  value={props.param[index]}
+                  value={props.param[index] ? props.param[index] : ""}
                   onChange={(e) => {
                     props.enterInputParams(e.target.value, index);
                   }}
@@ -148,6 +149,27 @@ const ParameterInput = (props: {
     return inputs.toString();
   };
 
+  const determineButtonBg = () => {
+    if (
+      props.functionObject === undefined ||
+      props.functionObject?.type === "constructor"
+    ) {
+      return "var(--vscode-button-background)";
+    }
+    if (props.functionObject?.stateMutability === "nonpayable") {
+      return "var(--vscode-button-background)";
+    }
+    if (props.functionObject?.stateMutability === "payable") {
+      return "#f75973";
+    }
+    if (
+      props.functionObject.stateMutability === "view" ||
+      props.functionObject.stateMutability === "pure"
+    ) {
+      return "#429bf5";
+    }
+  };
+
   return (
     <>
       <DeployParamsContainer>
@@ -156,15 +178,16 @@ const ParameterInput = (props: {
             onClick={(e) => {
               if (open) {
                 const paramValues = Object.values(paramInput);
-                props.functionToCall(paramValues);
+                props.functionToCall(paramValues, props.functionObject);
                 setParamInput([]);
               } else {
-                props.functionToCall(paramInput);
+                props.functionToCall(paramInput, props.functionObject);
                 setParamInput([]);
               }
             }}
             title={props.title}
             size={props.buttonSize}
+            buttonBg={determineButtonBg}
           >
             {props.children}
           </Button>
@@ -174,6 +197,7 @@ const ParameterInput = (props: {
                 <Input
                   placeholder={placeHolderValue()}
                   size={props.inputSize}
+                  value={paramInput}
                   onChange={(e) => {
                     enterInputParams(e.target.value);
                   }}
