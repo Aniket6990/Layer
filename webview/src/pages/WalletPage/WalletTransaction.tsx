@@ -146,7 +146,7 @@ const WalletTransaction = () => {
         setEventMsg({
           eventStatus: "success",
           eventType: "layer_msg",
-          eventResult: `Transferring ${amount} ${walletNetConfig.nativeCurrency.symbol} to ${recipientAddress}`,
+          eventResult: `Transferring ${amount} ${walletNetConfig.symbol} to ${recipientAddress}`,
         })
       );
       sendTokenTransaction(txObject);
@@ -199,9 +199,7 @@ const WalletTransaction = () => {
         <FullObjectWrapper>
           <TextField
             value={`${walletAccountBalance} ${
-              walletNetConfig.nativeCurrency !== undefined
-                ? walletNetConfig.nativeCurrency.symbol
-                : ""
+              walletNetConfig !== undefined ? walletNetConfig.symbol : ""
             }`}
             disabled
           ></TextField>

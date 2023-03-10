@@ -7,14 +7,13 @@ import {
   getContractFunctions,
   loadAllCompiledContracts,
 } from "./config/contract";
+import { addNetwork } from "./config/ext-config";
 
 // eslint-disable-next-line import/prefer-default-export
 export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     // command for testing
-    commands.registerCommand("layer.webview.test", async () => {
-      getContractFunctions(context, "MyToken");
-    }),
+    commands.registerCommand("layer.webview.test", async () => {}),
 
     // Activate
     commands.registerCommand("layer.activate", async () => {

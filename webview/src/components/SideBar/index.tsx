@@ -52,7 +52,7 @@ const SideBar = () => {
       ></WalletIcon>
       <SettingsIcon
         onClick={(e) => {
-          navigate("/");
+          navigate("/networksetting");
         }}
       ></SettingsIcon>
     </MenuContainer>

@@ -144,7 +144,7 @@ export class ReactPanel {
           case "get-network-list": {
             webview.postMessage({
               command: "post-network-list",
-              data: await networkConfig(),
+              data: await networkConfig(context.extensionPath),
             });
             break;
           }

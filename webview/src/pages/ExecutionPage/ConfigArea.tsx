@@ -252,9 +252,7 @@ const ConfigArea = () => {
           <GasLimitTextField
             placeholder="Balance"
             value={`${configBalance} ${
-              selectedNetConfig.nativeCurrency !== undefined
-                ? selectedNetConfig.nativeCurrency.symbol
-                : ""
+              selectedNetConfig !== undefined ? selectedNetConfig.symbol : ""
             }`}
             disabled
           ></GasLimitTextField>

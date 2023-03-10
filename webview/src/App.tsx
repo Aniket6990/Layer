@@ -25,6 +25,7 @@ import {
   setSelectedContractFunctions,
 } from "./store/extensionstore";
 import { NetworkConfig } from "./types";
+import NetworkSettings from "./pages/NetworkSettings";
 
 const Main = styled.div`
   width: 100%;
@@ -154,6 +155,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Execution />} />
           <Route path="/wallet" element={<Wallet />} />
+          <Route path="/networksetting" element={<NetworkSettings />} />
         </Routes>
         <ConsoleArea />
       </Wrapper>
