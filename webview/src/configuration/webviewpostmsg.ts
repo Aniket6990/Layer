@@ -121,7 +121,9 @@ export const deployContract = (
   password: string,
   selectedNetwork: string,
   selectedAccount: string,
-  rpcURL: string
+  rpcURL: string,
+  gasLimit: string,
+  value: string
 ) => {
   vscode.postMessage({
     command: "deploy-contract",
@@ -132,6 +134,8 @@ export const deployContract = (
       selectedNetwork: selectedNetwork,
       selectedAccount: selectedAccount,
       rpcURL: rpcURL,
+      gasLimit: gasLimit,
+      value: value,
     },
   });
 };
@@ -163,6 +167,7 @@ export const executeContractFunction = (
   selectedAccount: string,
   selectedNetwork: string,
   rpcUrl: string,
+  gasLimit: string,
   value?: string
 ) => {
   vscode.postMessage({
@@ -176,6 +181,7 @@ export const executeContractFunction = (
       selectedAccount: selectedAccount,
       selectedNetwork: selectedNetwork,
       rpcUrl: rpcUrl,
+      gasLimit: gasLimit,
       value: value,
     },
   });

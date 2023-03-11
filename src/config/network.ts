@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
+import { getSelectedNetworkProvider } from "./account";
+import { ethers } from "ethers";
 
 export const getConfiguration = () => {
   return vscode.workspace.getConfiguration("layer");
@@ -19,4 +21,11 @@ export const networkConfig = async (path: string) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const getLatestGasPrice = async (rpcUrl: string) => {
+  const provider = getSelectedNetworkProvider(rpcUrl);
+  const gasPrice = await provider.getGasPrice();
+  const gasPriceInWei = ethers.utils.formatUnits(gasPrice, "wei");
+  return gasPriceInWei;
 };

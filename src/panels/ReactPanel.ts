@@ -285,6 +285,8 @@ export class ReactPanel {
               selectedNetwork,
               selectedAccount,
               rpcURL,
+              gasLimit,
+              value,
             } = message.data;
             const deploymentResult = await deploySelectedContract(
               context,
@@ -293,7 +295,9 @@ export class ReactPanel {
               password,
               selectedNetwork,
               selectedAccount,
-              rpcURL
+              rpcURL,
+              gasLimit,
+              value
             );
             if (deploymentResult !== undefined) {
               webview.postMessage({
@@ -337,6 +341,7 @@ export class ReactPanel {
               selectedAccount,
               selectedNetwork,
               rpcUrl,
+              gasLimit,
               value,
             } = message.data;
             const contractExecution = await executeContractFunction(
@@ -349,6 +354,7 @@ export class ReactPanel {
               selectedAccount,
               selectedNetwork,
               rpcUrl,
+              gasLimit,
               value
             );
             webview.postMessage({
