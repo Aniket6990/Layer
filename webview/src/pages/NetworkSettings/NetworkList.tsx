@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { VscTrash } from "react-icons/vsc";
+import { VscLock, VscTrash } from "react-icons/vsc";
 import styled from "styled-components";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { setSettingNetworkConfig } from "../../store/extensionstore";
+import { deleteNetwork } from "../../configuration/webviewpostmsg";
+import {
+  setSettingNetwork,
+  setSettingNetworkConfig,
+} from "../../store/extensionstore";
 import { NetworkConfig } from "../../types";
 
 const ConfigContainer = styled.div`
@@ -75,6 +79,15 @@ const TrashIcon = styled(VscTrash)`
   }
 `;
 
+const LockIcon = styled(VscLock)`
+  width: 16px;
+  height: 16px;
+  color: var(--vscode-icon-foreground);
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 const Button = styled.button`
   width: 90%;
   display: flex;
@@ -103,18 +116,26 @@ const NetworkList = () => {
   };
 
   const handleNetworkSelection = (value: string) => {
+    dispatch(setSettingNetwork(value));
     const newNetworkInit: NetworkConfig = {
       rpc: "",
       blockScanner: "",
       chainID: "",
       symbol: "",
       decimals: "",
+      isDefault: false,
     };
     const selectedNetworkConfig =
       value !== "Add New Network" ? getSelectedConf(value) : newNetworkInit;
     dispatch(
       setSettingNetworkConfig(JSON.parse(JSON.stringify(selectedNetworkConfig)))
     );
+  };
+
+  const NetworkConfigStatus = (network: string) => {
+    const networkConfig = networks[network];
+    const isDefault = JSON.parse(networkConfig).isDefault;
+    return isDefault;
   };
 
   useEffect(() => {
@@ -139,7 +160,15 @@ const NetworkList = () => {
               >
                 {network}
               </Network>
-              <TrashIcon></TrashIcon>
+              {NetworkConfigStatus(network) === true ? (
+                <LockIcon></LockIcon>
+              ) : (
+                <TrashIcon
+                  onClick={(e) => {
+                    deleteNetwork(network);
+                  }}
+                ></TrashIcon>
+              )}
             </FullObjectWrapper>
           );
         })}

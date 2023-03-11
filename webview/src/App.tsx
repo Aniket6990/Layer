@@ -117,9 +117,6 @@ function App() {
           break;
         }
         case "post-deployed-contracts": {
-          console.log(
-            `got deployed contracts: ${JSON.stringify(eventData.data)}`
-          );
           dispatch(setDeployedContracts(eventData.data));
           break;
         }
@@ -131,6 +128,20 @@ function App() {
           if (eventData.data !== undefined) {
             dispatch(setEventMsg(eventData.data));
           }
+          break;
+        }
+        case "network-added": {
+          if (eventData.data !== undefined) {
+            dispatch(setEventMsg(eventData.data));
+          }
+          getNetworks();
+          break;
+        }
+        case "network-deleted": {
+          if (eventData.data !== undefined) {
+            dispatch(setEventMsg(eventData.data));
+          }
+          getNetworks();
           break;
         }
         case "extension-event": {

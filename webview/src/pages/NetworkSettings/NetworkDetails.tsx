@@ -2,8 +2,12 @@ import {
   VSCodeButton,
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { addNewNetwork } from "../../configuration/webviewpostmsg";
+import { setSettingNetwork } from "../../store/extensionstore";
+import { NetworkConfig } from "../../types";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -56,42 +60,132 @@ const NetworkDetails = () => {
   const settingNetworkConfig = useAppSelector(
     (state) => state.extension.settingNetworkConfig
   );
+  const settingNetwork = useAppSelector(
+    (state) => state.extension.settingNetwork
+  );
+  const [networkInfo, setNetworkInfo] =
+    useState<NetworkConfig>(settingNetworkConfig);
+  const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
 
+  useEffect(() => {
+    setNetworkInfo(settingNetworkConfig);
+  }, [settingNetworkConfig]);
+
+  const parameterCheck = () => {
+    if (settingNetwork === "Add New Network") {
+      return "Network name is required*";
+    }
+    if (
+      !networkInfo.rpc ||
+      !networkInfo.blockScanner ||
+      !networkInfo.chainID ||
+      !networkInfo.symbol ||
+      !networkInfo.decimals
+    ) {
+      return "All fields are required*";
+    }
+    return;
+  };
+
+  const handleSave = () => {
+    const paramCheck = parameterCheck();
+    if (paramCheck !== undefined) {
+      setErrorMsg(paramCheck);
+    } else {
+      setErrorMsg(undefined);
+      addNewNetwork(settingNetwork, networkInfo);
+    }
+  };
   return (
     <ConfigContainer>
       <ConfigWrapper>
+        <span>Network Name</span>
+        <FullObjectWrapper>
+          <TextField
+            placeholder="e.g Ethereum"
+            value={settingNetwork}
+            onChange={(e: any) => {
+              dispatch(setSettingNetwork(e.target.value));
+            }}
+            disabled={networkInfo.isDefault}
+          ></TextField>
+        </FullObjectWrapper>
+      </ConfigWrapper>
+      <ConfigWrapper>
         <span>RPC Url</span>
         <FullObjectWrapper>
-          <TextField value={settingNetworkConfig.rpc}></TextField>
+          <TextField
+            placeholder="e.g http://localhost:7545"
+            value={networkInfo.rpc}
+            onChange={(e: any) => {
+              setNetworkInfo({ ...networkInfo, rpc: e.target.value });
+            }}
+            disabled={networkInfo.isDefault}
+          ></TextField>
         </FullObjectWrapper>
       </ConfigWrapper>
       <ConfigWrapper>
         <span>Blockscanner Url</span>
         <FullObjectWrapper>
-          <TextField value={settingNetworkConfig.blockScanner}></TextField>
+          <TextField
+            placeholder="e.g http://localhost:7545"
+            value={networkInfo.blockScanner}
+            onChange={(e: any) => {
+              setNetworkInfo({ ...networkInfo, blockScanner: e.target.value });
+            }}
+            disabled={networkInfo.isDefault}
+          ></TextField>
         </FullObjectWrapper>
       </ConfigWrapper>
       <ConfigWrapper>
         <span>ChainId</span>
         <FullObjectWrapper>
-          <TextField value={settingNetworkConfig.chainID}></TextField>
+          <TextField
+            placeholder="e.g 1"
+            value={networkInfo.chainID}
+            onChange={(e: any) => {
+              setNetworkInfo({ ...networkInfo, chainID: e.target.value });
+            }}
+            disabled={networkInfo.isDefault}
+          ></TextField>
         </FullObjectWrapper>
       </ConfigWrapper>
       <ConfigWrapper>
         <span>Currency Symbol</span>
         <FullObjectWrapper>
-          <TextField value={settingNetworkConfig.symbol}></TextField>
+          <TextField
+            placeholder="e.g ETH"
+            value={networkInfo.symbol}
+            onChange={(e: any) => {
+              setNetworkInfo({ ...networkInfo, symbol: e.target.value });
+            }}
+            disabled={networkInfo.isDefault}
+          ></TextField>
         </FullObjectWrapper>
       </ConfigWrapper>
       <ConfigWrapper>
         <span>Decimals</span>
         <FullObjectWrapper>
-          <TextField value={settingNetworkConfig.decimals}></TextField>
+          <TextField
+            placeholder="e.g 18"
+            value={networkInfo.decimals}
+            onChange={(e: any) => {
+              setNetworkInfo({ ...networkInfo, decimals: e.target.value });
+            }}
+            disabled={networkInfo.isDefault}
+          ></TextField>
         </FullObjectWrapper>
       </ConfigWrapper>
       <ConfigWrapper>
-        <ErrorMessage></ErrorMessage>
-        <VSCodeButton>Save</VSCodeButton>
+        <ErrorMessage>{errorMsg !== undefined && errorMsg}</ErrorMessage>
+        <VSCodeButton
+          onClick={(e) => {
+            handleSave();
+          }}
+          disabled={networkInfo.isDefault}
+        >
+          Save
+        </VSCodeButton>
       </ConfigWrapper>
     </ConfigContainer>
   );

@@ -6,6 +6,7 @@ export interface NetworkConfig {
   chainID: string;
   symbol: string;
   decimals: string;
+  isDefault: boolean;
 }
 
 export interface TxInterface {

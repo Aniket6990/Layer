@@ -12,6 +12,10 @@ src/**
 *.ts
 *.sol
 .gitignore
+webview/node_modules/**
+webview/public/**
+webview/scripts/**
+webview/.gitignore
 keystore/
 node_modules/@babel
 node_modules/@emotion

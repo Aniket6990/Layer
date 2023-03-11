@@ -255,9 +255,7 @@ export const addContractAddress = (
         ...JSON.parse(contractJsonOutput),
         deployed: dataToAdd,
       };
-      fs.writeFile(path, JSON.stringify(addDeployedInput), "utf8", () => {
-        console.log("written successfully");
-      });
+      fs.writeFileSync(path, JSON.stringify(addDeployedInput));
     } else {
       const addDeployedInput = {
         ...JSON.parse(contractJsonOutput),
@@ -270,9 +268,7 @@ export const addContractAddress = (
           },
         ],
       };
-      fs.writeFile(path, JSON.stringify(addDeployedInput), "utf8", () => {
-        console.log("written successfully");
-      });
+      fs.writeFileSync(path, JSON.stringify(addDeployedInput));
     }
   } else {
     const addDeployedInput = {
@@ -285,9 +281,7 @@ export const addContractAddress = (
         },
       ],
     };
-    fs.writeFile(path, JSON.stringify(addDeployedInput), "utf8", () => {
-      console.log("written successfully");
-    });
+    fs.writeFileSync(path, JSON.stringify(addDeployedInput));
   }
 };
 

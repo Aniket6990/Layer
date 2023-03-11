@@ -8,6 +8,7 @@
 # testing
 /coverage
 /keystore/
+/networks.json
 
 # production
 /build

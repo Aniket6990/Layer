@@ -1,4 +1,4 @@
-import { FunctionObjectType, TxObjecttype } from "../types";
+import { FunctionObjectType, NetworkConfig, TxObjecttype } from "../types";
 import { vscode } from "../utilities/vscode";
 
 export const getNetworks = () => {
@@ -177,6 +177,28 @@ export const executeContractFunction = (
       selectedNetwork: selectedNetwork,
       rpcUrl: rpcUrl,
       value: value,
+    },
+  });
+};
+
+export const addNewNetwork = (
+  networkTitle: string,
+  networkInfo: NetworkConfig
+) => {
+  vscode.postMessage({
+    command: "add-network",
+    data: {
+      networkTitle: networkTitle,
+      networkInfo: networkInfo,
+    },
+  });
+};
+
+export const deleteNetwork = (networkTitle: string) => {
+  vscode.postMessage({
+    command: "delete-network",
+    data: {
+      networkTitle: networkTitle,
     },
   });
 };

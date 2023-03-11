@@ -99,6 +99,7 @@ export interface NetworkConfig {
   chainID: string;
   symbol: string;
   decimals: string;
+  isDefault: boolean;
 }
 
 export interface ERC4907ContractType {
