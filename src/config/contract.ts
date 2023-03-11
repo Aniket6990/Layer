@@ -26,6 +26,7 @@ import { ethers } from "ethers";
 import { exportPvtKeyPair, getSelectedNetworkProvider } from "./account";
 import { ReactPanel } from "../panels/ReactPanel";
 import { config } from "process";
+import { getLatestGasPrice } from "./network";
 
 // load all compiled contracts
 export const loadAllCompiledContracts = (context: ExtensionContext) => {
@@ -161,7 +162,9 @@ export const deploySelectedContract = async (
   password: string,
   selectedNetwork: string,
   selectedAccount: string,
-  rpcURL: string
+  rpcURL: string,
+  gasLimit: string,
+  value: string
 ) => {
   const contracts = context.workspaceState.get("contracts") as {
     [name: string]: CompiledJSONOutput;
@@ -182,10 +185,16 @@ export const deploySelectedContract = async (
       selectedNetwork,
       rpcURL
     );
+
+    const gasPrice = await getLatestGasPrice(rpcURL);
     const parameters = !!params.length ? params : [];
 
     if (myContract !== undefined) {
-      const contract = await myContract.deploy(...parameters);
+      const contract = await myContract.deploy(...parameters, {
+        value: value,
+        gasPrice: gasPrice,
+        gasLimit: gasLimit,
+      });
       addContractAddress(contractJSONOutput, {
         network: selectedNetwork,
         address: contract.address,
@@ -365,6 +374,7 @@ export const executeContractFunction = async (
   selectedAccount: string,
   selectedNetwork: string,
   rpcUrl: string,
+  gasLimit: string,
   value?: string
 ) => {
   let extensionEvent: ExtensionEventTypes;
@@ -395,6 +405,8 @@ export const executeContractFunction = async (
       eventResult: `Calling ${functionObject.name}`,
     });
 
+    const gasPrice = await getLatestGasPrice(rpcUrl);
+
     if (
       functionObject.stateMutability === "view" ||
       functionObject.stateMutability === "pure"
@@ -406,7 +418,10 @@ export const executeContractFunction = async (
         getSelectedNetworkProvider(rpcUrl)
       );
 
-      const result = await contract[functionObject.name as string](...params_);
+      const result = await contract[functionObject.name as string](...params_, {
+        gasPrice: gasPrice,
+        gasLimit: gasLimit,
+      });
       extensionEvent = {
         eventStatus: "success",
         eventType: "layer_extensionCall",
@@ -426,11 +441,16 @@ export const executeContractFunction = async (
 
       if (contract !== undefined) {
         if (functionObject.stateMutability === "nonpayable") {
-          result = await contract[functionObject.name as string](...params_);
+          result = await contract[functionObject.name as string](...params_, {
+            gasPrice: gasPrice,
+            gasLimit: gasLimit,
+          });
         }
         if (functionObject.stateMutability === "payable") {
           result = await contract[functionObject.name as string](...params_, {
             value: value,
+            gasPrice: gasPrice,
+            gasLimit: gasLimit,
           });
         }
         const submittedTx = await result.wait();

@@ -25,6 +25,7 @@ interface extensionState {
   selectedContract: string;
   selectedContractConstructor: any;
   gasLimit: string;
+  execValue: string;
   deployedContracts: Array<deployedContractData>;
   selectedContractFunctions: any;
   globalPswd: string;
@@ -54,6 +55,7 @@ const initialState: extensionState = {
   selectedContract: "Select Contract",
   selectedContractConstructor: undefined,
   gasLimit: "3000000",
+  execValue: "0",
   deployedContracts: [],
   selectedContractFunctions: undefined,
   globalPswd: "",
@@ -122,6 +124,9 @@ export const extensionSlice = createSlice({
     setGasLimit(state, action) {
       state.gasLimit = action.payload;
     },
+    setExecValue(state, action) {
+      state.execValue = action.payload;
+    },
     setDeployedContracts(state, action) {
       state.deployedContracts = action.payload;
     },
@@ -158,6 +163,7 @@ export const {
   setSelectedContract,
   setSelectedContractConstructor,
   setGasLimit,
+  setExecValue,
   setDeployedContracts,
   setSelectedContractFunctions,
   setGlobalPswd,

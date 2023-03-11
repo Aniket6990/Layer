@@ -84,6 +84,7 @@ const ContractArea = () => {
   const [selectedContractName, setSelectedContractName] = useState<string>();
   const [selectedContractAddress, setSelectContractAddress] =
     useState<string>();
+  const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   const selectedNetwork = useAppSelector(
     (state) => state.extension.selectedNetwork
   );
@@ -100,6 +101,10 @@ const ContractArea = () => {
     (state) => state.extension.selectedAccount
   );
   const globalPswd = useAppSelector((state) => state.extension.globalPswd);
+
+  const execValue = useAppSelector((state) => state.extension.execValue);
+
+  const gasLimit = useAppSelector((state) => state.extension.gasLimit);
   useEffect(() => {
     if (selectedNetwork !== "Select Network") {
       getDeployedContracts(selectedNetwork);
@@ -116,28 +121,55 @@ const ContractArea = () => {
     listContractFunctions(contractData[0]);
   };
 
-  const handleDeployContract = (
+  const parameterCheck = (
     contractParams: string[],
     functionObject: FunctionObjectType
   ) => {
+    if (selectedAccount === "Select Account") {
+      return "No Account selected*";
+    }
+    if (globalPswd === "") {
+      return "password is required*";
+    }
+    if (selectedNetConfig.rpc === undefined) {
+      return "No Network selected*";
+    }
     if (
-      selectedAccount !== "Select Account" &&
-      globalPswd !== "" &&
-      selectedNetConfig.rpc !== undefined &&
-      selectedContractName !== undefined &&
-      selectedContractAddress !== undefined
+      functionObject.inputs.length !== 0 &&
+      contractParams.length !== functionObject.inputs.length
     ) {
+      return "function parameter is missing*";
+    }
+    if (selectedContractName === undefined) {
+      return "No contract selected*";
+    }
+    if (parseInt(gasLimit) < 210000) {
+      return "Gas Limit should be more than 210000*";
+    }
+    return;
+  };
+
+  const handleExecuteContract = (
+    contractParams: string[],
+    functionObject: FunctionObjectType
+  ) => {
+    const paramCheck = parameterCheck(contractParams, functionObject);
+    if (paramCheck !== undefined) {
+      setErrorMsg(paramCheck);
+    } else {
+      setErrorMsg(undefined);
       executeContractFunction(
-        selectedContractName,
-        selectedContractAddress,
+        selectedContractName as string,
+        selectedContractAddress as string,
         functionObject,
         contractParams,
         globalPswd,
         selectedAccount,
         selectedNetwork,
-        selectedNetConfig.rpc
+        selectedNetConfig.rpc,
+        gasLimit,
+        execValue
       );
-      dispatch(setGlobalPswd(""));
     }
   };
 
@@ -189,6 +221,11 @@ const ContractArea = () => {
             ? `${selectedContractName}: ${selectedContractAddress}`
             : `Contract call`}
         </span>
+        {errorMsg !== undefined && (
+          <span style={{ alignSelf: "flex-start", color: "red" }}>
+            {errorMsg}
+          </span>
+        )}
         {selectedContractFunctions !== undefined &&
           selectedContractFunctions.map((func: any, index: any) => {
             return (
@@ -198,7 +235,7 @@ const ContractArea = () => {
                 buttonSize={1}
                 inputSize={3}
                 functionObject={func}
-                functionToCall={handleDeployContract}
+                functionToCall={handleExecuteContract}
               >
                 {func.name}
               </ParameterInput>

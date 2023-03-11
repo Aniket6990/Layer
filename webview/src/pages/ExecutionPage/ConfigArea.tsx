@@ -10,6 +10,7 @@ import { FaRegCopy } from "react-icons/fa";
 import { VscRefresh } from "react-icons/vsc";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
+  setExecValue,
   setGasLimit,
   setGlobalPswd,
   setSelectedAccount,
@@ -25,6 +26,7 @@ import {
   loadAllContracts,
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
+import { ethers } from "ethers";
 
 const ConfigContainer = styled.div`
   height: 600px;
@@ -120,7 +122,9 @@ const PasswordTextField = styled(VSCodeTextField)`
 
 const ConfigArea = () => {
   const dispatch = useAppDispatch();
-  const [pswd, setPswd] = useState<string>();
+  const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
+  const [value, setValue] = useState<string>("0");
+  const [format, setFormat] = useState<string>("wei");
   const networks = useAppSelector((state) => state.extension.networks);
   const accounts = useAppSelector((state) => state.extension.addresses);
   const selectedAccount = useAppSelector(
@@ -150,6 +154,8 @@ const ConfigArea = () => {
   const selectedContractConstructor = useAppSelector(
     (state) => state.extension.selectedContractConstructor
   );
+  const execValue = useAppSelector((state) => state.extension.execValue);
+
   useEffect(() => {
     if (
       selectedAccount !== "Select Account" &&
@@ -184,22 +190,62 @@ const ConfigArea = () => {
     dispatch(setSelectedAccount(event.target.value));
   };
 
-  const handleDeployContract = (contractParams: string[]) => {
+  const handleChangeInValue = (inValue: string) => {
+    if (inValue === "" || parseInt(inValue) < 0) {
+      setErrorMsg("value can't be less than zero.");
+      return;
+    }
+    setErrorMsg(undefined);
+    setValue(inValue);
+    const changeValueFormat = ethers.utils.parseUnits(inValue, format);
+    dispatch(setExecValue(changeValueFormat.toString()));
+  };
+
+  useEffect(() => {
+    handleChangeInValue(value);
+  }, [format]);
+
+  const parameterCheck = (contractParams: string[]) => {
+    if (selectedAccount === "Select Account") {
+      return "No Account selected*";
+    }
+    if (globalPswd === "") {
+      return "password is required*";
+    }
+    if (selectedNetConfig.rpc === undefined) {
+      return "No Network selected*";
+    }
+    if (selectedContract === "Select Contract") {
+      return "No solidity contract selected*";
+    }
     if (
-      selectedAccount !== "Select Account" &&
-      globalPswd !== "" &&
-      selectedNetConfig.rpc !== undefined &&
-      selectedContract !== "Select Contract"
+      selectedContractConstructor !== undefined &&
+      contractParams.length !== selectedContractConstructor[0].inputs.length
     ) {
+      return "Constructor parameter is missing*";
+    }
+    if (parseInt(gasLimit) < 210000) {
+      return "Gas Limit should be more than 210000*";
+    }
+    return;
+  };
+
+  const handleDeployContract = (contractParams: string[]) => {
+    const paramCheck = parameterCheck(contractParams);
+    if (paramCheck !== undefined) {
+      setErrorMsg(paramCheck);
+    } else {
+      setErrorMsg(undefined);
       deployContract(
         selectedContract,
         contractParams,
         globalPswd,
         selectedNetwork,
         selectedAccount,
-        selectedNetConfig.rpc
+        selectedNetConfig.rpc,
+        gasLimit,
+        execValue
       );
-      dispatch(setGlobalPswd(""));
     }
   };
   return (
@@ -277,11 +323,22 @@ const ConfigArea = () => {
       <ConfigWrapper>
         <span>Value</span>
         <PartialObjectWrapper>
-          <ValueTextField placeholder="Gas limit" value={"0"}></ValueTextField>
-          <ValueDropDown>
-            <VSCodeOption>Ether</VSCodeOption>
-            <VSCodeOption>Gwei</VSCodeOption>
-            <VSCodeOption>Wei</VSCodeOption>
+          <ValueTextField
+            placeholder="value"
+            value={value}
+            onChange={(e: any) => {
+              handleChangeInValue(e.target.value);
+            }}
+          ></ValueTextField>
+          <ValueDropDown
+            value={format}
+            onChange={(e: any) => setFormat(e.target.value)}
+          >
+            <VSCodeOption value="ether">Ether</VSCodeOption>
+            <VSCodeOption value="gwei">Gwei</VSCodeOption>
+            <VSCodeOption value="wei" selected={true}>
+              Wei
+            </VSCodeOption>
           </ValueDropDown>
         </PartialObjectWrapper>
       </ConfigWrapper>
@@ -350,6 +407,11 @@ const ConfigArea = () => {
           type="password"
         ></PasswordTextField>
       </ConfigWrapper>
+      {errorMsg !== undefined && (
+        <span style={{ alignSelf: "flex-start", color: "red" }}>
+          {errorMsg}
+        </span>
+      )}
     </ConfigContainer>
   );
 };
