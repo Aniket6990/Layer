@@ -93,17 +93,13 @@ export interface TxReceipt {
   logsBloom: string;
 }
 
-interface NativeCurrencyType {
-  name: string;
-  symbol: string;
-  decimals: string;
-}
-
 export interface NetworkConfig {
   rpc: string;
   blockScanner: string;
   chainID: string;
-  nativeCurrency: NativeCurrencyType;
+  symbol: string;
+  decimals: string;
+  isDefault: boolean;
 }
 
 export interface ERC4907ContractType {

@@ -28,6 +28,8 @@ interface extensionState {
   deployedContracts: Array<deployedContractData>;
   selectedContractFunctions: any;
   globalPswd: string;
+  settingNetworkConfig: NetworkConfig;
+  settingNetwork: string;
 }
 
 const initialState: extensionState = {
@@ -55,6 +57,15 @@ const initialState: extensionState = {
   deployedContracts: [],
   selectedContractFunctions: undefined,
   globalPswd: "",
+  settingNetworkConfig: {
+    rpc: "",
+    blockScanner: "",
+    chainID: "",
+    symbol: "",
+    decimals: "",
+    isDefault: false,
+  },
+  settingNetwork: "",
 };
 export const extensionSlice = createSlice({
   name: "extension",
@@ -120,6 +131,12 @@ export const extensionSlice = createSlice({
     setGlobalPswd(state, action) {
       state.globalPswd = action.payload;
     },
+    setSettingNetworkConfig(state, action) {
+      state.settingNetworkConfig = action.payload;
+    },
+    setSettingNetwork(state, action) {
+      state.settingNetwork = action.payload;
+    },
   },
 });
 
@@ -144,6 +161,8 @@ export const {
   setDeployedContracts,
   setSelectedContractFunctions,
   setGlobalPswd,
+  setSettingNetworkConfig,
+  setSettingNetwork,
 } = extensionSlice.actions;
 
 export default extensionSlice.reducer;

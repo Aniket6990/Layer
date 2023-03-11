@@ -26,6 +26,7 @@ import {
   getContractFunctions,
   loadAllCompiledContracts,
 } from "../config/contract";
+import { addNetwork, deleteNetwork } from "../config/ext-config";
 import {
   ConstructorInputValue,
   ExtensionEventTypes,
@@ -144,7 +145,7 @@ export class ReactPanel {
           case "get-network-list": {
             webview.postMessage({
               command: "post-network-list",
-              data: await networkConfig(),
+              data: await networkConfig(context.extensionPath),
             });
             break;
           }
@@ -353,6 +354,28 @@ export class ReactPanel {
             webview.postMessage({
               command: "function-executed",
               data: contractExecution,
+            });
+            break;
+          }
+          case "add-network": {
+            const { networkTitle, networkInfo } = message.data;
+            const status = addNetwork(
+              context.extensionPath,
+              networkTitle,
+              networkInfo
+            );
+            webview.postMessage({
+              command: "network-added",
+              data: status,
+            });
+            break;
+          }
+          case "delete-network": {
+            const { networkTitle } = message.data;
+            const status = deleteNetwork(context.extensionPath, networkTitle);
+            webview.postMessage({
+              command: "network-deleted",
+              data: status,
             });
             break;
           }

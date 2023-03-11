@@ -25,6 +25,7 @@ import {
   setSelectedContractFunctions,
 } from "./store/extensionstore";
 import { NetworkConfig } from "./types";
+import NetworkSettings from "./pages/NetworkSettings";
 
 const Main = styled.div`
   width: 100%;
@@ -116,9 +117,6 @@ function App() {
           break;
         }
         case "post-deployed-contracts": {
-          console.log(
-            `got deployed contracts: ${JSON.stringify(eventData.data)}`
-          );
           dispatch(setDeployedContracts(eventData.data));
           break;
         }
@@ -130,6 +128,20 @@ function App() {
           if (eventData.data !== undefined) {
             dispatch(setEventMsg(eventData.data));
           }
+          break;
+        }
+        case "network-added": {
+          if (eventData.data !== undefined) {
+            dispatch(setEventMsg(eventData.data));
+          }
+          getNetworks();
+          break;
+        }
+        case "network-deleted": {
+          if (eventData.data !== undefined) {
+            dispatch(setEventMsg(eventData.data));
+          }
+          getNetworks();
           break;
         }
         case "extension-event": {
@@ -154,6 +166,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Execution />} />
           <Route path="/wallet" element={<Wallet />} />
+          <Route path="/networksetting" element={<NetworkSettings />} />
         </Routes>
         <ConsoleArea />
       </Wrapper>

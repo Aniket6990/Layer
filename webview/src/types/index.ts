@@ -1,15 +1,12 @@
 import { JsonFragment } from "@ethersproject/abi";
-interface NativeCurrencyType {
-  name: string;
-  symbol: string;
-  decimal: string;
-}
 
 export interface NetworkConfig {
   rpc: string;
   blockScanner: string;
   chainID: string;
-  nativeCurrency: NativeCurrencyType;
+  symbol: string;
+  decimals: string;
+  isDefault: boolean;
 }
 
 export interface TxInterface {
