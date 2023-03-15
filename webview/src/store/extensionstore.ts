@@ -29,6 +29,7 @@ interface extensionState {
   deployedContracts: Array<deployedContractData>;
   selectedContractFunctions: any;
   globalPswd: string;
+  isAccountUnlocked: boolean;
   settingNetworkConfig: NetworkConfig;
   settingNetwork: string;
 }
@@ -58,6 +59,7 @@ const initialState: extensionState = {
   execValue: "0",
   deployedContracts: [],
   selectedContractFunctions: undefined,
+  isAccountUnlocked: false,
   globalPswd: "",
   settingNetworkConfig: {
     rpc: "",
@@ -136,6 +138,9 @@ export const extensionSlice = createSlice({
     setGlobalPswd(state, action) {
       state.globalPswd = action.payload;
     },
+    setIsAccountUnlocked(state, action) {
+      state.isAccountUnlocked = action.payload;
+    },
     setSettingNetworkConfig(state, action) {
       state.settingNetworkConfig = action.payload;
     },
@@ -167,6 +172,7 @@ export const {
   setDeployedContracts,
   setSelectedContractFunctions,
   setGlobalPswd,
+  setIsAccountUnlocked,
   setSettingNetworkConfig,
   setSettingNetwork,
 } = extensionSlice.actions;

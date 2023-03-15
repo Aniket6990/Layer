@@ -17,6 +17,7 @@ import {
   exportPvtKeyPair,
   exportPvtKeyPairFile,
   sendTransaction,
+  unlockSelectedAccount,
 } from "../config";
 import {
   deploySelectedContract,
@@ -381,6 +382,19 @@ export class ReactPanel {
             const status = deleteNetwork(context.extensionPath, networkTitle);
             webview.postMessage({
               command: "network-deleted",
+              data: status,
+            });
+            break;
+          }
+          case "unlock-account": {
+            const { accountAddress, pswd } = message.data;
+            const status = await unlockSelectedAccount(
+              context,
+              accountAddress,
+              pswd
+            );
+            webview.postMessage({
+              command: "account-unlocked",
               data: status,
             });
             break;

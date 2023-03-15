@@ -7,7 +7,7 @@ import {
 } from "@vscode/webview-ui-toolkit/react";
 import styled from "styled-components";
 import { FaRegCopy } from "react-icons/fa";
-import { VscRefresh } from "react-icons/vsc";
+import { VscPassFilled, VscRefresh } from "react-icons/vsc";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   setExecValue,
@@ -24,6 +24,7 @@ import {
   displayAccountBalance,
   listContractConstructor,
   loadAllContracts,
+  unlockAccount,
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
 import { ethers } from "ethers";
@@ -113,6 +114,15 @@ const RefreshIcon = styled(VscRefresh)`
   }
 `;
 
+const CheckIcon = styled(VscPassFilled)`
+  width: 16px;
+  height: 16px;
+  color: var(--vscode-icon-foreground);
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 const PasswordTextField = styled(VSCodeTextField)`
   width: 90%;
   font-size: 12px;
@@ -156,6 +166,10 @@ const ConfigArea = () => {
   );
   const execValue = useAppSelector((state) => state.extension.execValue);
 
+  const isAccountUnlocked = useAppSelector(
+    (state) => state.extension.isAccountUnlocked
+  );
+
   useEffect(() => {
     if (
       selectedAccount !== "Select Account" &&
@@ -167,6 +181,9 @@ const ConfigArea = () => {
 
   // list all constructor parameters
   useEffect(() => {
+    /**
+     * all contracts @parmas sould visible on account change if present.
+     */
     if (selectedContract !== "Select Contract") {
       listContractConstructor(selectedContract);
     }
@@ -247,6 +264,19 @@ const ConfigArea = () => {
         execValue
       );
     }
+  };
+
+  const handlePasswordCheck = () => {
+    if (globalPswd === "") {
+      setErrorMsg("Password is required.");
+      return;
+    }
+    if (selectedAccount === "Select Account") {
+      setErrorMsg("No Account selected.");
+      return;
+    }
+    setErrorMsg(undefined);
+    unlockAccount(selectedAccount, globalPswd);
   };
   return (
     <ConfigContainer>
@@ -368,16 +398,6 @@ const ConfigArea = () => {
           ></RefreshIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
-      <span style={{ alignSelf: "center", paddingRight: "10%" }}>OR</span>
-      <ConfigWrapper>
-        <PartialObjectWrapper>
-          <AtAddressButton>At Address</AtAddressButton>
-          <AtAddressTextField
-            placeholder="deployed Address"
-            value={""}
-          ></AtAddressTextField>
-        </PartialObjectWrapper>
-      </ConfigWrapper>
       {selectedContractConstructor !== undefined ? (
         <ParameterInput
           title="Deploy"
@@ -397,16 +417,27 @@ const ConfigArea = () => {
           Deploy
         </ParameterInput>
       )}
-
-      <ConfigWrapper>
-        <span>Password</span>
-        <PasswordTextField
-          placeholder="password"
-          value={globalPswd}
-          onChange={(e: any) => dispatch(setGlobalPswd(e.target.value))}
-          type="password"
-        ></PasswordTextField>
-      </ConfigWrapper>
+      {/* show password input field when @globalPswd is empty */}
+      {selectedAccount !== "Select Account" && isAccountUnlocked === false ? (
+        <ConfigWrapper>
+          <span>Unlock Account</span>
+          <FullObjectWrapper>
+            <PasswordTextField
+              placeholder="password"
+              value={globalPswd}
+              onChange={(e: any) => {
+                dispatch(setGlobalPswd(e.target.value));
+              }}
+              type="password"
+            ></PasswordTextField>
+            <CheckIcon
+              onClick={(e) => {
+                handlePasswordCheck();
+              }}
+            ></CheckIcon>
+          </FullObjectWrapper>
+        </ConfigWrapper>
+      ) : null}
       {errorMsg !== undefined && (
         <span style={{ alignSelf: "flex-start", color: "red" }}>
           {errorMsg}

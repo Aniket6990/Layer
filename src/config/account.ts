@@ -334,6 +334,31 @@ export const exportPvtKeyPairFile = async (
   }
 };
 
+//unlockAccount
+
+export const unlockSelectedAccount = async (
+  context: ExtensionContext,
+  accountAddress: string,
+  pswd: string
+) => {
+  let extensionEvent: ExtensionEventTypes;
+  const pvtKey = await exportPvtKeyPair(context, accountAddress, pswd);
+  if (pvtKey.eventStatus === "success") {
+    extensionEvent = {
+      eventStatus: "success",
+      eventType: "layer_extensionCall",
+      eventResult: "Account unlocked.",
+    };
+  } else {
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_extensionCall",
+      eventResult: "Password is wrong.",
+    };
+  }
+  return extensionEvent;
+};
+
 // send token transaction
 export const sendTransaction = async (
   context: ExtensionContext,
