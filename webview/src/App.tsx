@@ -23,6 +23,8 @@ import {
   setSelectedContractConstructor,
   setDeployedContracts,
   setSelectedContractFunctions,
+  setIsAccountUnlocked,
+  setGlobalPswd,
 } from "./store/extensionstore";
 import { NetworkConfig } from "./types";
 import NetworkSettings from "./pages/NetworkSettings";
@@ -55,6 +57,10 @@ function App() {
     (state) => state.extension.selectedNetworkConfig
   );
 
+  const selectedAccount = useAppSelector(
+    (state) => state.extension.selectedAccount
+  );
+
   useEffect(() => {
     getNetworks();
     getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
@@ -64,6 +70,11 @@ function App() {
   useEffect(() => {
     getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
   }, [selectedNetwork, selectedNetworkConfig]);
+
+  useEffect(() => {
+    dispatch(setGlobalPswd(""));
+    dispatch(setIsAccountUnlocked(false));
+  }, [selectedAccount]);
 
   useEffect(() => {
     const fn = (event: any) => {
@@ -141,6 +152,13 @@ function App() {
           if (eventData.data !== undefined) {
             dispatch(setEventMsg(eventData.data));
           }
+          getNetworks();
+          break;
+        }
+        case "account-unlocked": {
+          if (eventData.data.eventStatus === "success")
+            dispatch(setIsAccountUnlocked(true));
+          dispatch(setEventMsg(eventData.data));
           getNetworks();
           break;
         }

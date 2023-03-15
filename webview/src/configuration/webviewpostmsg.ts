@@ -208,3 +208,13 @@ export const deleteNetwork = (networkTitle: string) => {
     },
   });
 };
+
+export const unlockAccount = (accountAddress: string, pswd: string) => {
+  vscode.postMessage({
+    command: "unlock-account",
+    data: {
+      accountAddress: accountAddress,
+      pswd: pswd,
+    },
+  });
+};
