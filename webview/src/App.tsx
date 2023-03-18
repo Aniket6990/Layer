@@ -176,7 +176,7 @@ function App() {
     return () => {
       window.removeEventListener("message", fn);
     };
-  }, [dispatch]);
+  }, [dispatch, selectedNetwork, selectedNetworkConfig.rpc]);
 
   return (
     <Main>

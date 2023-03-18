@@ -195,7 +195,7 @@ export const deploySelectedContract = async (
         gasPrice: gasPrice,
         gasLimit: gasLimit,
       });
-      addContractAddress(contractJSONOutput, {
+      await addContractAddress(contractJSONOutput, {
         network: selectedNetwork,
         address: contract.address,
         contractName: contractName,
@@ -226,7 +226,7 @@ const getContractArtifactPath = (contract: CompiledJSONOutput) => {
 };
 
 // add deployed contract address to the json file
-export const addContractAddress = (
+export const addContractAddress = async (
   contract: CompiledJSONOutput,
   deployConfig: { network: string; address: string; contractName: string }
 ) => {
