@@ -42,7 +42,7 @@ const Main = styled.div`
 const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 0.3fr;
+  grid-template-rows: 1fr;
   row-gap: 20px;
 `;
 

@@ -2,18 +2,65 @@ import { ethers } from "ethers";
 import { ExtensionContext, Webview, WebviewPanel } from "vscode";
 import { exportPvtKeyPair, getSelectedNetworkProvider } from "../config";
 import { ReactPanel } from "../panels/ReactPanel";
-import { CompiledJSONOutput, TxInterface } from "../types";
+import { CompiledJSONOutput, FunctionObjectType, TxInterface } from "../types";
 
-export const generateTxnInterface = (
-  receipt: ethers.providers.TransactionReceipt
-) => {
+export const generateTxnInterface = async (props: {
+  receipt: ethers.providers.TransactionReceipt;
+  rpcUrl: string;
+  functionObject?: FunctionObjectType;
+  gasLimit: string;
+  params?: Array<string>;
+  contractName?: string;
+}) => {
+  const { gasLimit, receipt, rpcUrl, functionObject, params, contractName } =
+    props;
+  const provider = await getSelectedNetworkProvider(rpcUrl as string);
+  let inputData: string = "0x0000000000000000000000000000000000000000000000000";
+  const txn = await provider.getTransaction(receipt.transactionHash);
+  const decodedInput: Array<string> | undefined = !!params?.length
+    ? functionObject?.inputs.map((input, index) => {
+        return `${index}: ${input.type}: ${params[index]}`;
+      })
+    : undefined;
   const txnReceipt: TxInterface = {
     from: receipt.from,
-    to: receipt.to,
+    to: receipt.to !== null ? receipt.to : (contractName as string),
     txHash: receipt.transactionHash,
-    gas: ethers.utils.formatUnits(receipt.gasUsed, "wei"),
+    gasLimit: gasLimit,
+    gasUsed: ethers.utils.formatUnits(receipt.gasUsed, "wei"),
+    input: txn.data ? txn.data : inputData,
+    decodedInput: decodedInput !== undefined ? decodedInput : [],
+    logs: JSON.stringify(receipt.logs),
+    value: ethers.utils.formatUnits(txn.value, "wei"),
   };
   return txnReceipt;
+};
+
+export const getCallInterface = (
+  from: string,
+  to: string,
+  functionObject: FunctionObjectType,
+  params: Array<string>,
+  result: Array<string>
+) => {
+  const decodedInput: Array<string> = !!params.length
+    ? functionObject.inputs.map((input, index) => {
+        return `${index}: ${input.type}: ${params[index]}`;
+      })
+    : [""];
+  const decodedOutput: Array<string> =
+    functionObject.outputs.length > 1
+      ? functionObject.outputs.map((output, index) => {
+          return `${index}: ${output.type}: ${result[index]}`;
+        })
+      : [`0: ${functionObject.outputs[0].type}: ${result}`];
+  const callReceipt: TxInterface = {
+    from: from,
+    to: to,
+    decodedInput: decodedInput,
+    decodedOutput: !!functionObject.outputs.length ? decodedOutput : [""],
+  };
+  return callReceipt;
 };
 
 export const getABIType = (contract: CompiledJSONOutput): any => {

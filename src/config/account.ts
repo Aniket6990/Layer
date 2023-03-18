@@ -384,7 +384,11 @@ export const sendTransaction = async (
       extensionEvent = {
         eventStatus: "success",
         eventType: "layer_mutableCall",
-        eventResult: generateTxnInterface(submittedTx),
+        eventResult: await generateTxnInterface({
+          gasLimit: txObject.gasLimit,
+          receipt: submittedTx,
+          rpcUrl: txObject.selectedNetworkRpcUrl,
+        }),
       };
     } else {
       extensionEvent = {
