@@ -181,7 +181,10 @@ const ParameterInput = (props: {
                 props.functionToCall(paramValues, props.functionObject);
                 setParamInput([]);
               } else {
-                props.functionToCall(paramInput, props.functionObject);
+                const params = paramInput.map((param) => {
+                  return param.trim();
+                });
+                props.functionToCall(params, props.functionObject);
                 setParamInput([]);
               }
             }}
