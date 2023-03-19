@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import styled from "styled-components";
-import { FaRegCopy } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  deployContract,
   executeContractFunction,
   getDeployedContracts,
   listContractFunctions,
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
 import { FunctionObjectType, NetworkConfig } from "../../types";
-import { setGlobalPswd } from "../../store/extensionstore";
+import { VscCheck, VscCopy } from "react-icons/vsc";
 
 const ContractContainer = styled.div`
   height: 600px;
@@ -64,17 +62,24 @@ const ContractCall = styled.div`
   height: 100%;
 `;
 
-const FunctionArea = styled.div`
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const CopyIcon = styled(VscCopy)`
+  width: 18px;
+  height: 18px;
+  color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
-const CopyIcon = styled(FaRegCopy)`
-  width: 16px;
-  height: 16px;
+const CopyCheckIcon = styled(VscCheck)`
+  width: 18px;
+  height: 18px;
+  color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const ContractArea = () => {
@@ -85,6 +90,7 @@ const ContractArea = () => {
   const [selectedContractAddress, setSelectContractAddress] =
     useState<string>();
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
+  const [copied, setCopied] = useState<boolean>(false);
   const selectedNetwork = useAppSelector(
     (state) => state.extension.selectedNetwork
   );
@@ -173,6 +179,19 @@ const ContractArea = () => {
     }
   };
 
+  const copyItem = async (item: string) => {
+    await navigator.clipboard.writeText(item);
+    setCopied(true);
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (copied) setCopied(false);
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
   return (
     <ContractContainer>
       {/* dropdown for account selection */}
@@ -204,23 +223,19 @@ const ContractArea = () => {
               );
             })}
           </DropDown>
-          <CopyIcon
-            onClick={(e: any) => {
-              if (selectedNetwork !== "Select Network") {
-                getDeployedContracts(selectedNetwork);
-              }
-            }}
-          ></CopyIcon>
+          {!copied ? (
+            <CopyIcon
+              onClick={(e) => {
+                copyItem(selectedContractAddress as string);
+              }}
+            ></CopyIcon>
+          ) : (
+            <CopyCheckIcon></CopyCheckIcon>
+          )}
         </ContractSelection>
       </DeployedContract>
       {/* Area for contract call */}
       <ContractCall>
-        <span>
-          {selectedContractName !== undefined &&
-          selectedContractAddress !== undefined
-            ? `${selectedContractName}: ${selectedContractAddress}`
-            : `Contract call`}
-        </span>
         {errorMsg !== undefined && (
           <span style={{ alignSelf: "flex-start", color: "red" }}>
             {errorMsg}

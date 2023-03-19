@@ -6,8 +6,7 @@ import {
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react";
 import styled from "styled-components";
-import { FaRegCopy } from "react-icons/fa";
-import { VscPassFilled, VscRefresh } from "react-icons/vsc";
+import { VscCheck, VscCopy, VscPassFilled, VscRefresh } from "react-icons/vsc";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   setExecValue,
@@ -96,9 +95,9 @@ const AtAddressButton = styled(VSCodeButton)`
   width: 35%;
 `;
 
-const CopyIcon = styled(FaRegCopy)`
-  width: 16px;
-  height: 16px;
+const CopyIcon = styled(VscCopy)`
+  width: 18px;
+  height: 18px;
   color: var(--vscode-icon-foreground);
   &:hover {
     cursor: pointer;
@@ -106,8 +105,8 @@ const CopyIcon = styled(FaRegCopy)`
 `;
 
 const RefreshIcon = styled(VscRefresh)`
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   color: var(--vscode-icon-foreground);
   &:hover {
     cursor: pointer;
@@ -115,9 +114,20 @@ const RefreshIcon = styled(VscRefresh)`
 `;
 
 const CheckIcon = styled(VscPassFilled)`
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const CopyCheckIcon = styled(VscCheck)`
+  width: 18px;
+  height: 18px;
+  color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
   &:hover {
     cursor: pointer;
   }
@@ -135,6 +145,7 @@ const ConfigArea = () => {
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   const [value, setValue] = useState<string>("0");
   const [format, setFormat] = useState<string>("wei");
+  const [copied, setCopied] = useState<boolean>(false);
   const networks = useAppSelector((state) => state.extension.networks);
   const accounts = useAppSelector((state) => state.extension.addresses);
   const selectedAccount = useAppSelector(
@@ -278,6 +289,20 @@ const ConfigArea = () => {
     setErrorMsg(undefined);
     unlockAccount(selectedAccount, globalPswd);
   };
+
+  const copyItem = async (item: string) => {
+    await navigator.clipboard.writeText(item);
+    setCopied(true);
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (copied) setCopied(false);
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
   return (
     <ConfigContainer>
       {/* dropdown for network selection */}
@@ -318,7 +343,15 @@ const ConfigArea = () => {
               );
             })}
           </DropDown>
-          <CopyIcon></CopyIcon>
+          {!copied ? (
+            <CopyIcon
+              onClick={(e) => {
+                copyItem(selectedAccount);
+              }}
+            ></CopyIcon>
+          ) : (
+            <CopyCheckIcon></CopyCheckIcon>
+          )}
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* selected account balance on selected network */}
@@ -332,7 +365,7 @@ const ConfigArea = () => {
             }`}
             disabled
           ></GasLimitTextField>
-          <CopyIcon></CopyIcon>
+          <RefreshIcon></RefreshIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* textfield for gas limit */}
@@ -346,7 +379,6 @@ const ConfigArea = () => {
               dispatch(setGasLimit(e.target.value));
             }}
           ></GasLimitTextField>
-          <CopyIcon></CopyIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* Area for Value in different units */}
