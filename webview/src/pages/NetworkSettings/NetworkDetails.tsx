@@ -120,7 +120,6 @@ const NetworkDetails = () => {
             onChange={(e: any) => {
               setNetworkInfo({ ...networkInfo, rpc: e.target.value });
             }}
-            disabled={networkInfo.isDefault}
           ></TextField>
         </FullObjectWrapper>
       </ConfigWrapper>

@@ -126,7 +126,7 @@ const NetworkList = () => {
       isDefault: false,
     };
     const selectedNetworkConfig =
-      value !== "Add New Network" ? getSelectedConf(value) : newNetworkInit;
+      value !== "" ? getSelectedConf(value) : newNetworkInit;
     dispatch(
       setSettingNetworkConfig(JSON.parse(JSON.stringify(selectedNetworkConfig)))
     );
@@ -176,7 +176,7 @@ const NetworkList = () => {
       <Button
         onClick={(e) => {
           setIsNetworkSelected(true);
-          handleNetworkSelection("Add New Network");
+          handleNetworkSelection("");
         }}
       >
         Add New Network

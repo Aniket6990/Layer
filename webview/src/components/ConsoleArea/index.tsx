@@ -68,6 +68,9 @@ const ConsoleClearIcon = styled(VscClearAll)`
 const ConsoleArea = () => {
   const [consoleMsg, setConsoleMsg] = useState<Array<WebViewEventType>>([]);
   const eventMsg = useAppSelector((state) => state.extension.eventMsg);
+  const selectedNetwork = useAppSelector(
+    (state) => state.extension.selectedNetwork
+  );
 
   useEffect(() => {
     setConsoleMsg([...consoleMsg, eventMsg as WebViewEventType]);
@@ -106,7 +109,7 @@ const ConsoleArea = () => {
               <Toggle
                 txn={message.eventResult as TxInterface}
                 txnStatus={message.eventStatus}
-                selectedNetwork={"polygon mumbai"}
+                selectedNetwork={selectedNetwork}
               />
             );
           } else {
