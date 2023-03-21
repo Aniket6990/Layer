@@ -365,7 +365,16 @@ const ConfigArea = () => {
             }`}
             disabled
           ></GasLimitTextField>
-          <RefreshIcon></RefreshIcon>
+          <RefreshIcon
+            onClick={(e) => {
+              if (
+                selectedAccount !== "Select Account" &&
+                selectedNetConfig.rpc !== undefined
+              ) {
+                displayAccountBalance(selectedAccount, selectedNetConfig.rpc);
+              }
+            }}
+          ></RefreshIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* textfield for gas limit */}

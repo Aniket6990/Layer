@@ -6,6 +6,7 @@ import ExecutionPage from "./pages/ExecutionPage";
 import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
 import {
+  displayAccountBalance,
   getAccounts,
   getDeployedContracts,
   getNetworks,
@@ -61,6 +62,14 @@ function App() {
     (state) => state.extension.selectedAccount
   );
 
+  const walletAccount = useAppSelector(
+    (state) => state.extension.walletAccount
+  );
+
+  const walletNetConfig: NetworkConfig = useAppSelector(
+    (state) => state.extension.walletNetworkConfig
+  );
+
   useEffect(() => {
     getNetworks();
     getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
@@ -112,6 +121,7 @@ function App() {
         }
         case "send-token-result": {
           dispatch(setEventMsg(eventData.data));
+          displayAccountBalance(walletAccount, walletNetConfig.rpc);
           break;
         }
         case "post-compiled-contracts": {
@@ -124,6 +134,7 @@ function App() {
         }
         case "contract-deployed": {
           dispatch(setEventMsg(eventData.data));
+          displayAccountBalance(selectedAccount, selectedNetworkConfig.rpc);
           getDeployedContracts(selectedNetwork);
           break;
         }
@@ -138,6 +149,7 @@ function App() {
         case "function-executed": {
           if (eventData.data !== undefined) {
             dispatch(setEventMsg(eventData.data));
+            displayAccountBalance(selectedAccount, selectedNetworkConfig.rpc);
           }
           break;
         }
@@ -176,7 +188,14 @@ function App() {
     return () => {
       window.removeEventListener("message", fn);
     };
-  }, [dispatch, selectedNetwork, selectedNetworkConfig.rpc]);
+  }, [
+    dispatch,
+    selectedAccount,
+    selectedNetwork,
+    selectedNetworkConfig.rpc,
+    walletAccount,
+    walletNetConfig.rpc,
+  ]);
 
   return (
     <Main>
