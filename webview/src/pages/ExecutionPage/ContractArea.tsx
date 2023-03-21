@@ -11,6 +11,7 @@ import ParameterInput from "../../components/UI/ParameterInput";
 import { FunctionObjectType, NetworkConfig } from "../../types";
 import { VscCheck, VscCopy } from "react-icons/vsc";
 import { isLocalNetwork } from "../../utilities/functions";
+import { setSelectedContractFunctions } from "../../store/extensionstore";
 
 const ContractContainer = styled.div`
   height: 600px;
@@ -127,6 +128,10 @@ const ContractArea = () => {
     setSelectContractAddress(contractData[1]);
     listContractFunctions(contractData[0]);
   };
+
+  useEffect(() => {
+    dispatch(setSelectedContractFunctions(undefined));
+  }, [selectedNetwork]);
 
   const parameterCheck = (
     contractParams: string[],

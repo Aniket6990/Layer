@@ -14,6 +14,7 @@ import {
   setGlobalPswd,
   setSelectedAccount,
   setSelectedContract,
+  setSelectedContractConstructor,
   setSelectedNetwork,
   setSelectedNetworkConfig,
 } from "../../store/extensionstore";
@@ -261,13 +262,18 @@ const ConfigArea = () => {
 
   const handleDeployContract = (contractParams: string[]) => {
     const paramCheck = parameterCheck(contractParams);
+
+    // Incase after changing the contract from dropdown the value in contract params not change.
+    const params: string[] =
+      selectedContractConstructor === undefined ? [] : contractParams;
+
     if (paramCheck !== undefined) {
       setErrorMsg(paramCheck);
     } else {
       setErrorMsg(undefined);
       deployContract(
         selectedContract,
-        contractParams,
+        params,
         globalPswd,
         selectedNetwork,
         selectedAccount,
