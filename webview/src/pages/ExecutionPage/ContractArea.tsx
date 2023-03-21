@@ -10,6 +10,7 @@ import {
 import ParameterInput from "../../components/UI/ParameterInput";
 import { FunctionObjectType, NetworkConfig } from "../../types";
 import { VscCheck, VscCopy } from "react-icons/vsc";
+import { isLocalNetwork } from "../../utilities/functions";
 
 const ContractContainer = styled.div`
   height: 600px;
@@ -134,7 +135,7 @@ const ContractArea = () => {
     if (selectedAccount === "Select Account") {
       return "No Account selected*";
     }
-    if (globalPswd === "") {
+    if (globalPswd === "" && !isLocalNetwork(selectedNetwork)) {
       return "password is required*";
     }
     if (selectedNetConfig.rpc === undefined) {

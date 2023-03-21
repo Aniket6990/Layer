@@ -27,6 +27,7 @@ import {
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
 import { ethers } from "ethers";
+import { isLocalNetwork } from "../../utilities/functions";
 
 const ConfigContainer = styled.div`
   height: 600px;
@@ -237,7 +238,7 @@ const ConfigArea = () => {
     if (selectedAccount === "Select Account") {
       return "No Account selected*";
     }
-    if (globalPswd === "") {
+    if (globalPswd === "" && !isLocalNetwork(selectedNetwork)) {
       return "password is required*";
     }
     if (selectedNetConfig.rpc === undefined) {
@@ -459,7 +460,9 @@ const ConfigArea = () => {
         </ParameterInput>
       )}
       {/* show password input field when @globalPswd is empty */}
-      {selectedAccount !== "Select Account" && isAccountUnlocked === false ? (
+      {selectedAccount !== "Select Account" &&
+      isAccountUnlocked === false &&
+      !isLocalNetwork(selectedNetwork) ? (
         <ConfigWrapper>
           <span>Unlock Account</span>
           <FullObjectWrapper>
