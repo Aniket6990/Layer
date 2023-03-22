@@ -13,7 +13,6 @@ import {
 } from "../../configuration/webviewpostmsg";
 import {
   setEventMsg,
-  setIsWalletTx,
   setWalletNetwork,
   setWalletNetworkConfig,
 } from "../../store/extensionstore";
@@ -199,19 +198,13 @@ const WalletTransaction = () => {
         <FullObjectWrapper>
           <TextField
             value={`${walletAccountBalance} ${
-              walletNetConfig !== undefined ? walletNetConfig.symbol : ""
+              walletSelectedNetwork !== "Select Network"
+                ? walletNetConfig.symbol
+                : "ETH"
             }`}
             disabled
           ></TextField>
         </FullObjectWrapper>
-      </ConfigWrapper>
-      {/* Transaction menu area */}
-      <ConfigWrapper>
-        <span>Transaction</span>
-        <SemiWrapper>
-          <VSCodeButton>Send</VSCodeButton>
-          <VSCodeButton>Receive</VSCodeButton>
-        </SemiWrapper>
       </ConfigWrapper>
       {/* Recipient textfield area */}
       <ConfigWrapper>

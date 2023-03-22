@@ -5,14 +5,14 @@ import { FunctionObjectType, JsonFragmentType } from "../../types";
 
 const DeployParamsContainer = styled.div`
   width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 0.1fr;
+  grid-template-rows: 1fr;
+  column-gap: 10px;
   align-items: center;
 `;
 
 const PartialObjectWrapper = styled.div`
-  width: 90%;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -51,28 +51,40 @@ const Input = styled.input.attrs((props: { size: any }) => ({
   }
 `;
 
+const SoloInput = styled.input`
+  padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  outline: none;
+  border: 1px solid var(--vscode-icon-foreground);
+  &:hover {
+    cursor: text;
+  }
+`;
+
 const UpArrow = styled(MdArrowForwardIos)`
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   color: var(--vscode-icon-foreground);
   transform: rotate(270deg);
 `;
 
 const DownArrow = styled(MdArrowForwardIos)`
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   color: var(--vscode-icon-foreground);
   transform: rotate(90deg);
 `;
 
 const MultiInputContainer = styled.div`
-  width: 100%;
+  width: 90%;
   display: flex;
   flex-direction: column;
   gap: 8px;
 `;
 
 const Param = styled.div`
+  width: 90%;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -101,13 +113,16 @@ const MultiParamsInput = (props: {
                 >
                   {`${constructorInput.name as string}:`}
                 </span>
-                <Input
+                <SoloInput
+                  style={{
+                    width: "60%",
+                  }}
                   placeholder={constructorInput.type as string}
                   value={props.param[index] ? props.param[index] : ""}
                   onChange={(e) => {
                     props.enterInputParams(e.target.value, index);
                   }}
-                ></Input>
+                ></SoloInput>
               </Param>
             );
           }

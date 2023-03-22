@@ -14,7 +14,6 @@
     "eth2.0",
     "remix ide"
   ],
-  "icon": "images/ethcode.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/Aniket6990/ETHcode-layer"

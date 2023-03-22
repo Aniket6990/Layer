@@ -14,7 +14,7 @@ import { isLocalNetwork } from "../../utilities/functions";
 import { setSelectedContractFunctions } from "../../store/extensionstore";
 
 const ContractContainer = styled.div`
-  height: 600px;
+  height: 500px;
   overflow-y: scroll;
   border: 1px solid var(--vscode-icon-foreground);
   border-radius: 10px;
@@ -26,7 +26,7 @@ const ContractContainer = styled.div`
   gap: 8px;
 `;
 
-const DeployedContract = styled.div`
+const ConfigWrapper = styled.div`
   font-size: 12px;
   color: var(--vscode-icon-foreground);
   font-weight: 600;
@@ -39,14 +39,15 @@ const DeployedContract = styled.div`
 `;
 
 const ContractSelection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 0.1fr;
+  grid-template-rows: 1fr;
+  column-gap: 10px;
+  align-items: center;
 `;
 
 const DropDown = styled(VSCodeDropdown)`
-  width: 90%;
   font-size: 12px;
   border: 1px solid var(--vscode-icon-foreground);
 `;
@@ -201,7 +202,7 @@ const ContractArea = () => {
   return (
     <ContractContainer>
       {/* dropdown for account selection */}
-      <DeployedContract>
+      <ConfigWrapper>
         <span>Deployed Contracts</span>
         <ContractSelection>
           <DropDown
@@ -239,9 +240,9 @@ const ContractArea = () => {
             <CopyCheckIcon></CopyCheckIcon>
           )}
         </ContractSelection>
-      </DeployedContract>
+      </ConfigWrapper>
       {/* Area for contract call */}
-      <ContractCall>
+      <ConfigWrapper>
         {errorMsg !== undefined && (
           <span style={{ alignSelf: "flex-start", color: "red" }}>
             {errorMsg}
@@ -262,7 +263,7 @@ const ContractArea = () => {
               </ParameterInput>
             );
           })}
-      </ContractCall>
+      </ConfigWrapper>
     </ContractContainer>
   );
 };

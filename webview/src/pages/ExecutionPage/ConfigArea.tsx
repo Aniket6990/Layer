@@ -31,7 +31,7 @@ import { ethers } from "ethers";
 import { isLocalNetwork } from "../../utilities/functions";
 
 const ConfigContainer = styled.div`
-  height: 600px;
+  height: 500px;
   overflow-y: scroll;
   border: 1px solid var(--vscode-icon-foreground);
   border-radius: 10px;
@@ -39,7 +39,7 @@ const ConfigContainer = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding: 20px;
+  padding: 20px 0px 20px 20px;
   gap: 14px;
 `;
 
@@ -56,45 +56,38 @@ const ConfigWrapper = styled.div`
 `;
 
 const DropDown = styled(VSCodeDropdown)`
-  width: 90%;
   font-size: 12px;
   border: 1px solid var(--vscode-icon-foreground);
 `;
 
 const FullObjectWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 0.1fr;
+  grid-template-rows: 1fr;
+  column-gap: 10px;
+  align-items: center;
 `;
 
 const PartialObjectWrapper = styled.div`
-  width: 90%;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  grid-template-rows: 1fr;
+  column-gap: 10px;
 `;
 
 const GasLimitTextField = styled(VSCodeTextField)`
-  width: 90%;
   font-size: 12px;
   border: 1px solid var(--vscode-icon-foreground);
 `;
 
 const ValueTextField = styled(GasLimitTextField)`
-  width: 60%;
-`;
-
-const AtAddressTextField = styled(GasLimitTextField)`
-  width: 60%;
+  font-size: 12px;
+  border: 1px solid var(--vscode-icon-foreground);
 `;
 
 const ValueDropDown = styled(DropDown)`
-  width: 35%;
-`;
-
-const AtAddressButton = styled(VSCodeButton)`
-  width: 35%;
+  font-size: 12px;
 `;
 
 const CopyIcon = styled(VscCopy)`
@@ -136,7 +129,6 @@ const CopyCheckIcon = styled(VscCheck)`
 `;
 
 const PasswordTextField = styled(VSCodeTextField)`
-  width: 90%;
   font-size: 12px;
   border: 1px solid var(--vscode-icon-foreground);
   align-self: flex-start;
@@ -315,21 +307,23 @@ const ConfigArea = () => {
       {/* dropdown for network selection */}
       <ConfigWrapper>
         <span>Network</span>
-        <DropDown
-          value={selectedNetwork}
-          onChange={(e: any) => {
-            handleNetworkDropdownChange(e);
-          }}
-        >
-          <VSCodeOption value="Select Network">Select Network</VSCodeOption>
-          {Object.keys(networks).map((network, index) => {
-            return (
-              <VSCodeOption key={index} value={network}>
-                {network}
-              </VSCodeOption>
-            );
-          })}
-        </DropDown>
+        <FullObjectWrapper>
+          <DropDown
+            value={selectedNetwork}
+            onChange={(e: any) => {
+              handleNetworkDropdownChange(e);
+            }}
+          >
+            <VSCodeOption value="Select Network">Select Network</VSCodeOption>
+            {Object.keys(networks).map((network, index) => {
+              return (
+                <VSCodeOption key={index} value={network}>
+                  {network}
+                </VSCodeOption>
+              );
+            })}
+          </DropDown>
+        </FullObjectWrapper>
       </ConfigWrapper>
       {/* dropdown for account selection */}
       <ConfigWrapper>
@@ -368,7 +362,9 @@ const ConfigArea = () => {
           <GasLimitTextField
             placeholder="Balance"
             value={`${configBalance} ${
-              selectedNetConfig !== undefined ? selectedNetConfig.symbol : ""
+              selectedNetwork !== "Select Network"
+                ? selectedNetConfig.symbol
+                : "ETH"
             }`}
             disabled
           ></GasLimitTextField>
@@ -400,25 +396,27 @@ const ConfigArea = () => {
       {/* Area for Value in different units */}
       <ConfigWrapper>
         <span>Value</span>
-        <PartialObjectWrapper>
-          <ValueTextField
-            placeholder="value"
-            value={value}
-            onChange={(e: any) => {
-              handleChangeInValue(e.target.value);
-            }}
-          ></ValueTextField>
-          <ValueDropDown
-            value={format}
-            onChange={(e: any) => setFormat(e.target.value)}
-          >
-            <VSCodeOption value="ether">Ether</VSCodeOption>
-            <VSCodeOption value="gwei">Gwei</VSCodeOption>
-            <VSCodeOption value="wei" selected={true}>
-              Wei
-            </VSCodeOption>
-          </ValueDropDown>
-        </PartialObjectWrapper>
+        <FullObjectWrapper>
+          <PartialObjectWrapper>
+            <ValueTextField
+              placeholder="value"
+              value={value}
+              onChange={(e: any) => {
+                handleChangeInValue(e.target.value);
+              }}
+            ></ValueTextField>
+            <ValueDropDown
+              value={format}
+              onChange={(e: any) => setFormat(e.target.value)}
+            >
+              <VSCodeOption value="ether">Ether</VSCodeOption>
+              <VSCodeOption value="gwei">Gwei</VSCodeOption>
+              <VSCodeOption value="wei" selected={true}>
+                Wei
+              </VSCodeOption>
+            </ValueDropDown>
+          </PartialObjectWrapper>
+        </FullObjectWrapper>
       </ConfigWrapper>
       {/* dropdown for selecting a compiled contract */}
       <ConfigWrapper>
@@ -446,25 +444,27 @@ const ConfigArea = () => {
           ></RefreshIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
-      {selectedContractConstructor !== undefined ? (
-        <ParameterInput
-          title="Deploy"
-          buttonSize={1}
-          inputSize={3}
-          functionObject={selectedContractConstructor[0]}
-          functionToCall={handleDeployContract}
-        >
-          Deploy
-        </ParameterInput>
-      ) : (
-        <ParameterInput
-          title="Deploy"
-          buttonSize={1}
-          functionToCall={handleDeployContract}
-        >
-          Deploy
-        </ParameterInput>
-      )}
+      <ConfigWrapper>
+        {selectedContractConstructor !== undefined ? (
+          <ParameterInput
+            title="Deploy"
+            buttonSize={1}
+            inputSize={3}
+            functionObject={selectedContractConstructor[0]}
+            functionToCall={handleDeployContract}
+          >
+            Deploy
+          </ParameterInput>
+        ) : (
+          <ParameterInput
+            title="Deploy"
+            buttonSize={1}
+            functionToCall={handleDeployContract}
+          >
+            Deploy
+          </ParameterInput>
+        )}
+      </ConfigWrapper>
       {/* show password input field when @globalPswd is empty */}
       {selectedAccount !== "Select Account" &&
       isAccountUnlocked === false &&

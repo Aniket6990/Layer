@@ -35,15 +35,17 @@ const Main = styled.div`
   height: 100%;
   overflow-y: scroll;
   display: grid;
-  grid-template-columns: 1fr 0.1fr;
+  grid-template-columns: 1fr 0.03fr;
   grid-template-rows: 1fr;
-  padding: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin: 0;
 `;
 
 const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr 0.4fr;
   row-gap: 20px;
 `;
 
