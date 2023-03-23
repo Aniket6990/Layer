@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { MdArrowForwardIos, MdCancel } from "react-icons/md";
 import styled from "styled-components";
-import { setSelectedNetwork } from "../../store/extensionstore";
 import { TxInterface } from "../../types";
 import { shortenText } from "../../utilities/functions";
 
@@ -80,7 +79,7 @@ const TxDataContainer = (props: {
   txn: TxInterface;
   txnStatus: string;
 }) => {
-  const { open, txn, txnStatus } = props;
+  const { open, txn } = props;
   return (
     <TxData defaultChecked={open}>
       <div
@@ -88,7 +87,7 @@ const TxDataContainer = (props: {
           width: "100%",
         }}
       >
-        <span>{`txn Hash: ${txn.txHash}`}</span>
+        {txn.txHash ? <span>{`txn Hash: ${txn.txHash}`}</span> : null}
       </div>
       <div
         style={{
@@ -101,7 +100,29 @@ const TxDataContainer = (props: {
       >
         <span>{`from: ${txn.from}`}</span>
         <span>{`to: ${txn.to}`}</span>
-        <span>{`gasCost: ${txn.gas}`}</span>
+        {txn.gasLimit ? <span>{`gas limit: ${txn.gasLimit} gas`}</span> : null}
+        {txn.gasUsed ? <span>{`gas used: ${txn.gasUsed} gas`}</span> : null}
+        {txn.input ? (
+          <span>
+            {`input: ${txn.input?.substring(0, 8)}...${txn.input?.substring(
+              txn.input.length - 6
+            )}`}
+          </span>
+        ) : null}
+        <span>{`decoded input: {
+          ${txn.decodedInput?.map((input) => {
+            return input;
+          })}
+        }`}</span>
+        {txn.decodedOutput ? (
+          <span>{`decoded output: {
+          ${txn.decodedOutput?.map((input) => {
+            return input;
+          })}
+        }`}</span>
+        ) : null}
+        {txn.logs ? <span>{`logs: []`}</span> : null}
+        {txn.value ? <span>{`value: ${txn.value} wei`}</span> : null}
       </div>
     </TxData>
   );
@@ -131,11 +152,9 @@ const Toggle = (props: {
             txn.from,
             4,
             4
-          )} to: ${shortenText(txn.to, 4, 4)} hash: ${shortenText(
-            txn.txHash,
-            4,
-            4
-          )}`}</span>
+          )} to: ${shortenText(txn.to, 4, 4)} ${
+            txn.txHash ? `hash: ${shortenText(txn.txHash as string, 4, 4)}` : ""
+          }`}</span>
         </TxnTitle>
       </ToggleHeader>
       {open && <TxDataContainer open={open} txn={txn} txnStatus={txnStatus} />}

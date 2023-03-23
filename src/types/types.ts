@@ -129,16 +129,16 @@ export interface TxObjecttype {
 }
 
 export interface TxInterface {
+  index?: any;
   from: string;
   to: string;
-  txHash: string;
-  gas?: string;
-  exexutionCost?: string;
-  transactionCost?: string;
+  txHash?: string;
+  gasLimit?: string;
+  gasUsed?: string;
   input?: string;
-  decodedInput?: string | Object;
-  decodedOutput?: string | Object;
-  logs?: any;
+  decodedInput?: string[];
+  decodedOutput?: string[];
+  logs?: string;
   value?: string;
 }
 
@@ -166,6 +166,7 @@ export interface FunctionObjectType {
   stateMutability?: string;
   type?: string;
   inputs: Array<JsonFragmentType>;
+  outputs: Array<JsonFragmentType>;
 }
 // Typeguard
 

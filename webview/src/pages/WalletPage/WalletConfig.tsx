@@ -5,7 +5,6 @@ import {
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react";
 import React, { useEffect, useState } from "react";
-import { FaRegCopy } from "react-icons/fa";
 import {
   AiOutlineEye,
   AiOutlineEyeInvisible,
@@ -23,6 +22,7 @@ import {
 } from "../../configuration/webviewpostmsg";
 import { setEventMsg, setWalletAccount } from "../../store/extensionstore";
 import { NetworkConfig } from "../../types";
+import { VscCheck, VscCopy } from "react-icons/vsc";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -35,6 +35,13 @@ const ConfigContainer = styled.div`
   align-items: center;
   padding: 20px 0px 20px 20px;
   gap: 14px;
+`;
+
+const Header = styled.span`
+  font-size: 14px;
+  color: var(--vscode-icon-foreground);
+  font-weight: 600;
+  align-self: flex-start;
 `;
 
 const ConfigWrapper = styled.div`
@@ -75,31 +82,43 @@ const TextField = styled(VSCodeTextField)`
   border: 1px solid var(--vscode-icon-foreground);
 `;
 
-const CopyIcon = styled(FaRegCopy)`
-  width: 16px;
-  height: 16px;
+const CopyIcon = styled(VscCopy)`
+  width: 18px;
+  height: 18px;
+  color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const CopyCheckIcon = styled(VscCheck)`
+  width: 18px;
+  height: 18px;
+  color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
   &:hover {
     cursor: pointer;
   }
 `;
 
 const ShowPvtKey = styled(AiOutlineEye)`
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   &:hover {
     cursor: pointer;
   }
 `;
 const HidePvtKey = styled(AiOutlineEyeInvisible)`
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   &:hover {
     cursor: pointer;
   }
 `;
 const AddIcon = styled(AiOutlinePlus)`
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   &:hover {
     cursor: pointer;
   }
@@ -120,6 +139,7 @@ const WalletConfig = () => {
   const [exportPvtKeyPswd, setExportPvtKeyPswd] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [showPvtKey, setShowPvtKey] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
   const accounts = useAppSelector((state) => state.extension.addresses);
   const walletSelectedAccount = useAppSelector(
     (state) => state.extension.walletAccount
@@ -227,8 +247,22 @@ const WalletConfig = () => {
     };
   }, []);
 
+  const copyItem = async (item: string) => {
+    await navigator.clipboard.writeText(item);
+    setCopied(true);
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (copied) setCopied(false);
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
   return (
     <ConfigContainer>
+      <Header>Account configurations</Header>
       {/* Account selection dropdown */}
       <ConfigWrapper>
         <span>Account</span>
@@ -248,7 +282,15 @@ const WalletConfig = () => {
               );
             })}
           </DropDown>
-          <CopyIcon></CopyIcon>
+          {!copied ? (
+            <CopyIcon
+              onClick={(e) => {
+                copyItem(walletSelectedAccount);
+              }}
+            ></CopyIcon>
+          ) : (
+            <CopyCheckIcon></CopyCheckIcon>
+          )}
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* Import account field */}

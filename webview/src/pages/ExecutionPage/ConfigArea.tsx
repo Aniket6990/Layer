@@ -6,8 +6,7 @@ import {
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react";
 import styled from "styled-components";
-import { FaRegCopy } from "react-icons/fa";
-import { VscPassFilled, VscRefresh } from "react-icons/vsc";
+import { VscCheck, VscCopy, VscPassFilled, VscRefresh } from "react-icons/vsc";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   setExecValue,
@@ -15,6 +14,7 @@ import {
   setGlobalPswd,
   setSelectedAccount,
   setSelectedContract,
+  setSelectedContractConstructor,
   setSelectedNetwork,
   setSelectedNetworkConfig,
 } from "../../store/extensionstore";
@@ -28,9 +28,10 @@ import {
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
 import { ethers } from "ethers";
+import { isLocalNetwork } from "../../utilities/functions";
 
 const ConfigContainer = styled.div`
-  height: 600px;
+  height: 500px;
   overflow-y: scroll;
   border: 1px solid var(--vscode-icon-foreground);
   border-radius: 10px;
@@ -38,8 +39,15 @@ const ConfigContainer = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding: 20px;
+  padding: 20px 0px 20px 20px;
   gap: 14px;
+`;
+
+const Header = styled.span`
+  font-size: 14px;
+  color: var(--vscode-icon-foreground);
+  font-weight: 600;
+  align-self: flex-start;
 `;
 
 const ConfigWrapper = styled.div`
@@ -55,50 +63,43 @@ const ConfigWrapper = styled.div`
 `;
 
 const DropDown = styled(VSCodeDropdown)`
-  width: 90%;
   font-size: 12px;
   border: 1px solid var(--vscode-icon-foreground);
 `;
 
 const FullObjectWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 0.1fr;
+  grid-template-rows: 1fr;
+  column-gap: 10px;
+  align-items: center;
 `;
 
 const PartialObjectWrapper = styled.div`
-  width: 90%;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  grid-template-rows: 1fr;
+  column-gap: 10px;
 `;
 
 const GasLimitTextField = styled(VSCodeTextField)`
-  width: 90%;
   font-size: 12px;
   border: 1px solid var(--vscode-icon-foreground);
 `;
 
 const ValueTextField = styled(GasLimitTextField)`
-  width: 60%;
-`;
-
-const AtAddressTextField = styled(GasLimitTextField)`
-  width: 60%;
+  font-size: 12px;
+  border: 1px solid var(--vscode-icon-foreground);
 `;
 
 const ValueDropDown = styled(DropDown)`
-  width: 35%;
+  font-size: 12px;
 `;
 
-const AtAddressButton = styled(VSCodeButton)`
-  width: 35%;
-`;
-
-const CopyIcon = styled(FaRegCopy)`
-  width: 16px;
-  height: 16px;
+const CopyIcon = styled(VscCopy)`
+  width: 18px;
+  height: 18px;
   color: var(--vscode-icon-foreground);
   &:hover {
     cursor: pointer;
@@ -106,8 +107,8 @@ const CopyIcon = styled(FaRegCopy)`
 `;
 
 const RefreshIcon = styled(VscRefresh)`
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   color: var(--vscode-icon-foreground);
   &:hover {
     cursor: pointer;
@@ -115,16 +116,26 @@ const RefreshIcon = styled(VscRefresh)`
 `;
 
 const CheckIcon = styled(VscPassFilled)`
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const CopyCheckIcon = styled(VscCheck)`
+  width: 18px;
+  height: 18px;
+  color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
   &:hover {
     cursor: pointer;
   }
 `;
 
 const PasswordTextField = styled(VSCodeTextField)`
-  width: 90%;
   font-size: 12px;
   border: 1px solid var(--vscode-icon-foreground);
   align-self: flex-start;
@@ -135,6 +146,7 @@ const ConfigArea = () => {
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   const [value, setValue] = useState<string>("0");
   const [format, setFormat] = useState<string>("wei");
+  const [copied, setCopied] = useState<boolean>(false);
   const networks = useAppSelector((state) => state.extension.networks);
   const accounts = useAppSelector((state) => state.extension.addresses);
   const selectedAccount = useAppSelector(
@@ -226,7 +238,7 @@ const ConfigArea = () => {
     if (selectedAccount === "Select Account") {
       return "No Account selected*";
     }
-    if (globalPswd === "") {
+    if (globalPswd === "" && !isLocalNetwork(selectedNetwork)) {
       return "password is required*";
     }
     if (selectedNetConfig.rpc === undefined) {
@@ -249,13 +261,18 @@ const ConfigArea = () => {
 
   const handleDeployContract = (contractParams: string[]) => {
     const paramCheck = parameterCheck(contractParams);
+
+    // Incase after changing the contract from dropdown the value in contract params not change.
+    const params: string[] =
+      selectedContractConstructor === undefined ? [] : contractParams;
+
     if (paramCheck !== undefined) {
       setErrorMsg(paramCheck);
     } else {
       setErrorMsg(undefined);
       deployContract(
         selectedContract,
-        contractParams,
+        params,
         globalPswd,
         selectedNetwork,
         selectedAccount,
@@ -278,26 +295,43 @@ const ConfigArea = () => {
     setErrorMsg(undefined);
     unlockAccount(selectedAccount, globalPswd);
   };
+
+  const copyItem = async (item: string) => {
+    await navigator.clipboard.writeText(item);
+    setCopied(true);
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (copied) setCopied(false);
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
   return (
     <ConfigContainer>
+      <Header>Environment setup</Header>
       {/* dropdown for network selection */}
       <ConfigWrapper>
         <span>Network</span>
-        <DropDown
-          value={selectedNetwork}
-          onChange={(e: any) => {
-            handleNetworkDropdownChange(e);
-          }}
-        >
-          <VSCodeOption value="Select Network">Select Network</VSCodeOption>
-          {Object.keys(networks).map((network, index) => {
-            return (
-              <VSCodeOption key={index} value={network}>
-                {network}
-              </VSCodeOption>
-            );
-          })}
-        </DropDown>
+        <FullObjectWrapper>
+          <DropDown
+            value={selectedNetwork}
+            onChange={(e: any) => {
+              handleNetworkDropdownChange(e);
+            }}
+          >
+            <VSCodeOption value="Select Network">Select Network</VSCodeOption>
+            {Object.keys(networks).map((network, index) => {
+              return (
+                <VSCodeOption key={index} value={network}>
+                  {network}
+                </VSCodeOption>
+              );
+            })}
+          </DropDown>
+        </FullObjectWrapper>
       </ConfigWrapper>
       {/* dropdown for account selection */}
       <ConfigWrapper>
@@ -318,7 +352,15 @@ const ConfigArea = () => {
               );
             })}
           </DropDown>
-          <CopyIcon></CopyIcon>
+          {!copied ? (
+            <CopyIcon
+              onClick={(e) => {
+                copyItem(selectedAccount);
+              }}
+            ></CopyIcon>
+          ) : (
+            <CopyCheckIcon></CopyCheckIcon>
+          )}
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* selected account balance on selected network */}
@@ -328,11 +370,22 @@ const ConfigArea = () => {
           <GasLimitTextField
             placeholder="Balance"
             value={`${configBalance} ${
-              selectedNetConfig !== undefined ? selectedNetConfig.symbol : ""
+              selectedNetwork !== "Select Network"
+                ? selectedNetConfig.symbol
+                : "ETH"
             }`}
             disabled
           ></GasLimitTextField>
-          <CopyIcon></CopyIcon>
+          <RefreshIcon
+            onClick={(e) => {
+              if (
+                selectedAccount !== "Select Account" &&
+                selectedNetConfig.rpc !== undefined
+              ) {
+                displayAccountBalance(selectedAccount, selectedNetConfig.rpc);
+              }
+            }}
+          ></RefreshIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* textfield for gas limit */}
@@ -346,31 +399,32 @@ const ConfigArea = () => {
               dispatch(setGasLimit(e.target.value));
             }}
           ></GasLimitTextField>
-          <CopyIcon></CopyIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* Area for Value in different units */}
       <ConfigWrapper>
         <span>Value</span>
-        <PartialObjectWrapper>
-          <ValueTextField
-            placeholder="value"
-            value={value}
-            onChange={(e: any) => {
-              handleChangeInValue(e.target.value);
-            }}
-          ></ValueTextField>
-          <ValueDropDown
-            value={format}
-            onChange={(e: any) => setFormat(e.target.value)}
-          >
-            <VSCodeOption value="ether">Ether</VSCodeOption>
-            <VSCodeOption value="gwei">Gwei</VSCodeOption>
-            <VSCodeOption value="wei" selected={true}>
-              Wei
-            </VSCodeOption>
-          </ValueDropDown>
-        </PartialObjectWrapper>
+        <FullObjectWrapper>
+          <PartialObjectWrapper>
+            <ValueTextField
+              placeholder="value"
+              value={value}
+              onChange={(e: any) => {
+                handleChangeInValue(e.target.value);
+              }}
+            ></ValueTextField>
+            <ValueDropDown
+              value={format}
+              onChange={(e: any) => setFormat(e.target.value)}
+            >
+              <VSCodeOption value="ether">Ether</VSCodeOption>
+              <VSCodeOption value="gwei">Gwei</VSCodeOption>
+              <VSCodeOption value="wei" selected={true}>
+                Wei
+              </VSCodeOption>
+            </ValueDropDown>
+          </PartialObjectWrapper>
+        </FullObjectWrapper>
       </ConfigWrapper>
       {/* dropdown for selecting a compiled contract */}
       <ConfigWrapper>
@@ -398,27 +452,31 @@ const ConfigArea = () => {
           ></RefreshIcon>
         </FullObjectWrapper>
       </ConfigWrapper>
-      {selectedContractConstructor !== undefined ? (
-        <ParameterInput
-          title="Deploy"
-          buttonSize={1}
-          inputSize={3}
-          functionObject={selectedContractConstructor[0]}
-          functionToCall={handleDeployContract}
-        >
-          Deploy
-        </ParameterInput>
-      ) : (
-        <ParameterInput
-          title="Deploy"
-          buttonSize={1}
-          functionToCall={handleDeployContract}
-        >
-          Deploy
-        </ParameterInput>
-      )}
+      <ConfigWrapper>
+        {selectedContractConstructor !== undefined ? (
+          <ParameterInput
+            title="Deploy"
+            buttonSize={1}
+            inputSize={3}
+            functionObject={selectedContractConstructor[0]}
+            functionToCall={handleDeployContract}
+          >
+            Deploy
+          </ParameterInput>
+        ) : (
+          <ParameterInput
+            title="Deploy"
+            buttonSize={1}
+            functionToCall={handleDeployContract}
+          >
+            Deploy
+          </ParameterInput>
+        )}
+      </ConfigWrapper>
       {/* show password input field when @globalPswd is empty */}
-      {selectedAccount !== "Select Account" && isAccountUnlocked === false ? (
+      {selectedAccount !== "Select Account" &&
+      isAccountUnlocked === false &&
+      !isLocalNetwork(selectedNetwork) ? (
         <ConfigWrapper>
           <span>Unlock Account</span>
           <FullObjectWrapper>

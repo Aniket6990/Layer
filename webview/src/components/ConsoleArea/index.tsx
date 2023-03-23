@@ -21,6 +21,17 @@ const ConsoleContainer = styled.div`
   gap: 5px;
 `;
 
+const EventContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 5px;
+`;
+
 const ConsoleHeader = styled.div`
   width: 100%;
   display: flex;
@@ -57,6 +68,9 @@ const ConsoleClearIcon = styled(VscClearAll)`
 const ConsoleArea = () => {
   const [consoleMsg, setConsoleMsg] = useState<Array<WebViewEventType>>([]);
   const eventMsg = useAppSelector((state) => state.extension.eventMsg);
+  const homeNetwork = useAppSelector(
+    (state) => state.extension.selectedNetwork
+  );
 
   useEffect(() => {
     setConsoleMsg([...consoleMsg, eventMsg as WebViewEventType]);
@@ -72,41 +86,44 @@ const ConsoleArea = () => {
           }}
         ></ConsoleClearIcon>
       </ConsoleHeader>
-
-      {consoleMsg.map((message) => {
-        if (
-          message.eventStatus === "success" &&
-          (message.eventType === "layer_extensionCall" ||
-            message.eventType === "layer_msg")
-        ) {
-          return (
-            <TransactionContainer>
-              {message.eventType !== "layer_msg" && (
-                <TransactionSuccessIcon></TransactionSuccessIcon>
-              )}
-              {message.eventResult as string}
-            </TransactionContainer>
-          );
-        } else if (
-          message.eventType === "layer_ImutableCall" ||
-          message.eventType === "layer_mutableCall"
-        ) {
-          return (
-            <Toggle
-              txn={message.eventResult as TxInterface}
-              txnStatus={message.eventStatus}
-              selectedNetwork={"polygon mumbai"}
-            />
-          );
-        } else {
-          return (
-            <TransactionContainer>
-              <TransactionFailureIcon></TransactionFailureIcon>
-              {message.eventResult as string}
-            </TransactionContainer>
-          );
-        }
-      })}
+      <EventContainer id="eventContainer">
+        {consoleMsg.map((message) => {
+          if (
+            message.eventStatus === "success" &&
+            (message.eventType === "layer_extensionCall" ||
+              message.eventType === "layer_msg")
+          ) {
+            return (
+              <TransactionContainer>
+                {message.eventType !== "layer_msg" && (
+                  <TransactionSuccessIcon></TransactionSuccessIcon>
+                )}
+                {message.eventResult as string}
+              </TransactionContainer>
+            );
+          } else if (
+            message.eventType === "layer_ImutableCall" ||
+            message.eventType === "layer_mutableCall"
+          ) {
+            return (
+              <Toggle
+                txn={message.eventResult as TxInterface}
+                txnStatus={message.eventStatus}
+                selectedNetwork={
+                  homeNetwork === "Select Network" ? "Txn" : homeNetwork
+                }
+              />
+            );
+          } else {
+            return (
+              <TransactionContainer>
+                <TransactionFailureIcon></TransactionFailureIcon>
+                {message.eventResult as string}
+              </TransactionContainer>
+            );
+          }
+        })}
+      </EventContainer>
     </ConsoleContainer>
   );
 };

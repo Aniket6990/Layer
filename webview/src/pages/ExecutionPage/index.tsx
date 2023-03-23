@@ -19,7 +19,7 @@ const Assessibilty = styled.div`
 `;
 
 const Divider = styled.div`
-  height: 550px;
+  height: 450px;
   width: 0;
   border: 0.5px solid var(--vscode-icon-foreground);
   justify-self: center;

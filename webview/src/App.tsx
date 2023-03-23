@@ -6,6 +6,8 @@ import ExecutionPage from "./pages/ExecutionPage";
 import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
 import {
+  displayAccountBalance,
+  displayWalletAccountBalance,
   getAccounts,
   getDeployedContracts,
   getNetworks,
@@ -34,15 +36,17 @@ const Main = styled.div`
   height: 100%;
   overflow-y: scroll;
   display: grid;
-  grid-template-columns: 1fr 0.1fr;
+  grid-template-columns: 1fr 0.03fr;
   grid-template-rows: 1fr;
-  padding: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin: 0;
 `;
 
 const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 0.3fr;
+  grid-template-rows: 1fr 0.4fr;
   row-gap: 20px;
 `;
 
@@ -59,6 +63,14 @@ function App() {
 
   const selectedAccount = useAppSelector(
     (state) => state.extension.selectedAccount
+  );
+
+  const walletAccount = useAppSelector(
+    (state) => state.extension.walletAccount
+  );
+
+  const walletNetConfig: NetworkConfig = useAppSelector(
+    (state) => state.extension.walletNetworkConfig
   );
 
   useEffect(() => {
@@ -112,6 +124,7 @@ function App() {
         }
         case "send-token-result": {
           dispatch(setEventMsg(eventData.data));
+          displayWalletAccountBalance(walletAccount, walletNetConfig.rpc);
           break;
         }
         case "post-compiled-contracts": {
@@ -124,6 +137,7 @@ function App() {
         }
         case "contract-deployed": {
           dispatch(setEventMsg(eventData.data));
+          displayAccountBalance(selectedAccount, selectedNetworkConfig.rpc);
           getDeployedContracts(selectedNetwork);
           break;
         }
@@ -138,6 +152,7 @@ function App() {
         case "function-executed": {
           if (eventData.data !== undefined) {
             dispatch(setEventMsg(eventData.data));
+            displayAccountBalance(selectedAccount, selectedNetworkConfig.rpc);
           }
           break;
         }
@@ -176,7 +191,14 @@ function App() {
     return () => {
       window.removeEventListener("message", fn);
     };
-  }, [dispatch]);
+  }, [
+    dispatch,
+    selectedAccount,
+    selectedNetwork,
+    selectedNetworkConfig.rpc,
+    walletAccount,
+    walletNetConfig.rpc,
+  ]);
 
   return (
     <Main>

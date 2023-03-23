@@ -16,6 +16,7 @@ import { getDirectoriesRecursive } from "../lib/file";
 import {
   generateTxnInterface,
   getABIType,
+  getCallInterface,
   getContractByteCode,
   getContractFactoryWithParams,
   getSignedContract,
@@ -195,15 +196,32 @@ export const deploySelectedContract = async (
         gasPrice: gasPrice,
         gasLimit: gasLimit,
       });
-      addContractAddress(contractJSONOutput, {
+      const txnReceipt = await getSelectedNetworkProvider(
+        rpcURL
+      ).getTransactionReceipt(contract.deployTransaction.hash);
+
+      await addContractAddress(contractJSONOutput, {
         network: selectedNetwork,
         address: contract.address,
         contractName: contractName,
       });
+      const constructorInputs = getContractConstructor(context, contractName);
+      const inputsvalue =
+        constructorInputs !== undefined ? constructorInputs[0] : undefined;
+
+      const txnObject = await generateTxnInterface({
+        receipt: txnReceipt,
+        gasLimit: gasLimit,
+        rpcUrl: rpcURL,
+        functionObject: inputsvalue,
+        params: parameters,
+        contractName: contractName,
+      });
+
       extensionEvent = {
         eventStatus: "success",
-        eventType: "layer_extensionCall",
-        eventResult: `${contractName}.sol deployed on ${contract.address}`,
+        eventType: "layer_mutableCall",
+        eventResult: txnObject,
       };
       return extensionEvent;
     }
@@ -211,7 +229,9 @@ export const deploySelectedContract = async (
     extensionEvent = {
       eventStatus: "fail",
       eventType: "layer_extensionCall",
-      eventResult: `Error while deploying ${contractName} ${err.message}`,
+      eventResult: `Error while deploying ${contractName} ${JSON.stringify(
+        err.body
+      )}`,
     };
     return extensionEvent;
   }
@@ -226,7 +246,7 @@ const getContractArtifactPath = (contract: CompiledJSONOutput) => {
 };
 
 // add deployed contract address to the json file
-export const addContractAddress = (
+export const addContractAddress = async (
   contract: CompiledJSONOutput,
   deployConfig: { network: string; address: string; contractName: string }
 ) => {
@@ -354,11 +374,13 @@ export const getContractFunctions = (
       stateMutability: string;
       inputs: JsonFragmentType[];
       type: string;
+      outputs: JsonFragmentType[];
     }) => ({
       name: e.name,
       stateMutability: e.stateMutability,
       type: e.type,
       inputs: e.inputs?.map((c) => ({ ...c, value: "" })),
+      outputs: e.outputs,
     })
   );
   return functions;
@@ -422,10 +444,17 @@ export const executeContractFunction = async (
         gasPrice: gasPrice,
         gasLimit: gasLimit,
       });
+      const callReceipt = getCallInterface(
+        selectedAccount,
+        contractAddress,
+        functionObject,
+        params_,
+        result
+      );
       extensionEvent = {
         eventStatus: "success",
-        eventType: "layer_extensionCall",
-        eventResult: JSON.stringify(result),
+        eventType: "layer_ImutableCall",
+        eventResult: callReceipt,
       };
     } else {
       const contract = await getSignedContract(
@@ -454,10 +483,20 @@ export const executeContractFunction = async (
           });
         }
         const submittedTx = await result.wait();
+
+        const txnObject = await generateTxnInterface({
+          gasLimit: gasLimit,
+          receipt: submittedTx,
+          rpcUrl: rpcUrl,
+          functionObject: functionObject,
+          params: params_,
+          contractName: contractName,
+        });
+
         extensionEvent = {
           eventStatus: "success",
           eventType: "layer_mutableCall",
-          eventResult: generateTxnInterface(submittedTx),
+          eventResult: txnObject,
         };
       } else {
         return;

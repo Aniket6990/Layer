@@ -12,3 +12,9 @@ const shortenText = (text: string, charStart: number, charEnd: number) => {
   return `${text.slice(0, charStart + 2)}...${text.slice(-charEnd)}`;
 };
 export { containOnlyDigits, isValidAddress, shortenText };
+
+export const isLocalNetwork = (network: string) => {
+  if (network === "Hardhat Network" || network === "Ganache Network")
+    return true;
+  return false;
+};

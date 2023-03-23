@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { VSCodeDropdown, VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import styled from "styled-components";
-import { FaRegCopy } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  deployContract,
   executeContractFunction,
   getDeployedContracts,
   listContractFunctions,
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
 import { FunctionObjectType, NetworkConfig } from "../../types";
-import { setGlobalPswd } from "../../store/extensionstore";
+import { VscCheck, VscCopy } from "react-icons/vsc";
+import { isLocalNetwork } from "../../utilities/functions";
+import { setSelectedContractFunctions } from "../../store/extensionstore";
 
 const ContractContainer = styled.div`
-  height: 600px;
+  height: 500px;
   overflow-y: scroll;
   border: 1px solid var(--vscode-icon-foreground);
   border-radius: 10px;
@@ -23,10 +23,17 @@ const ContractContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
   padding: 20px;
-  gap: 8px;
+  gap: 14px;
 `;
 
-const DeployedContract = styled.div`
+const Header = styled.span`
+  font-size: 14px;
+  color: var(--vscode-icon-foreground);
+  font-weight: 600;
+  align-self: flex-start;
+`;
+
+const ConfigWrapper = styled.div`
   font-size: 12px;
   color: var(--vscode-icon-foreground);
   font-weight: 600;
@@ -39,14 +46,15 @@ const DeployedContract = styled.div`
 `;
 
 const ContractSelection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 0.1fr;
+  grid-template-rows: 1fr;
+  column-gap: 10px;
+  align-items: center;
 `;
 
 const DropDown = styled(VSCodeDropdown)`
-  width: 90%;
   font-size: 12px;
   border: 1px solid var(--vscode-icon-foreground);
 `;
@@ -64,17 +72,24 @@ const ContractCall = styled.div`
   height: 100%;
 `;
 
-const FunctionArea = styled.div`
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const CopyIcon = styled(VscCopy)`
+  width: 18px;
+  height: 18px;
+  color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
-const CopyIcon = styled(FaRegCopy)`
-  width: 16px;
-  height: 16px;
+const CopyCheckIcon = styled(VscCheck)`
+  width: 18px;
+  height: 18px;
+  color: var(--vscode-icon-foreground);
+  transition: "all 200ms ease-in-out";
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const ContractArea = () => {
@@ -85,6 +100,7 @@ const ContractArea = () => {
   const [selectedContractAddress, setSelectContractAddress] =
     useState<string>();
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
+  const [copied, setCopied] = useState<boolean>(false);
   const selectedNetwork = useAppSelector(
     (state) => state.extension.selectedNetwork
   );
@@ -105,6 +121,7 @@ const ContractArea = () => {
   const execValue = useAppSelector((state) => state.extension.execValue);
 
   const gasLimit = useAppSelector((state) => state.extension.gasLimit);
+
   useEffect(() => {
     if (selectedNetwork !== "Select Network") {
       getDeployedContracts(selectedNetwork);
@@ -121,6 +138,10 @@ const ContractArea = () => {
     listContractFunctions(contractData[0]);
   };
 
+  useEffect(() => {
+    dispatch(setSelectedContractFunctions(undefined));
+  }, [selectedNetwork]);
+
   const parameterCheck = (
     contractParams: string[],
     functionObject: FunctionObjectType
@@ -128,7 +149,7 @@ const ContractArea = () => {
     if (selectedAccount === "Select Account") {
       return "No Account selected*";
     }
-    if (globalPswd === "") {
+    if (globalPswd === "" && !isLocalNetwork(selectedNetwork)) {
       return "password is required*";
     }
     if (selectedNetConfig.rpc === undefined) {
@@ -151,7 +172,8 @@ const ContractArea = () => {
 
   const handleExecuteContract = (
     contractParams: string[],
-    functionObject: FunctionObjectType
+    functionObject: FunctionObjectType,
+    index: any
   ) => {
     const paramCheck = parameterCheck(contractParams, functionObject);
     if (paramCheck !== undefined) {
@@ -173,10 +195,24 @@ const ContractArea = () => {
     }
   };
 
+  const copyItem = async (item: string) => {
+    await navigator.clipboard.writeText(item);
+    setCopied(true);
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (copied) setCopied(false);
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
   return (
     <ContractContainer>
+      <Header>Deployed contract interaction</Header>
       {/* dropdown for account selection */}
-      <DeployedContract>
+      <ConfigWrapper>
         <span>Deployed Contracts</span>
         <ContractSelection>
           <DropDown
@@ -204,30 +240,26 @@ const ContractArea = () => {
               );
             })}
           </DropDown>
-          <CopyIcon
-            onClick={(e: any) => {
-              if (selectedNetwork !== "Select Network") {
-                getDeployedContracts(selectedNetwork);
-              }
-            }}
-          ></CopyIcon>
+          {!copied ? (
+            <CopyIcon
+              onClick={(e) => {
+                copyItem(selectedContractAddress as string);
+              }}
+            ></CopyIcon>
+          ) : (
+            <CopyCheckIcon></CopyCheckIcon>
+          )}
         </ContractSelection>
-      </DeployedContract>
+      </ConfigWrapper>
       {/* Area for contract call */}
-      <ContractCall>
-        <span>
-          {selectedContractName !== undefined &&
-          selectedContractAddress !== undefined
-            ? `${selectedContractName}: ${selectedContractAddress}`
-            : `Contract call`}
-        </span>
+      <ConfigWrapper>
         {errorMsg !== undefined && (
           <span style={{ alignSelf: "flex-start", color: "red" }}>
             {errorMsg}
           </span>
         )}
         {selectedContractFunctions !== undefined &&
-          selectedContractFunctions.map((func: any, index: any) => {
+          selectedContractFunctions.map((func: any, index: number) => {
             return (
               <ParameterInput
                 key={index}
@@ -241,7 +273,7 @@ const ContractArea = () => {
               </ParameterInput>
             );
           })}
-      </ContractCall>
+      </ConfigWrapper>
     </ContractContainer>
   );
 };

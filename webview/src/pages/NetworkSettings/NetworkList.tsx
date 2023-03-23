@@ -22,6 +22,13 @@ const ConfigContainer = styled.div`
   gap: 14px;
 `;
 
+const Header = styled.span`
+  font-size: 14px;
+  color: var(--vscode-icon-foreground);
+  font-weight: 600;
+  align-self: flex-start;
+`;
+
 const Network = styled.div.attrs(
   (props: { isNetworkSelected: boolean; index: any }) => ({
     isNetworkSelected: props.isNetworkSelected,
@@ -126,7 +133,7 @@ const NetworkList = () => {
       isDefault: false,
     };
     const selectedNetworkConfig =
-      value !== "Add New Network" ? getSelectedConf(value) : newNetworkInit;
+      value !== "" ? getSelectedConf(value) : newNetworkInit;
     dispatch(
       setSettingNetworkConfig(JSON.parse(JSON.stringify(selectedNetworkConfig)))
     );
@@ -144,6 +151,7 @@ const NetworkList = () => {
 
   return (
     <ConfigContainer>
+      <Header>Networks</Header>
       <ConfigWrapper>
         <span>Networks</span>
         {Object.keys(networks).map((network, index) => {
@@ -176,7 +184,7 @@ const NetworkList = () => {
       <Button
         onClick={(e) => {
           setIsNetworkSelected(true);
-          handleNetworkSelection("Add New Network");
+          handleNetworkSelection("");
         }}
       >
         Add New Network

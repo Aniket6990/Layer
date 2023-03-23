@@ -22,6 +22,13 @@ const ConfigContainer = styled.div`
   gap: 14px;
 `;
 
+const Header = styled.span`
+  font-size: 14px;
+  color: var(--vscode-icon-foreground);
+  font-weight: 600;
+  align-self: flex-start;
+`;
+
 const ConfigWrapper = styled.div`
   font-size: 12px;
   color: var(--vscode-icon-foreground);
@@ -98,6 +105,7 @@ const NetworkDetails = () => {
   };
   return (
     <ConfigContainer>
+      <Header>Edit network configurations</Header>
       <ConfigWrapper>
         <span>Network Name</span>
         <FullObjectWrapper>
@@ -120,7 +128,6 @@ const NetworkDetails = () => {
             onChange={(e: any) => {
               setNetworkInfo({ ...networkInfo, rpc: e.target.value });
             }}
-            disabled={networkInfo.isDefault}
           ></TextField>
         </FullObjectWrapper>
       </ConfigWrapper>

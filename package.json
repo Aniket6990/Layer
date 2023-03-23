@@ -1,24 +1,29 @@
 {
   "name": "layer",
-  "displayName": "Layer",
-  "description": "Ethereum IDE for VS Code",
+  "displayName": "Layer solidity",
+  "description": "Extension to interact with smart contracts written in Solidity.",
   "version": "0.0.1",
-  "publisher": "Aniket6990",
+  "publisher": "Chaintown",
   "categories": [
     "Debuggers",
-    "Programming Languages"
+    "Programming Languages",
+    "Other"
   ],
   "keywords": [
     "solidity",
     "ethereum",
     "eth2.0",
-    "remix ide"
+    "remix",
+    "remix ide",
+    "blockchain",
+    "layer",
+    "sol"
   ],
-  "icon": "images/ethcode.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Aniket6990/ETHcode-layer"
+    "url": "https://github.com/Aniket6990/Layer"
   },
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.38.1",
     "node": ">=16.15.0"
@@ -57,11 +62,6 @@
       {
         "command": "layer.activate",
         "title": "Activate extension",
-        "category": "Layer"
-      },
-      {
-        "command": "layer.webview.test",
-        "title": "Test extension new feature",
         "category": "Layer"
       }
     ],
