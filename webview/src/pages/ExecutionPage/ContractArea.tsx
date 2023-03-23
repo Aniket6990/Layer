@@ -23,7 +23,14 @@ const ContractContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
   padding: 20px;
-  gap: 8px;
+  gap: 14px;
+`;
+
+const Header = styled.span`
+  font-size: 14px;
+  color: var(--vscode-icon-foreground);
+  font-weight: 600;
+  align-self: flex-start;
 `;
 
 const ConfigWrapper = styled.div`
@@ -114,6 +121,7 @@ const ContractArea = () => {
   const execValue = useAppSelector((state) => state.extension.execValue);
 
   const gasLimit = useAppSelector((state) => state.extension.gasLimit);
+
   useEffect(() => {
     if (selectedNetwork !== "Select Network") {
       getDeployedContracts(selectedNetwork);
@@ -164,7 +172,8 @@ const ContractArea = () => {
 
   const handleExecuteContract = (
     contractParams: string[],
-    functionObject: FunctionObjectType
+    functionObject: FunctionObjectType,
+    index: any
   ) => {
     const paramCheck = parameterCheck(contractParams, functionObject);
     if (paramCheck !== undefined) {
@@ -201,6 +210,7 @@ const ContractArea = () => {
 
   return (
     <ContractContainer>
+      <Header>Deployed contract interaction</Header>
       {/* dropdown for account selection */}
       <ConfigWrapper>
         <span>Deployed Contracts</span>
@@ -249,7 +259,7 @@ const ContractArea = () => {
           </span>
         )}
         {selectedContractFunctions !== undefined &&
-          selectedContractFunctions.map((func: any, index: any) => {
+          selectedContractFunctions.map((func: any, index: number) => {
             return (
               <ParameterInput
                 key={index}

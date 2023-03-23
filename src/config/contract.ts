@@ -229,7 +229,9 @@ export const deploySelectedContract = async (
     extensionEvent = {
       eventStatus: "fail",
       eventType: "layer_extensionCall",
-      eventResult: `Error while deploying ${contractName} ${err.message}`,
+      eventResult: `Error while deploying ${contractName} ${JSON.stringify(
+        err.body
+      )}`,
     };
     return extensionEvent;
   }

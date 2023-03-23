@@ -1,12 +1,11 @@
 import { TxInterface, WebViewEventType } from "../../types/index";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppSelector } from "../../app/hooks";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { MdCancel } from "react-icons/md";
 import { VscClearAll } from "react-icons/vsc";
 import Toggle from "../UI/Toggle";
-import { setIsWalletTx } from "../../store/extensionstore";
 
 const ConsoleContainer = styled.div`
   overflow-y: scroll;
@@ -87,7 +86,7 @@ const ConsoleArea = () => {
           }}
         ></ConsoleClearIcon>
       </ConsoleHeader>
-      <EventContainer>
+      <EventContainer id="eventContainer">
         {consoleMsg.map((message) => {
           if (
             message.eventStatus === "success" &&

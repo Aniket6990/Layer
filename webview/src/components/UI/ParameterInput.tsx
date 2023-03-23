@@ -30,6 +30,7 @@ const Button = styled.button.attrs((props: { size: any; buttonBg: any }) => ({
   color: var(--vscode-button-foreground);
   flex-grow: ${(props) => props.size};
   border: none;
+  width: 40%;
   &:hover {
     background-color: var(--vscode-button-hoverBackground);
     cursor: pointer;
@@ -45,6 +46,7 @@ const Input = styled.input.attrs((props: { size: any }) => ({
   color: var(--vscode-input-foreground);
   flex-grow: ${(props) => props.size};
   outline: none;
+  width: 60%;
   border: 1px solid var(--vscode-icon-foreground);
   &:hover {
     cursor: text;

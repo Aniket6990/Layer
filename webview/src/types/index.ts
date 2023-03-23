@@ -10,6 +10,7 @@ export interface NetworkConfig {
 }
 
 export interface TxInterface {
+  index?: any;
   from: string;
   to: string;
   txHash?: string;

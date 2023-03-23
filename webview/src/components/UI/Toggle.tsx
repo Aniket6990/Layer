@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { MdArrowForwardIos, MdCancel } from "react-icons/md";
 import styled from "styled-components";
-import { setSelectedNetwork } from "../../store/extensionstore";
 import { TxInterface } from "../../types";
 import { shortenText } from "../../utilities/functions";
 
