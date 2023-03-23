@@ -1,11 +1,12 @@
 import { TxInterface, WebViewEventType } from "../../types/index";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { MdCancel } from "react-icons/md";
 import { VscClearAll } from "react-icons/vsc";
 import Toggle from "../UI/Toggle";
+import { setIsWalletTx } from "../../store/extensionstore";
 
 const ConsoleContainer = styled.div`
   overflow-y: scroll;
@@ -68,7 +69,7 @@ const ConsoleClearIcon = styled(VscClearAll)`
 const ConsoleArea = () => {
   const [consoleMsg, setConsoleMsg] = useState<Array<WebViewEventType>>([]);
   const eventMsg = useAppSelector((state) => state.extension.eventMsg);
-  const selectedNetwork = useAppSelector(
+  const homeNetwork = useAppSelector(
     (state) => state.extension.selectedNetwork
   );
 
@@ -109,7 +110,9 @@ const ConsoleArea = () => {
               <Toggle
                 txn={message.eventResult as TxInterface}
                 txnStatus={message.eventStatus}
-                selectedNetwork={selectedNetwork}
+                selectedNetwork={
+                  homeNetwork === "Select Network" ? "Txn" : homeNetwork
+                }
               />
             );
           } else {

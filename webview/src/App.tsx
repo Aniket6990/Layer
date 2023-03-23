@@ -7,6 +7,7 @@ import WalletPage from "./pages/WalletPage";
 import { withRouter } from "./utilities/withRouter";
 import {
   displayAccountBalance,
+  displayWalletAccountBalance,
   getAccounts,
   getDeployedContracts,
   getNetworks,
@@ -123,7 +124,7 @@ function App() {
         }
         case "send-token-result": {
           dispatch(setEventMsg(eventData.data));
-          displayAccountBalance(walletAccount, walletNetConfig.rpc);
+          displayWalletAccountBalance(walletAccount, walletNetConfig.rpc);
           break;
         }
         case "post-compiled-contracts": {

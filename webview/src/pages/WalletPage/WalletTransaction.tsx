@@ -13,11 +13,16 @@ import {
 } from "../../configuration/webviewpostmsg";
 import {
   setEventMsg,
+  setIsWalletTx,
   setWalletNetwork,
   setWalletNetworkConfig,
 } from "../../store/extensionstore";
 import { NetworkConfig, TxObjecttype } from "../../types";
-import { containOnlyDigits, isValidAddress } from "../../utilities/functions";
+import {
+  containOnlyDigits,
+  isLocalNetwork,
+  isValidAddress,
+} from "../../utilities/functions";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -184,9 +189,11 @@ const WalletTransaction = () => {
             <VSCodeOption value="Select Network">Select Network</VSCodeOption>
             {Object.keys(networks).map((network, index) => {
               return (
-                <VSCodeOption key={index} value={network}>
-                  {network}
-                </VSCodeOption>
+                !isLocalNetwork(network) && (
+                  <VSCodeOption key={index} value={network}>
+                    {network}
+                  </VSCodeOption>
+                )
               );
             })}
           </DropDown>
