@@ -14,9 +14,13 @@ Currently, `Layer solidity` extension supports only Hardhat compiled contracts. 
 
 But for now, you can only interact with solidity smart contracts compiled using Hardhat using `Layer solidity`. To start interacting with smart contracts open your hardhat project and fellow the below steps:
 
-1. **Activate the extension:** Activate the extension by clicking on the extension icon visible in the activity bar. \*\*\*\*
-
-   A button with the title `work with solidity` will be shown in the sidebar to activate the [Layer solidity](https://marketplace.visualstudio.com/items?itemName=Chaintown.layer) extension. Click on this button to start working with smart contracts written in solidity.
+1. **Activate the extension:** Extension can be activated in two ways:
+   1. using command palette:
+      1. `ctrl + shift + P` or open VScode command palette.
+      2. select command `Layer: Activate extension`.
+   2. Using `Layer extension`.
+      1. Activate the extension by clicking on the extension icon visible in the activity bar.
+      2. A button with the title `work with solidity` will be shown in the sidebar to activate the [Layer solidity](https://marketplace.visualstudio.com/items?itemName=Chaintown.layer) extension. Click on this button to start working with smart contracts written in solidity.
 
 2. **Select Network:** Select the Network on which you want to deploy the smart contract and execute the functions available in the smart contracts.
 3. **Select Ethereum address:** This will help in signing the transactions while performing smart contract deployment and execution.
