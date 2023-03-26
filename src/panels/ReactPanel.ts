@@ -11,14 +11,14 @@ import {
   listAddresses,
   createNewKeyPair,
   displayAccountBalance,
-  networkConfig,
   createAccountFromKey,
   importNewKeyPair,
   exportPvtKeyPair,
   exportPvtKeyPairFile,
   sendTransaction,
   unlockSelectedAccount,
-} from "../config";
+} from "../config/account";
+import { networkConfig } from "../config/network";
 import {
   deploySelectedContract,
   executeContractFunction,

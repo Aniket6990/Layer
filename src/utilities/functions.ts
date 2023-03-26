@@ -1,6 +1,9 @@
 import { ethers } from "ethers";
 import { ExtensionContext, Webview, WebviewPanel } from "vscode";
-import { exportPvtKeyPair, getSelectedNetworkProvider } from "../config";
+import {
+  exportPvtKeyPair,
+  getSelectedNetworkProvider,
+} from "../config/account";
 import { ReactPanel } from "../panels/ReactPanel";
 import { CompiledJSONOutput, FunctionObjectType, TxInterface } from "../types";
 
