@@ -19,3 +19,8 @@ export const isLocalNetwork = (network: string) => {
     return true;
   return false;
 };
+
+export const getFileNameFromPath = (path_: string) => {
+  const splitedPath = path_.split("\\");
+  return splitedPath[splitedPath.length - 1];
+};

@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import path from "path";
 import * as https from "https";
-import { versions } from "./versions";
+import versions from "./versions";
 import { ExtensionEventTypes } from "../../types";
 import { ReactPanel } from "../../panels/ReactPanel";
 
@@ -17,7 +17,12 @@ export const downloadCompilationFile = (
       .get(url, function (response: any) {
         if (response.statusCode !== 200) {
           reject(
-            "Error retrieving solidity compiler: " + response.statusMessage
+            ReactPanel.EmitExtensionEvent({
+              eventStatus: "fail",
+              eventType: "layer_msg",
+              eventResult:
+                "Error retrieving solidity compiler: " + response.statusMessage,
+            })
           );
         } else {
           response.pipe(file);
@@ -35,7 +40,8 @@ export const downloadCompilationFile = (
 };
 
 export const downloadRemoteVersion = async (
-  folderPath: string
+  folderPath: string,
+  compilerVersion: string
 ): Promise<any> => {
   let extensionEvent: ExtensionEventTypes = {
     eventStatus: "success",
@@ -44,12 +50,11 @@ export const downloadRemoteVersion = async (
   };
 
   try {
-    const releases = versions;
+    const releases: any = versions;
 
-    const selectedVersion = "0.8.16";
     let version = "";
 
-    const value: string = releases[selectedVersion];
+    const value: string = releases[compilerVersion];
     if (value !== "undefined") {
       version = value.replace("soljson-", "");
       version = version.replace(".js", "");

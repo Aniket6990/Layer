@@ -1,4 +1,4 @@
-export const versions = {
+const versions = {
   "0.8.19": "soljson-v0.8.19+commit.7dd6d404.js",
   "0.8.18": "soljson-v0.8.18+commit.87f61d96.js",
   "0.8.17": "soljson-v0.8.17+commit.8df45f5f.js",
@@ -102,3 +102,4 @@ export const versions = {
   "0.1.2": "soljson-v0.1.2+commit.d0d36e3.js",
   "0.1.1": "soljson-v0.1.1+commit.6ff4cd6.js",
 };
+export default versions;

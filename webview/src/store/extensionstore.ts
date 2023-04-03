@@ -32,6 +32,7 @@ interface extensionState {
   isAccountUnlocked: boolean;
   settingNetworkConfig: NetworkConfig;
   settingNetwork: string;
+  compilerVersions: Array<string>;
 }
 
 const initialState: extensionState = {
@@ -70,6 +71,7 @@ const initialState: extensionState = {
     isDefault: false,
   },
   settingNetwork: "",
+  compilerVersions: [],
 };
 export const extensionSlice = createSlice({
   name: "extension",
@@ -147,6 +149,9 @@ export const extensionSlice = createSlice({
     setSettingNetwork(state, action) {
       state.settingNetwork = action.payload;
     },
+    setCompilerVersions(state, action) {
+      state.compilerVersions = action.payload;
+    },
   },
 });
 
@@ -175,6 +180,7 @@ export const {
   setIsAccountUnlocked,
   setSettingNetworkConfig,
   setSettingNetwork,
+  setCompilerVersions,
 } = extensionSlice.actions;
 
 export default extensionSlice.reducer;

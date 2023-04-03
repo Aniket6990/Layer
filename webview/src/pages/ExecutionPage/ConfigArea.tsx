@@ -20,6 +20,7 @@ import {
 } from "../../store/extensionstore";
 import { NetworkConfig, TxInterface } from "../../types";
 import {
+  compileContract,
   deployContract,
   displayAccountBalance,
   listContractConstructor,
@@ -28,7 +29,8 @@ import {
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
 import { ethers } from "ethers";
-import { isLocalNetwork } from "../../utilities/functions";
+import { getFileNameFromPath, isLocalNetwork } from "../../utilities/functions";
+import ExtensionButton from "../../components/UI/Button";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -147,6 +149,7 @@ const ConfigArea = () => {
   const [value, setValue] = useState<string>("0");
   const [format, setFormat] = useState<string>("wei");
   const [selectedSolContract, setSelectedSolContract] = useState<string>("");
+  const [compilerVersion, setCompilerVersion] = useState<string>("0.8.19");
   const [copied, setCopied] = useState<boolean>(false);
   const networks = useAppSelector((state) => state.extension.networks);
   const accounts = useAppSelector((state) => state.extension.addresses);
@@ -164,6 +167,9 @@ const ConfigArea = () => {
   );
   const solidityContracts = useAppSelector(
     (state) => state.extension.solidityContracts
+  );
+  const compilerVersions = useAppSelector(
+    (state) => state.extension.compilerVersions
   );
   const compiledContracts = useAppSelector(
     (state) => state.extension.compiledContracts
@@ -303,6 +309,15 @@ const ConfigArea = () => {
   const copyItem = async (item: string) => {
     await navigator.clipboard.writeText(item);
     setCopied(true);
+  };
+
+  const handleCompileContract = () => {
+    if (
+      selectedSolContract !== "Select Contract" &&
+      selectedSolContract !== ""
+    ) {
+      compileContract(selectedSolContract, compilerVersion);
+    }
   };
 
   useEffect(() => {
@@ -448,7 +463,7 @@ const ConfigArea = () => {
             {solidityContracts.map((contract, index) => {
               return (
                 <VSCodeOption key={index} value={contract}>
-                  {contract}
+                  {getFileNameFromPath(contract)}
                 </VSCodeOption>
               );
             })}
@@ -459,6 +474,35 @@ const ConfigArea = () => {
             }}
           ></RefreshIcon>
         </FullObjectWrapper>
+      </ConfigWrapper>
+      <ConfigWrapper>
+        <span>Compiler version</span>
+        <FullObjectWrapper>
+          <DropDown
+            value={compilerVersion}
+            onChange={(e: any) => {
+              setCompilerVersion(e.target.value);
+            }}
+          >
+            {compilerVersions.map((compiler, index) => {
+              return (
+                <VSCodeOption key={index} value={compiler}>
+                  {compiler}
+                </VSCodeOption>
+              );
+            })}
+          </DropDown>
+        </FullObjectWrapper>
+      </ConfigWrapper>
+      <ConfigWrapper>
+        <ExtensionButton
+          onClick={(e: any) => {
+            handleCompileContract();
+          }}
+          title="Compile"
+        >
+          Compile
+        </ExtensionButton>
       </ConfigWrapper>
       {/* dropdown for selecting a compiled contract */}
       <ConfigWrapper>

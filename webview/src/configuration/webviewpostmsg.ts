@@ -224,3 +224,22 @@ export const unlockAccount = (accountAddress: string, pswd: string) => {
     },
   });
 };
+
+export const compileContract = (
+  contractPath: string,
+  compilerVersion: string
+) => {
+  vscode.postMessage({
+    command: "compile-contract",
+    data: {
+      contractPath: contractPath,
+      compilerVersion: compilerVersion,
+    },
+  });
+};
+
+export const loadCompilerVersions = () => {
+  vscode.postMessage({
+    command: "load-compiler-versions",
+  });
+};

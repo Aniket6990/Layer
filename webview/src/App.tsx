@@ -12,6 +12,7 @@ import {
   getDeployedContracts,
   getNetworks,
   loadAllContracts,
+  loadCompilerVersions,
   loadSolidityContracts,
 } from "./configuration/webviewpostmsg";
 import { useEffect } from "react";
@@ -29,6 +30,7 @@ import {
   setIsAccountUnlocked,
   setGlobalPswd,
   setSolidityContracts,
+  setCompilerVersions,
 } from "./store/extensionstore";
 import { NetworkConfig } from "./types";
 import NetworkSettings from "./pages/NetworkSettings";
@@ -80,6 +82,7 @@ function App() {
     getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
     loadSolidityContracts();
     loadAllContracts();
+    loadCompilerVersions();
   }, []);
 
   useEffect(() => {
@@ -101,6 +104,10 @@ function App() {
         }
         case "post-account-list": {
           dispatch(setAccounts(eventData.data));
+          break;
+        }
+        case "post-compiler-versions": {
+          dispatch(setCompilerVersions(eventData.data));
           break;
         }
         case "new-keypair-created": {

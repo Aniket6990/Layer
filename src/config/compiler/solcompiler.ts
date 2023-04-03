@@ -3,6 +3,8 @@ import path from "path";
 import * as fs from "fs";
 import { downloadRemoteVersion } from "./filedownloader";
 import { workspace } from "vscode";
+import { ReactPanel } from "../../panels/ReactPanel";
+import versions from "./versions";
 const solc = require("solc");
 
 export const loadSolidityContracts = () => {
@@ -62,19 +64,33 @@ const importCallback = (path_: any) => {
   };
 };
 
-const downLoadCompiler = async (context: vscode.ExtensionContext) => {
-  await downloadRemoteVersion(path.join(context.extensionPath, "compiler"));
+const downloadCompiler = async (
+  context: vscode.ExtensionContext,
+  compilerVersion: string
+) => {
+  if (!fs.existsSync(path.join(context.extensionPath, "compiler")))
+    fs.mkdirSync(path.join(context.extensionPath, "compiler"));
+  await downloadRemoteVersion(
+    path.join(context.extensionPath, "compiler"),
+    compilerVersion
+  );
 };
 
 export const loadCompiler = async (
   context: vscode.ExtensionContext,
-  path_: string
+  path_: string,
+  compilerVersion: string
 ) => {
-  const name = ["fsf", "fs", "fs"];
-  name.splice;
-
   try {
+    if (workspace.workspaceFolders === undefined) {
+      vscode.window.showErrorMessage("please open solidity project to work");
+      return;
+    }
+
+    const extensionPath = workspace.workspaceFolders[0].uri.fsPath;
+
     const contractSource = fs.readFileSync(path_, "utf8");
+
     const input = {
       language: "Solidity",
       sources: {
@@ -94,28 +110,39 @@ export const loadCompiler = async (
         },
       },
     };
+
+    const availableVersions: any = versions;
+    const compilerFile = availableVersions[compilerVersion];
+
     if (
-      fs.existsSync(
-        path.join(
-          context.extensionPath,
-          "compiler",
-          "soljson-v0.8.16+commit.07a7930e.js"
-        )
-      )
+      fs.existsSync(path.join(context.extensionPath, "compiler", compilerFile))
     ) {
-      console.log("loading compiler...");
+      ReactPanel.EmitExtensionEvent({
+        eventStatus: "success",
+        eventType: "layer_msg",
+        eventResult: "loading compiler...",
+      });
+
       const solidityfile = require(path.join(
         context.extensionPath,
         "compiler",
-        "soljson-v0.8.16+commit.07a7930e.js"
+        compilerFile
       ));
+
       const localSolc = solc.setupMethods(solidityfile);
-      console.log(`loaded version ${localSolc.version()}`);
+      ReactPanel.EmitExtensionEvent({
+        eventStatus: "success",
+        eventType: "layer_msg",
+        eventResult: "compiling...",
+      });
+
       const output = localSolc.compile(JSON.stringify(input), {
         import: (path: any) => importCallback(path),
       });
-      console.log(JSON.stringify(output));
-      fs.writeFileSync("./buildInfo.json", JSON.parse(JSON.stringify(output)));
+      fs.writeFileSync(
+        path.join(extensionPath, "buildInfo.json"),
+        JSON.parse(JSON.stringify(output))
+      );
 
       const outputToWork = JSON.parse(output);
 
@@ -123,31 +150,72 @@ export const loadCompiler = async (
         console.log(`Error: ${outputToWork.errors[0].formattedMessage}`);
         return;
       }
+      const contractName = Object.keys(
+        outputToWork.contracts["MyContract.sol"]
+      )[0];
       const contractOutput = JSON.parse(
-        JSON.stringify(outputToWork.contracts["MyContract.sol"]["ContractA"])
+        JSON.stringify(outputToWork.contracts["MyContract.sol"][contractName])
       );
 
       const outputToWrite = {
-        name: "Mytoken",
+        name: contractName,
         abi: contractOutput.abi,
         bytecode: "0x" + contractOutput.evm.bytecode.object,
       };
-      fs.writeFileSync("./test.json", JSON.stringify(outputToWrite));
-      console.log(
-        `contract compiled successfully with version: ${localSolc.version()}`
+      if (
+        !fs.existsSync(
+          path.join(extensionPath, "artifacts", "contracts", `${contractName}`)
+        )
+      ) {
+        fs.mkdirSync(
+          path.join(
+            extensionPath,
+            "artifacts",
+            "contracts",
+            `${contractName}.sol`
+          ),
+          { recursive: true }
+        );
+      }
+
+      fs.writeFileSync(
+        path.join(
+          extensionPath,
+          "artifacts",
+          "contracts",
+          `${contractName}.sol`,
+          `${contractName}.json`
+        ),
+        JSON.stringify(outputToWrite)
       );
+      ReactPanel.EmitExtensionEvent({
+        eventStatus: "success",
+        eventType: "layer_msg",
+        eventResult: `contract compiled successfully with version: ${localSolc.version()}`,
+      });
     } else {
-      downLoadCompiler(context)
+      await downloadCompiler(context, compilerVersion)
         .then(() => {
-          loadCompiler(context, path_);
+          loadCompiler(context, path_, compilerVersion);
         })
-        .catch((error) => {
-          console.log(
-            "Error occured while download compiler for compilation: " + error
-          );
+        .catch((error: any) => {
+          ReactPanel.EmitExtensionEvent({
+            eventStatus: "fail",
+            eventType: "layer_msg",
+            eventResult:
+              "Error occured while download compiler for compilation: " + error,
+          });
         });
     }
   } catch (error) {
-    console.log("Error while loading the compiler:" + error);
+    ReactPanel.EmitExtensionEvent({
+      eventStatus: "fail",
+      eventType: "layer_msg",
+      eventResult: "Error while loading the compiler:" + error,
+    });
   }
+};
+
+export const getCompilerVersions = () => {
+  return Object.keys(versions);
 };

@@ -34,7 +34,11 @@ import {
   JsonFragmentType,
 } from "../types";
 import { getUri } from "../utilities/getUri";
-import { loadSolidityContracts } from "../config/compiler/solcompiler";
+import {
+  getCompilerVersions,
+  loadCompiler,
+  loadSolidityContracts,
+} from "../config/compiler/solcompiler";
 
 export class ReactPanel {
   public static currentPanel: ReactPanel | undefined;
@@ -407,6 +411,19 @@ export class ReactPanel {
             webview.postMessage({
               command: "account-unlocked",
               data: status,
+            });
+            break;
+          }
+          case "compile-contract": {
+            const { contractPath, compilerVersion } = message.data;
+            await loadCompiler(context, contractPath, compilerVersion);
+            break;
+          }
+          case "load-compiler-versions": {
+            const versions = getCompilerVersions();
+            webview.postMessage({
+              command: "post-compiler-versions",
+              data: versions,
             });
             break;
           }

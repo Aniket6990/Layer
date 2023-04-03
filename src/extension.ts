@@ -12,11 +12,11 @@ export async function activate(context: vscode.ExtensionContext) {
     // Activate
     commands.registerCommand("layer.activate", async () => {
       ReactPanel.render(context);
-    }),
-    commands.registerCommand("layer.test", async () => {
-      const paths = loadSolidityContracts();
-      console.log(paths);
-      if (paths !== undefined) loadCompiler(context, paths[0]);
     })
+    // commands.registerCommand("layer.test", async () => {
+    //   const paths = loadSolidityContracts();
+    //   console.log(paths);
+    //   if (paths !== undefined) loadCompiler(context, paths[0]);
+    // })
   );
 }
