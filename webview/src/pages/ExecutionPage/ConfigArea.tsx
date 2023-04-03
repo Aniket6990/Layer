@@ -146,6 +146,7 @@ const ConfigArea = () => {
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   const [value, setValue] = useState<string>("0");
   const [format, setFormat] = useState<string>("wei");
+  const [selectedSolContract, setSelectedSolContract] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
   const networks = useAppSelector((state) => state.extension.networks);
   const accounts = useAppSelector((state) => state.extension.addresses);
@@ -160,6 +161,9 @@ const ConfigArea = () => {
   );
   const configBalance = useAppSelector(
     (state) => state.extension.configBalance
+  );
+  const solidityContracts = useAppSelector(
+    (state) => state.extension.solidityContracts
   );
   const compiledContracts = useAppSelector(
     (state) => state.extension.compiledContracts
@@ -428,7 +432,37 @@ const ConfigArea = () => {
       </ConfigWrapper>
       {/* dropdown for selecting a compiled contract */}
       <ConfigWrapper>
-        <span>contract</span>
+        <span>Solidity contract</span>
+        <FullObjectWrapper>
+          <DropDown
+            value={selectedSolContract}
+            onChange={(e: any) => {
+              setSelectedSolContract(e.target.value);
+            }}
+          >
+            <VSCodeOption value="Select Contract">
+              {solidityContracts.length === 0
+                ? "No Contract"
+                : "Select Contract"}
+            </VSCodeOption>
+            {solidityContracts.map((contract, index) => {
+              return (
+                <VSCodeOption key={index} value={contract}>
+                  {contract}
+                </VSCodeOption>
+              );
+            })}
+          </DropDown>
+          <RefreshIcon
+            onClick={(e) => {
+              loadAllContracts();
+            }}
+          ></RefreshIcon>
+        </FullObjectWrapper>
+      </ConfigWrapper>
+      {/* dropdown for selecting a compiled contract */}
+      <ConfigWrapper>
+        <span>Compiled contract</span>
         <FullObjectWrapper>
           <DropDown
             value={selectedContract}

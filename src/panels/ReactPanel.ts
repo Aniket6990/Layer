@@ -34,6 +34,7 @@ import {
   JsonFragmentType,
 } from "../types";
 import { getUri } from "../utilities/getUri";
+import { loadSolidityContracts } from "../config/compiler/solcompiler";
 
 export class ReactPanel {
   public static currentPanel: ReactPanel | undefined;
@@ -254,6 +255,16 @@ export class ReactPanel {
               command: "send-token-result",
               data: msg,
             });
+            break;
+          }
+          case "get-solidity-contracts": {
+            const solidityContracts = loadSolidityContracts();
+            if (solidityContracts !== undefined) {
+              webview.postMessage({
+                command: "post-solidity-contracts",
+                data: solidityContracts,
+              });
+            }
             break;
           }
           case "get-compiled-contracts": {

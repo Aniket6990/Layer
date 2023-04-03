@@ -100,6 +100,12 @@ export const sendTokenTransaction = (txObject: TxObjecttype) => {
   });
 };
 
+export const loadSolidityContracts = () => {
+  vscode.postMessage({
+    command: "get-solidity-contracts",
+  });
+};
+
 export const loadAllContracts = () => {
   vscode.postMessage({
     command: "get-compiled-contracts",

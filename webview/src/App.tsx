@@ -12,6 +12,7 @@ import {
   getDeployedContracts,
   getNetworks,
   loadAllContracts,
+  loadSolidityContracts,
 } from "./configuration/webviewpostmsg";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
@@ -27,6 +28,7 @@ import {
   setSelectedContractFunctions,
   setIsAccountUnlocked,
   setGlobalPswd,
+  setSolidityContracts,
 } from "./store/extensionstore";
 import { NetworkConfig } from "./types";
 import NetworkSettings from "./pages/NetworkSettings";
@@ -76,6 +78,7 @@ function App() {
   useEffect(() => {
     getNetworks();
     getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
+    loadSolidityContracts();
     loadAllContracts();
   }, []);
 
@@ -125,6 +128,10 @@ function App() {
         case "send-token-result": {
           dispatch(setEventMsg(eventData.data));
           displayWalletAccountBalance(walletAccount, walletNetConfig.rpc);
+          break;
+        }
+        case "post-solidity-contracts": {
+          dispatch(setSolidityContracts(eventData.data));
           break;
         }
         case "post-compiled-contracts": {
