@@ -63,6 +63,11 @@
         "command": "layer.activate",
         "title": "Activate extension",
         "category": "Layer"
+      },
+      {
+        "command": "layer.test",
+        "title": "test new feature",
+        "category": "Layer"
       }
     ],
     "keybindings": [
@@ -84,6 +89,7 @@
     "number-to-bn": "^1.7.0",
     "randombytes": "^2.1.0",
     "react-icons": "^4.7.1",
+    "solc": "^0.8.19",
     "styled-components": "^5.3.6",
     "underscore": "^1.13.4",
     "utf8": "^3.0.0"
