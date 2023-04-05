@@ -47,13 +47,13 @@
           },
           "markdownDescription": "List of networks settings including ethereum, polygon etc",
           "default": {
-            "Ethereum": "{\"rpc\": \"homestead\",\"blockScanner\":\"https://etherscan.io\", \"chainID\": \"1\", \"symbol\":\"ETH\",\"decimals\": \"18\", \"isDefault\": true}",
+            "Ethereum Mainnet": "{\"rpc\": \"homestead\",\"blockScanner\":\"https://etherscan.io\", \"chainID\": \"1\", \"symbol\":\"ETH\",\"decimals\": \"18\", \"isDefault\": true}",
             "Ganache Network": "{\"rpc\": \"http://127.0.0.1:7545\", \"blockScanner\": \"https://etherscan.io\", \"chainID\": \"1337\", \"symbol\":\"ETH\",\"decimals\": \"18\", \"isDefault\": true}",
             "Hardhat Network": "{\"rpc\": \"http://127.0.0.1:8545\", \"blockScanner\": \"https://etherscan.io\", \"chainID\": \"1337\", \"symbol\":\"ETH\",\"decimals\": \"18\", \"isDefault\": true}",
             "Goerli Testnet": "{\"rpc\": \"goerli\", \"blockScanner\": \"https://goerli.etherscan.io\", \"chainID\": \"5\", \"symbol\":\"görETH\",\"decimals\": \"18\", \"isDefault\": true}",
-            "Polygon": "{\"rpc\": \"https://polygon-rpc.com\", \"blockScanner\": \"https://polygonscan.com\", \"chainID\": \"137\", \"symbol\":\"MATIC\",\"decimals\": \"18\", \"isDefault\": true}",
+            "Polygon Mainnet": "{\"rpc\": \"https://polygon-rpc.com\", \"blockScanner\": \"https://polygonscan.com\", \"chainID\": \"137\", \"symbol\":\"MATIC\",\"decimals\": \"18\", \"isDefault\": true}",
             "Sepolia Testnet": "{\"rpc\": \"https://rpc.sepolia.dev\", \"blockScanner\": \"https://sepolia.etherscan.io\",\"chainID\": \"11155111\", \"symbol\":\"ETH\",\"decimals\": \"18\", \"isDefault\": true}",
-            "Polygon Mumbai": "{\"rpc\": \"https://rpc-mumbai.maticvigil.com\", \"blockScanner\": \"https://mumbai.polygonscan.com\",\"chainID\": \"80001\", \"symbol\":\"mMATIC\",\"decimals\": \"18\", \"isDefault\": true}"
+            "Polygon Mumbai Testnet": "{\"rpc\": \"https://rpc-mumbai.maticvigil.com\", \"blockScanner\": \"https://mumbai.polygonscan.com\",\"chainID\": \"80001\", \"symbol\":\"mMATIC\",\"decimals\": \"18\", \"isDefault\": true}"
           }
         }
       }
@@ -62,6 +62,11 @@
       {
         "command": "layer.activate",
         "title": "Activate extension",
+        "category": "Layer"
+      },
+      {
+        "command": "layer.test",
+        "title": "test new feature",
         "category": "Layer"
       }
     ],
@@ -84,6 +89,7 @@
     "number-to-bn": "^1.7.0",
     "randombytes": "^2.1.0",
     "react-icons": "^4.7.1",
+    "solc": "^0.8.19",
     "styled-components": "^5.3.6",
     "underscore": "^1.13.4",
     "utf8": "^3.0.0"

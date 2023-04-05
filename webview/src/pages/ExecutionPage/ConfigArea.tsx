@@ -20,6 +20,7 @@ import {
 } from "../../store/extensionstore";
 import { NetworkConfig, TxInterface } from "../../types";
 import {
+  compileContract,
   deployContract,
   displayAccountBalance,
   listContractConstructor,
@@ -28,7 +29,8 @@ import {
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
 import { ethers } from "ethers";
-import { isLocalNetwork } from "../../utilities/functions";
+import { getFileNameFromPath, isLocalNetwork } from "../../utilities/functions";
+import ExtensionButton from "../../components/UI/Button";
 
 const ConfigContainer = styled.div`
   height: 500px;
@@ -146,6 +148,8 @@ const ConfigArea = () => {
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   const [value, setValue] = useState<string>("0");
   const [format, setFormat] = useState<string>("wei");
+  const [selectedSolContract, setSelectedSolContract] = useState<string>("");
+  const [compilerVersion, setCompilerVersion] = useState<string>("0.8.19");
   const [copied, setCopied] = useState<boolean>(false);
   const networks = useAppSelector((state) => state.extension.networks);
   const accounts = useAppSelector((state) => state.extension.addresses);
@@ -160,6 +164,12 @@ const ConfigArea = () => {
   );
   const configBalance = useAppSelector(
     (state) => state.extension.configBalance
+  );
+  const solidityContracts = useAppSelector(
+    (state) => state.extension.solidityContracts
+  );
+  const compilerVersions = useAppSelector(
+    (state) => state.extension.compilerVersions
   );
   const compiledContracts = useAppSelector(
     (state) => state.extension.compiledContracts
@@ -301,6 +311,15 @@ const ConfigArea = () => {
     setCopied(true);
   };
 
+  const handleCompileContract = () => {
+    if (
+      selectedSolContract !== "Select Contract" &&
+      selectedSolContract !== ""
+    ) {
+      compileContract(selectedSolContract, compilerVersion);
+    }
+  };
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (copied) setCopied(false);
@@ -343,7 +362,9 @@ const ConfigArea = () => {
               handleAccountDropdownChange(e);
             }}
           >
-            <VSCodeOption value="Select Account">Select Account</VSCodeOption>
+            <VSCodeOption value="Select Account">
+              {accounts.length === 0 ? "No Account" : "Select Account"}
+            </VSCodeOption>
             {accounts.map((account, index) => {
               return (
                 <VSCodeOption key={index} value={account}>
@@ -393,10 +414,13 @@ const ConfigArea = () => {
         <span>Gas Limit</span>
         <FullObjectWrapper>
           <GasLimitTextField
+            type={"number"}
+            step={18}
             placeholder="Gas limit"
             value={gasLimit}
             onChange={(e: any) => {
-              dispatch(setGasLimit(e.target.value));
+              const gaslimit = e.target.value;
+              dispatch(setGasLimit(gaslimit.toString()));
             }}
           ></GasLimitTextField>
         </FullObjectWrapper>
@@ -407,10 +431,13 @@ const ConfigArea = () => {
         <FullObjectWrapper>
           <PartialObjectWrapper>
             <ValueTextField
+              type={"number"}
+              step={18}
               placeholder="value"
               value={value}
               onChange={(e: any) => {
-                handleChangeInValue(e.target.value);
+                const valuetoTransfer = e.target.value;
+                handleChangeInValue(valuetoTransfer.toString());
               }}
             ></ValueTextField>
             <ValueDropDown
@@ -428,7 +455,68 @@ const ConfigArea = () => {
       </ConfigWrapper>
       {/* dropdown for selecting a compiled contract */}
       <ConfigWrapper>
-        <span>contract</span>
+        <span>Solidity contract</span>
+        <FullObjectWrapper>
+          <DropDown
+            value={selectedSolContract}
+            onChange={(e: any) => {
+              setSelectedSolContract(e.target.value);
+            }}
+          >
+            <VSCodeOption value="Select Contract">
+              {solidityContracts.length === 0
+                ? "No Contract"
+                : "Select Contract"}
+            </VSCodeOption>
+            {solidityContracts.map((contract, index) => {
+              return (
+                <VSCodeOption key={index} value={contract}>
+                  {getFileNameFromPath(contract)}
+                </VSCodeOption>
+              );
+            })}
+          </DropDown>
+          <RefreshIcon
+            onClick={(e) => {
+              loadAllContracts();
+            }}
+          ></RefreshIcon>
+        </FullObjectWrapper>
+      </ConfigWrapper>
+      <ConfigWrapper>
+        <span>Compiler version</span>
+        <FullObjectWrapper>
+          <DropDown
+            value={compilerVersion}
+            onChange={(e: any) => {
+              setCompilerVersion(e.target.value);
+            }}
+          >
+            {compilerVersions.map((compiler, index) => {
+              return (
+                <VSCodeOption key={index} value={compiler}>
+                  {compiler}
+                </VSCodeOption>
+              );
+            })}
+          </DropDown>
+        </FullObjectWrapper>
+      </ConfigWrapper>
+      <ConfigWrapper>
+        <FullObjectWrapper>
+          <ExtensionButton
+            onClick={(e: any) => {
+              handleCompileContract();
+            }}
+            title="Compile"
+          >
+            Compile
+          </ExtensionButton>
+        </FullObjectWrapper>
+      </ConfigWrapper>
+      {/* dropdown for selecting a compiled contract */}
+      <ConfigWrapper>
+        <span>Compiled contract</span>
         <FullObjectWrapper>
           <DropDown
             value={selectedContract}
@@ -436,7 +524,9 @@ const ConfigArea = () => {
               dispatch(setSelectedContract(e.target.value));
             }}
           >
-            <VSCodeOption value="Select Contract">Select Contract</VSCodeOption>
+            <VSCodeOption value="Select Contract">
+              Select Contract to deploy
+            </VSCodeOption>
             {compiledContracts.map((contract, index) => {
               return (
                 <VSCodeOption key={index} value={contract}>
@@ -481,6 +571,11 @@ const ConfigArea = () => {
           <span>Unlock Account</span>
           <FullObjectWrapper>
             <PasswordTextField
+              onKeyPress={(e: any) => {
+                if (e.key === "Enter") {
+                  unlockAccount(selectedAccount, globalPswd);
+                }
+              }}
               placeholder="password"
               value={globalPswd}
               onChange={(e: any) => {

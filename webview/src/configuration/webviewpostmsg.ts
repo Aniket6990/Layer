@@ -100,6 +100,12 @@ export const sendTokenTransaction = (txObject: TxObjecttype) => {
   });
 };
 
+export const loadSolidityContracts = () => {
+  vscode.postMessage({
+    command: "get-solidity-contracts",
+  });
+};
+
 export const loadAllContracts = () => {
   vscode.postMessage({
     command: "get-compiled-contracts",
@@ -216,5 +222,24 @@ export const unlockAccount = (accountAddress: string, pswd: string) => {
       accountAddress: accountAddress,
       pswd: pswd,
     },
+  });
+};
+
+export const compileContract = (
+  contractPath: string,
+  compilerVersion: string
+) => {
+  vscode.postMessage({
+    command: "compile-contract",
+    data: {
+      contractPath: contractPath,
+      compilerVersion: compilerVersion,
+    },
+  });
+};
+
+export const loadCompilerVersions = () => {
+  vscode.postMessage({
+    command: "load-compiler-versions",
   });
 };

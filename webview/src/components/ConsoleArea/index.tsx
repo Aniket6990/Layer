@@ -1,4 +1,4 @@
-import { TxInterface, WebViewEventType } from "../../types/index";
+import { SolcError, TxInterface, WebViewEventType } from "../../types/index";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useAppSelector } from "../../app/hooks";
@@ -6,6 +6,7 @@ import { AiFillCheckCircle } from "react-icons/ai";
 import { MdCancel } from "react-icons/md";
 import { VscClearAll } from "react-icons/vsc";
 import Toggle from "../UI/Toggle";
+import CompilerError from "../UI/CompilerError";
 
 const ConsoleContainer = styled.div`
   overflow-y: scroll;
@@ -55,6 +56,7 @@ const TransactionFailureIcon = styled(MdCancel)`
 const TransactionContainer = styled.div`
   width: 100%;
   display: flex;
+  flex-direction: column;
   gap: 5px;
   justify-content: flex-start;
   align-items: flex-start;
@@ -95,10 +97,20 @@ const ConsoleArea = () => {
           ) {
             return (
               <TransactionContainer>
-                {message.eventType !== "layer_msg" && (
-                  <TransactionSuccessIcon></TransactionSuccessIcon>
-                )}
-                {message.eventResult as string}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  {message.eventType !== "layer_msg" && (
+                    <TransactionSuccessIcon></TransactionSuccessIcon>
+                  )}
+                  <span>{message.eventResult as string}</span>
+                </div>
               </TransactionContainer>
             );
           } else if (
@@ -114,11 +126,41 @@ const ConsoleArea = () => {
                 }
               />
             );
+          } else if (message.eventType === "layer_solc_error") {
+            return (
+              <TransactionContainer>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <TransactionFailureIcon></TransactionFailureIcon>{" "}
+                  <span>Error occured while compiling the contract:</span>
+                </div>
+                <CompilerError
+                  eventResult={message.eventResult as Array<SolcError>}
+                />
+              </TransactionContainer>
+            );
           } else {
             return (
               <TransactionContainer>
-                <TransactionFailureIcon></TransactionFailureIcon>
-                {message.eventResult as string}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <TransactionFailureIcon></TransactionFailureIcon>
+                  <span>{message.eventResult as string}</span>
+                </div>
               </TransactionContainer>
             );
           }

@@ -34,6 +34,11 @@ import {
   JsonFragmentType,
 } from "../types";
 import { getUri } from "../utilities/getUri";
+import {
+  getCompilerVersions,
+  loadCompiler,
+  loadSolidityContracts,
+} from "../config/compiler/solcompiler";
 
 export class ReactPanel {
   public static currentPanel: ReactPanel | undefined;
@@ -69,7 +74,7 @@ export class ReactPanel {
         // Panel view type
         "showHelloWorld",
         // Panel title
-        "ETHcode-layer",
+        "Layer",
         // The editor column the panel should be displayed in
         ViewColumn.One,
         // Extra panel configurations
@@ -256,6 +261,16 @@ export class ReactPanel {
             });
             break;
           }
+          case "get-solidity-contracts": {
+            const solidityContracts = loadSolidityContracts();
+            if (solidityContracts !== undefined) {
+              webview.postMessage({
+                command: "post-solidity-contracts",
+                data: solidityContracts,
+              });
+            }
+            break;
+          }
           case "get-compiled-contracts": {
             const compiledContracts = loadAllCompiledContracts(context);
             if (compiledContracts !== undefined) {
@@ -396,6 +411,19 @@ export class ReactPanel {
             webview.postMessage({
               command: "account-unlocked",
               data: status,
+            });
+            break;
+          }
+          case "compile-contract": {
+            const { contractPath, compilerVersion } = message.data;
+            await loadCompiler(context, contractPath, compilerVersion);
+            break;
+          }
+          case "load-compiler-versions": {
+            const versions = getCompilerVersions();
+            webview.postMessage({
+              command: "post-compiler-versions",
+              data: versions,
             });
             break;
           }

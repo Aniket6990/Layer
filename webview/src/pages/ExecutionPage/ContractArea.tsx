@@ -221,7 +221,9 @@ const ContractArea = () => {
               handleSelectContract(e);
             }}
           >
-            <VSCodeOption value="Select Contract">Select Contract</VSCodeOption>
+            <VSCodeOption value="Select Contract">
+              Select deployed contract
+            </VSCodeOption>
             {deployedContracts.map((contractData, index) => {
               return (
                 contractData !== null && (

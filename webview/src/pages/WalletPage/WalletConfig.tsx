@@ -273,7 +273,9 @@ const WalletConfig = () => {
               handleAccountDropdownChange(e);
             }}
           >
-            <VSCodeOption value="Select Account">Select Account</VSCodeOption>
+            <VSCodeOption value="Select Account">
+              {accounts.length === 0 ? "No account" : "Select Account"}
+            </VSCodeOption>
             {accounts.map((account, index) => {
               return (
                 <VSCodeOption key={index} value={account}>
@@ -291,6 +293,30 @@ const WalletConfig = () => {
           ) : (
             <CopyCheckIcon></CopyCheckIcon>
           )}
+        </FullObjectWrapper>
+      </ConfigWrapper>
+      {/* Create new account field */}
+      <ConfigWrapper>
+        <span>Create account</span>
+        <FullObjectWrapper>
+          <PartialObjectWrapper>
+            <TextField
+              placeholder="password"
+              type="password"
+              value={password}
+              onChange={(e: any) => {
+                setPassword(e.target.value);
+              }}
+            ></TextField>
+            <VSCodeButton
+              onClick={(e) => {
+                handleCreateNewKeyPair();
+                getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
+              }}
+            >
+              Create
+            </VSCodeButton>
+          </PartialObjectWrapper>
         </FullObjectWrapper>
       </ConfigWrapper>
       {/* Import account field */}
@@ -381,30 +407,6 @@ const WalletConfig = () => {
           >
             Export JSON
           </VSCodeButton>
-        </FullObjectWrapper>
-      </ConfigWrapper>
-      {/* Create new account field */}
-      <ConfigWrapper>
-        <span>Create account</span>
-        <FullObjectWrapper>
-          <PartialObjectWrapper>
-            <TextField
-              placeholder="password"
-              type="password"
-              value={password}
-              onChange={(e: any) => {
-                setPassword(e.target.value);
-              }}
-            ></TextField>
-            <VSCodeButton
-              onClick={(e) => {
-                handleCreateNewKeyPair();
-                getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
-              }}
-            >
-              Create
-            </VSCodeButton>
-          </PartialObjectWrapper>
         </FullObjectWrapper>
       </ConfigWrapper>
       {errorMsg !== "" ? <ErrorMessage>{errorMsg}</ErrorMessage> : null}

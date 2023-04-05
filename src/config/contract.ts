@@ -196,9 +196,11 @@ export const deploySelectedContract = async (
         gasPrice: gasPrice,
         gasLimit: gasLimit,
       });
-      const txnReceipt = await getSelectedNetworkProvider(
-        rpcURL
-      ).getTransactionReceipt(contract.deployTransaction.hash);
+      await contract.deployed();
+      const provider = getSelectedNetworkProvider(rpcURL);
+      const txnReceipt = await provider.getTransactionReceipt(
+        contract.deployTransaction.hash
+      );
 
       await addContractAddress(contractJSONOutput, {
         network: selectedNetwork,
@@ -229,9 +231,9 @@ export const deploySelectedContract = async (
     extensionEvent = {
       eventStatus: "fail",
       eventType: "layer_extensionCall",
-      eventResult: `Error while deploying ${contractName} ${JSON.stringify(
-        err.body
-      )}`,
+      eventResult: `Error while deploying ${contractName} ${
+        err.body !== undefined ? err.body : err
+      }`,
     };
     return extensionEvent;
   }

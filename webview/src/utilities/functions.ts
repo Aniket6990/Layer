@@ -1,3 +1,4 @@
+import path from "path";
 import { ethers } from "ethers";
 
 const containOnlyDigits = (value: string) => {
@@ -17,4 +18,9 @@ export const isLocalNetwork = (network: string) => {
   if (network === "Hardhat Network" || network === "Ganache Network")
     return true;
   return false;
+};
+
+export const getFileNameFromPath = (path_: string) => {
+  const splitedPath = path_.split("\\");
+  return splitedPath[splitedPath.length - 1];
 };

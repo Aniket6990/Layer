@@ -20,6 +20,7 @@ interface extensionState {
   walletAccountBalance: string;
   eventMsg: WebViewEventType | undefined;
   isWalletTx: boolean;
+  solidityContracts: Array<string>;
   compiledContracts: Array<string>;
   selectedContract: string;
   selectedContractConstructor: any;
@@ -31,6 +32,7 @@ interface extensionState {
   isAccountUnlocked: boolean;
   settingNetworkConfig: NetworkConfig;
   settingNetwork: string;
+  compilerVersions: Array<string>;
 }
 
 const initialState: extensionState = {
@@ -50,6 +52,7 @@ const initialState: extensionState = {
     eventResult: "Welcome to ETHcode-layer",
   },
   isWalletTx: false,
+  solidityContracts: [],
   compiledContracts: [],
   selectedContract: "Select Contract",
   selectedContractConstructor: undefined,
@@ -68,6 +71,7 @@ const initialState: extensionState = {
     isDefault: false,
   },
   settingNetwork: "",
+  compilerVersions: [],
 };
 export const extensionSlice = createSlice({
   name: "extension",
@@ -109,6 +113,9 @@ export const extensionSlice = createSlice({
     setIsWalletTx(state, action) {
       state.isWalletTx = action.payload;
     },
+    setSolidityContracts(state, action) {
+      state.solidityContracts = action.payload;
+    },
     setCompiledContracts(state, action) {
       state.compiledContracts = action.payload;
     },
@@ -142,6 +149,9 @@ export const extensionSlice = createSlice({
     setSettingNetwork(state, action) {
       state.settingNetwork = action.payload;
     },
+    setCompilerVersions(state, action) {
+      state.compilerVersions = action.payload;
+    },
   },
 });
 
@@ -158,6 +168,7 @@ export const {
   setWalletAccountBalance,
   setEventMsg,
   setIsWalletTx,
+  setSolidityContracts,
   setCompiledContracts,
   setSelectedContract,
   setSelectedContractConstructor,
@@ -169,6 +180,7 @@ export const {
   setIsAccountUnlocked,
   setSettingNetworkConfig,
   setSettingNetwork,
+  setCompilerVersions,
 } = extensionSlice.actions;
 
 export default extensionSlice.reducer;

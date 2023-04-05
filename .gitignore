@@ -9,7 +9,7 @@
 /coverage
 /keystore/
 /networks.json
-
+/compiler
 # production
 /build
 *.vsix
