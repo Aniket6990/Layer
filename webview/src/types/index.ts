@@ -23,14 +23,25 @@ export interface TxInterface {
   value?: string;
 }
 
+export interface SolcError {
+  component: string;
+  errorCode: string;
+  formattedMessage: string;
+  message: string;
+  severity: string;
+  sourceLocation: { end: Number; file: string; start: Number };
+  type: string;
+}
+
 export interface WebViewEventType {
   eventStatus: "success" | "fail";
   eventType:
     | "layer_extensionCall"
     | "layer_ImutableCall"
     | "layer_mutableCall"
-    | "layer_msg";
-  eventResult: string | TxInterface;
+    | "layer_msg"
+    | "layer_solc_error";
+  eventResult: string | TxInterface | Array<SolcError>;
 }
 
 export interface TxObjecttype {

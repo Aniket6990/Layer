@@ -45,7 +45,7 @@ export const downloadRemoteVersion = async (
 ): Promise<any> => {
   let extensionEvent: ExtensionEventTypes = {
     eventStatus: "success",
-    eventType: "layer_msg",
+    eventType: "layer_extensionCall",
     eventResult: "",
   };
 
@@ -69,7 +69,7 @@ export const downloadRemoteVersion = async (
   } catch (e) {
     extensionEvent = {
       eventStatus: "fail",
-      eventType: "layer_msg",
+      eventType: "layer_extensionCall",
       eventResult: "Error downloading compiler: " + e,
     };
     ReactPanel.EmitExtensionEvent(extensionEvent);

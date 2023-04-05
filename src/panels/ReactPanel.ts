@@ -74,7 +74,7 @@ export class ReactPanel {
         // Panel view type
         "showHelloWorld",
         // Panel title
-        "ETHcode-layer",
+        "Layer",
         // The editor column the panel should be displayed in
         ViewColumn.One,
         // Extra panel configurations

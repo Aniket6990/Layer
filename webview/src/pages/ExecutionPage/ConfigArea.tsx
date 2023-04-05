@@ -362,7 +362,9 @@ const ConfigArea = () => {
               handleAccountDropdownChange(e);
             }}
           >
-            <VSCodeOption value="Select Account">Select Account</VSCodeOption>
+            <VSCodeOption value="Select Account">
+              {accounts.length === 0 ? "No Account" : "Select Account"}
+            </VSCodeOption>
             {accounts.map((account, index) => {
               return (
                 <VSCodeOption key={index} value={account}>
@@ -412,10 +414,13 @@ const ConfigArea = () => {
         <span>Gas Limit</span>
         <FullObjectWrapper>
           <GasLimitTextField
+            type={"number"}
+            step={18}
             placeholder="Gas limit"
             value={gasLimit}
             onChange={(e: any) => {
-              dispatch(setGasLimit(e.target.value));
+              const gaslimit = e.target.value;
+              dispatch(setGasLimit(gaslimit.toString()));
             }}
           ></GasLimitTextField>
         </FullObjectWrapper>
@@ -426,10 +431,13 @@ const ConfigArea = () => {
         <FullObjectWrapper>
           <PartialObjectWrapper>
             <ValueTextField
+              type={"number"}
+              step={18}
               placeholder="value"
               value={value}
               onChange={(e: any) => {
-                handleChangeInValue(e.target.value);
+                const valuetoTransfer = e.target.value;
+                handleChangeInValue(valuetoTransfer.toString());
               }}
             ></ValueTextField>
             <ValueDropDown
@@ -495,14 +503,16 @@ const ConfigArea = () => {
         </FullObjectWrapper>
       </ConfigWrapper>
       <ConfigWrapper>
-        <ExtensionButton
-          onClick={(e: any) => {
-            handleCompileContract();
-          }}
-          title="Compile"
-        >
-          Compile
-        </ExtensionButton>
+        <FullObjectWrapper>
+          <ExtensionButton
+            onClick={(e: any) => {
+              handleCompileContract();
+            }}
+            title="Compile"
+          >
+            Compile
+          </ExtensionButton>
+        </FullObjectWrapper>
       </ConfigWrapper>
       {/* dropdown for selecting a compiled contract */}
       <ConfigWrapper>
@@ -514,7 +524,9 @@ const ConfigArea = () => {
               dispatch(setSelectedContract(e.target.value));
             }}
           >
-            <VSCodeOption value="Select Contract">Select Contract</VSCodeOption>
+            <VSCodeOption value="Select Contract">
+              Select Contract to deploy
+            </VSCodeOption>
             {compiledContracts.map((contract, index) => {
               return (
                 <VSCodeOption key={index} value={contract}>
@@ -559,6 +571,11 @@ const ConfigArea = () => {
           <span>Unlock Account</span>
           <FullObjectWrapper>
             <PasswordTextField
+              onKeyPress={(e: any) => {
+                if (e.key === "Enter") {
+                  unlockAccount(selectedAccount, globalPswd);
+                }
+              }}
               placeholder="password"
               value={globalPswd}
               onChange={(e: any) => {

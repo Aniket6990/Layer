@@ -147,7 +147,12 @@ export const loadCompiler = async (
       const outputToWork = JSON.parse(output);
 
       if (outputToWork.errors !== undefined) {
-        console.log(`Error: ${outputToWork.errors[0].formattedMessage}`);
+        console.log(JSON.stringify(outputToWork.errors));
+        ReactPanel.EmitExtensionEvent({
+          eventStatus: "fail",
+          eventType: "layer_solc_error",
+          eventResult: outputToWork.errors,
+        });
         return;
       }
       const contractName = Object.keys(
@@ -158,7 +163,8 @@ export const loadCompiler = async (
       );
 
       const outputToWrite = {
-        name: contractName,
+        _format: "layer-sol-artifact",
+        contractName: contractName,
         abi: contractOutput.abi,
         bytecode: "0x" + contractOutput.evm.bytecode.object,
       };
@@ -190,7 +196,7 @@ export const loadCompiler = async (
       );
       ReactPanel.EmitExtensionEvent({
         eventStatus: "success",
-        eventType: "layer_msg",
+        eventType: "layer_extensionCall",
         eventResult: `contract compiled successfully with version: ${localSolc.version()}`,
       });
     } else {
@@ -201,7 +207,7 @@ export const loadCompiler = async (
         .catch((error: any) => {
           ReactPanel.EmitExtensionEvent({
             eventStatus: "fail",
-            eventType: "layer_msg",
+            eventType: "layer_extensionCall",
             eventResult:
               "Error occured while download compiler for compilation: " + error,
           });
@@ -210,7 +216,7 @@ export const loadCompiler = async (
   } catch (error) {
     ReactPanel.EmitExtensionEvent({
       eventStatus: "fail",
-      eventType: "layer_msg",
+      eventType: "layer_extensionCall",
       eventResult: "Error while loading the compiler:" + error,
     });
   }

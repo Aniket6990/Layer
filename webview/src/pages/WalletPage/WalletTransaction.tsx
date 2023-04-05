@@ -207,6 +207,20 @@ const WalletTransaction = () => {
           </DropDown>
         </FullObjectWrapper>
       </ConfigWrapper>
+      {/* Show selected account field */}
+      <ConfigWrapper>
+        <span>From</span>
+        <FullObjectWrapper>
+          <TextField
+            value={`${
+              walletAccount !== "Select Account"
+                ? walletAccount
+                : "No account selected"
+            }`}
+            disabled
+          ></TextField>
+        </FullObjectWrapper>
+      </ConfigWrapper>
       {/* Show balance filed */}
       <ConfigWrapper>
         <span>Balance</span>
