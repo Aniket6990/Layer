@@ -146,7 +146,7 @@ const NetworkList = () => {
   };
 
   useEffect(() => {
-    handleNetworkSelection("Ethereum");
+    handleNetworkSelection("Ethereum Mainnet");
   }, []);
 
   return (

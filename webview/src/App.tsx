@@ -41,7 +41,7 @@ const Main = styled.div`
   overflow-y: scroll;
   display: grid;
   grid-template-columns: 1fr 0.03fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr 0.5fr;
   padding-top: 20px;
   padding-bottom: 20px;
   margin: 0;
@@ -50,7 +50,7 @@ const Main = styled.div`
 const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 0.4fr;
+  grid-template-rows: 1fr;
   row-gap: 20px;
 `;
 
@@ -215,17 +215,19 @@ function App() {
   ]);
 
   return (
-    <Main>
-      <Wrapper>
-        <Routes>
-          <Route path="/" element={<Execution />} />
-          <Route path="/wallet" element={<Wallet />} />
-          <Route path="/networksetting" element={<NetworkSettings />} />
-        </Routes>
+    <>
+      <Main>
+        <Wrapper>
+          <Routes>
+            <Route path="/" element={<Execution />} />
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/networksetting" element={<NetworkSettings />} />
+          </Routes>
+        </Wrapper>
+        <SideBar />
         <ConsoleArea />
-      </Wrapper>
-      <SideBar />
-    </Main>
+      </Main>
+    </>
   );
 }
 

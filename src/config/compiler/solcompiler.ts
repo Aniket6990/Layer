@@ -147,7 +147,6 @@ export const loadCompiler = async (
       const outputToWork = JSON.parse(output);
 
       if (outputToWork.errors !== undefined) {
-        console.log(JSON.stringify(outputToWork.errors));
         ReactPanel.EmitExtensionEvent({
           eventStatus: "fail",
           eventType: "layer_solc_error",

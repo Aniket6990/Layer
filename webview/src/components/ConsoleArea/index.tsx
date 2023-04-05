@@ -20,6 +20,10 @@ const ConsoleContainer = styled.div`
   justify-content: flex-start;
   align-items: flex-start;
   gap: 5px;
+  position: relative;
+  height: 250px;
+  bottom: 0px;
+  margin-top: 20px;
 `;
 
 const EventContainer = styled.div`
