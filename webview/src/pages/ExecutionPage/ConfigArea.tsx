@@ -25,6 +25,7 @@ import {
   displayAccountBalance,
   listContractConstructor,
   loadAllContracts,
+  loadSolidityContracts,
   unlockAccount,
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
@@ -148,7 +149,8 @@ const ConfigArea = () => {
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   const [value, setValue] = useState<string>("0");
   const [format, setFormat] = useState<string>("wei");
-  const [selectedSolContract, setSelectedSolContract] = useState<string>("");
+  const [selectedSolContract, setSelectedSolContract] =
+    useState<string>("Select Contract");
   const [compilerVersion, setCompilerVersion] = useState<string>("0.8.19");
   const [copied, setCopied] = useState<boolean>(false);
   const networks = useAppSelector((state) => state.extension.networks);
@@ -478,7 +480,7 @@ const ConfigArea = () => {
           </DropDown>
           <RefreshIcon
             onClick={(e) => {
-              loadAllContracts();
+              loadSolidityContracts();
             }}
           ></RefreshIcon>
         </FullObjectWrapper>

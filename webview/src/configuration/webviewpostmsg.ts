@@ -20,6 +20,11 @@ export const getAccounts = (
   });
 };
 
+export const getWalletAccounts = () => {
+  vscode.postMessage({
+    command: "get-wallet-account-list",
+  });
+};
 export const createNewKeyPairAccount = (password: string) => {
   vscode.postMessage({
     command: "create-new-keypair",

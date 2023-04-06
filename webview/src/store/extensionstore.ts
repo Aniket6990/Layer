@@ -10,6 +10,7 @@ interface deployedContractData {
 interface extensionState {
   networks: any;
   addresses: Array<string>;
+  walletAddresses: Array<string>;
   selectedNetwork: string;
   selectedNetworkConfig: any;
   selectedAccount: string;
@@ -38,6 +39,7 @@ interface extensionState {
 const initialState: extensionState = {
   networks: {},
   addresses: [],
+  walletAddresses: [],
   selectedNetwork: "Select Network",
   selectedNetworkConfig: {},
   selectedAccount: "Select Account",
@@ -82,6 +84,9 @@ export const extensionSlice = createSlice({
     },
     setAccounts(state, action) {
       state.addresses = action.payload;
+    },
+    setWalletAccounts(state, action) {
+      state.walletAddresses = action.payload;
     },
     setSelectedNetwork(state, action) {
       state.selectedNetwork = action.payload;
@@ -158,6 +163,7 @@ export const extensionSlice = createSlice({
 export const {
   setNetworks,
   setAccounts,
+  setWalletAccounts,
   setSelectedNetwork,
   setSelectedNetworkConfig,
   setSelectedAccount,

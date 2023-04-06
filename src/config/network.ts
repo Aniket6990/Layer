@@ -16,7 +16,8 @@ export const networkConfig = async (path: string) => {
       return parsedNetworksObject;
     } else {
       const networks = getConfiguration().get("networks") as Object;
-      return networks;
+      const parsedNetworksObject = JSON.parse(JSON.stringify(networks));
+      return parsedNetworksObject;
     }
   } catch (error) {
     console.log(error);
