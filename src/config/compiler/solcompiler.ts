@@ -114,20 +114,20 @@ export const loadCompiler = async (
     const availableVersions: any = versions;
     const compilerFile = availableVersions[compilerVersion];
 
-    if (
-      fs.existsSync(path.join(context.extensionPath, "compiler", compilerFile))
-    ) {
-      ReactPanel.EmitExtensionEvent({
-        eventStatus: "success",
-        eventType: "layer_msg",
-        eventResult: "loading compiler...",
-      });
-
-      const solidityfile = require(path.join(
+    if (fs.existsSync(`${context.extensionPath}/compiler/${compilerFile}`)) {
+      const solidityfile = await require(path.join(
         context.extensionPath,
         "compiler",
         compilerFile
       ));
+
+      if (solidityfile === undefined) {
+        return ReactPanel.EmitExtensionEvent({
+          eventStatus: "fail",
+          eventType: "layer_solc_error",
+          eventResult: "No compiler found.",
+        });
+      }
 
       const localSolc = solc.setupMethods(solidityfile);
       ReactPanel.EmitExtensionEvent({
@@ -199,24 +199,14 @@ export const loadCompiler = async (
         eventResult: `contract compiled successfully with version: ${localSolc.version()}`,
       });
     } else {
-      await downloadCompiler(context, compilerVersion)
-        .then(() => {
-          loadCompiler(context, path_, compilerVersion);
-        })
-        .catch((error: any) => {
-          ReactPanel.EmitExtensionEvent({
-            eventStatus: "fail",
-            eventType: "layer_extensionCall",
-            eventResult:
-              "Error occured while download compiler for compilation: " + error,
-          });
-        });
+      await downloadCompiler(context, compilerVersion);
+      loadCompiler(context, path_, compilerVersion);
     }
   } catch (error) {
     ReactPanel.EmitExtensionEvent({
       eventStatus: "fail",
       eventType: "layer_extensionCall",
-      eventResult: "Error while loading the compiler:" + error,
+      eventResult: "Error while loading the compiler: " + error,
     });
   }
 };

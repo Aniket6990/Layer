@@ -18,7 +18,8 @@ webview/scripts/**
 webview/.gitignore
 webview/tsconfig.json
 webview/yarn.lock
-keystore/
+webview/src/**
+keystore/**
 node_modules/@babel
 node_modules/@emotion
 node_modules/acorn
@@ -71,3 +72,4 @@ node_modules/@svgr
 node_modules/@jest
 node_modules/remix-url-resolver/node_modules/solc
 networks.json
+compiler/**

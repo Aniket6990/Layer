@@ -11,6 +11,7 @@ import {
   getAccounts,
   getDeployedContracts,
   getNetworks,
+  getWalletAccounts,
   loadAllContracts,
   loadCompilerVersions,
   loadSolidityContracts,
@@ -31,6 +32,7 @@ import {
   setGlobalPswd,
   setSolidityContracts,
   setCompilerVersions,
+  setWalletAccounts,
 } from "./store/extensionstore";
 import { NetworkConfig } from "./types";
 import NetworkSettings from "./pages/NetworkSettings";
@@ -79,6 +81,7 @@ function App() {
 
   useEffect(() => {
     getNetworks();
+    getWalletAccounts();
     getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
     loadSolidityContracts();
     loadAllContracts();
@@ -106,12 +109,18 @@ function App() {
           dispatch(setAccounts(eventData.data));
           break;
         }
+        case "post-wallet-account-list": {
+          dispatch(setWalletAccounts(eventData.data));
+          break;
+        }
         case "post-compiler-versions": {
           dispatch(setCompilerVersions(eventData.data));
           break;
         }
         case "new-keypair-created": {
           dispatch(setEventMsg(eventData.data));
+          getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
+          getWalletAccounts();
           break;
         }
         case "post-account-balance": {
@@ -125,11 +134,13 @@ function App() {
         case "imported-account-key": {
           dispatch(setEventMsg(eventData.data));
           getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
+          getWalletAccounts();
           break;
         }
         case "imported-account": {
           dispatch(setEventMsg(eventData.data));
           getAccounts(selectedNetwork, selectedNetworkConfig.rpc);
+          getWalletAccounts();
           break;
         }
         case "send-token-result": {

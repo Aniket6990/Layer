@@ -25,6 +25,7 @@ import {
   displayAccountBalance,
   listContractConstructor,
   loadAllContracts,
+  loadSolidityContracts,
   unlockAccount,
 } from "../../configuration/webviewpostmsg";
 import ParameterInput from "../../components/UI/ParameterInput";
@@ -479,7 +480,7 @@ const ConfigArea = () => {
           </DropDown>
           <RefreshIcon
             onClick={(e) => {
-              loadAllContracts();
+              loadSolidityContracts();
             }}
           ></RefreshIcon>
         </FullObjectWrapper>

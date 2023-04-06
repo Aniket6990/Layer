@@ -175,6 +175,14 @@ export class ReactPanel {
 
             break;
           }
+          case "get-wallet-account-list": {
+            webview.postMessage({
+              command: "post-wallet-account-list",
+              data: await listAddresses(context.extensionPath),
+            });
+
+            break;
+          }
           case "create-new-keypair": {
             const password: string = message.data;
             webview.postMessage({

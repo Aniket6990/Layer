@@ -140,7 +140,7 @@ const WalletConfig = () => {
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [showPvtKey, setShowPvtKey] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-  const accounts = useAppSelector((state) => state.extension.addresses);
+  const accounts = useAppSelector((state) => state.extension.walletAddresses);
   const walletSelectedAccount = useAppSelector(
     (state) => state.extension.walletAccount
   );

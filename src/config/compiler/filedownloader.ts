@@ -12,6 +12,12 @@ export const downloadCompilationFile = (
   const file = fs.createWriteStream(path);
   const url =
     "https://binaries.soliditylang.org/bin/soljson-" + version + ".js";
+
+  ReactPanel.EmitExtensionEvent({
+    eventStatus: "success",
+    eventType: "layer_msg",
+    eventResult: `Downloading the compiler ${version}...`,
+  });
   return new Promise((resolve, reject) => {
     const request = https
       .get(url, function (response: any) {
@@ -33,6 +39,13 @@ export const downloadCompilationFile = (
         }
       })
       .on("error", function (error) {
+        fs.unlink(path, () => {
+          ReactPanel.EmitExtensionEvent({
+            eventStatus: "fail",
+            eventType: "layer_msg",
+            eventResult: "Error retrieving solidity compiler.",
+          });
+        });
         reject(error);
       });
     request.end();
