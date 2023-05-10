@@ -12,6 +12,7 @@
 const rewire = require("rewire");
 const defaults = rewire("react-scripts/scripts/build.js");
 const config = defaults.__get__("config");
+const path = require('path')
 
 // Disable code splitting
 config.optimization.splitChunks = {
@@ -19,6 +20,9 @@ config.optimization.splitChunks = {
     default: false,
   },
 };
+
+// const absolutePath = path.join(config.output.path)
+// config.output.path = path.join(absolutePath.slice(0, -6), "webview_build")
 
 // Disable code chunks
 config.optimization.runtimeChunk = false;

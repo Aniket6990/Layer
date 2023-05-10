@@ -1,11 +1,13 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
         "target": "es5",
+        "module": "commonjs",
         "outDir": "build",
         "lib": [
 			"es6",
-			"dom"
+            "dom",
+            "dom.iterable",
+            "esnext"
         ],
         "sourceMap": true,
         "rootDir": ".",
@@ -13,9 +15,17 @@
         "moduleResolution": "node",
         "skipLibCheck": true,
         "esModuleInterop": true,
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "resolveJsonModule": true,
+        "isolatedModules": false,
+        "noEmit": false,
+        "jsx": "react-jsx"
 	},
 	"include": [
-		"src"
+        "extension",
 	],
     "exclude": [
         "node_modules",
