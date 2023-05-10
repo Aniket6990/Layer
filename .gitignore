@@ -12,6 +12,7 @@
 /compiler
 # production
 /build
+/webview_build
 *.vsix
 
 # misc

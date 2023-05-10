@@ -31,7 +31,7 @@
   "activationEvents": [
     "onCommand: layer.activate"
   ],
-  "main": "./build/src/extension.js",
+  "main": "./build/extension/extension.js",
   "extensionDependencies": [
     "ibm.output-colorizer"
   ],
@@ -78,21 +78,38 @@
     ]
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
     "@types/glob": "^8.0.0",
+    "@types/jest": "^29.5.1",
     "@types/randombytes": "^2.0.0",
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
     "@types/styled-components": "^5.1.26",
     "@types/underscore": "^1.11.4",
+    "@types/vscode-webview": "^1.57.1",
+    "@vscode/webview-ui-toolkit": "^1.2.2",
     "axios": "^0.27.2",
     "bn.js": "^5.2.1",
     "ethers": "^5.6.9",
     "keythereum": "^1.2.0",
     "number-to-bn": "^1.7.0",
+    "path-browserify": "^1.0.1",
     "randombytes": "^2.1.0",
-    "react-icons": "^4.7.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.8.0",
+    "react-redux": "^8.0.5",
+    "react-router-dom": "^6.11.1",
+    "react-scripts": "^5.0.1",
+    "rewire": "^6.0.0",
     "solc": "^0.8.19",
     "styled-components": "^5.3.6",
     "underscore": "^1.13.4",
-    "utf8": "^3.0.0"
+    "utf8": "^3.0.0",
+    "web-vitals": "^3.3.1"
   },
   "devDependencies": {
     "@types/keythereum": "^1.2.1",
@@ -103,12 +120,21 @@
     "vscode": "^1.1.37"
   },
   "scripts": {
-    "install:all": "yarn install && cd webview && yarn install",
-    "start:webview": "cd webview && yarn run start",
-    "build:webview": "cd webview && yarn run build",
-    "build:all": "yarn run build && yarn run build:webview",
+    "build:all": "node ./scripts/build-react-no-split.js && move build webview_build && yarn run build",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -watch -p ./"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
