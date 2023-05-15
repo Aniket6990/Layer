@@ -5,6 +5,8 @@ import {
   loadCompiler,
   loadSolidityContracts,
 } from "./config/compiler/solcompiler";
+import { getFoundryOutDir } from "./utilities/functions";
+import { logger } from "./lib";
 
 // eslint-disable-next-line import/prefer-default-export
 export async function activate(context: vscode.ExtensionContext) {
@@ -14,9 +16,16 @@ export async function activate(context: vscode.ExtensionContext) {
       ReactPanel.render(context);
     })
     // commands.registerCommand("layer.test", async () => {
-    //   const paths = loadSolidityContracts();
-    //   console.log(paths);
-    //   if (paths !== undefined) loadCompiler(context, paths[0]);
+    //   if (vscode.workspace.workspaceFolders === undefined) {
+    //     logger.error(new Error("Please open your solidity project to vscode"));
+    //     return;
+    //   }
+
+    //   context.workspaceState.update("contracts", ""); // Initialize contracts storage
+
+    //   const path_ = vscode.workspace.workspaceFolders[0].uri.fsPath;
+    //   const outDir = getFoundryOutDir(path_);
+    //   console.log(outDir)
     // })
   );
 }
