@@ -9,6 +9,7 @@ import {
   ExtensionEventTypes,
   FunctionObjectType,
   IFunctionQP,
+  isFoundryProject,
   isHardhatProject,
   JsonFragmentType,
 } from "../types";
@@ -19,6 +20,7 @@ import {
   getCallInterface,
   getContractByteCode,
   getContractFactoryWithParams,
+  getFoundryOutDir,
   getSignedContract,
   isTestingNetwork,
 } from "../utilities/functions";
@@ -96,12 +98,17 @@ const getCompiledJsonObject = (_jsonPayload: any): CompiledJSONOutput => {
 const loadAllCompiledJsonOutputs = (path_: string) => {
   let allFiles;
 
-  if (isHardhatProject(path_))
+  if (isHardhatProject(path_)) {
     allFiles = getDirectoriesRecursive(
       path.join(path_, "artifacts", "contracts"),
       0
     );
-  else allFiles = getDirectoriesRecursive(path_, 0);
+  } else if (isFoundryProject(path_)) {
+    const foundryOutDir = getFoundryOutDir(path_);
+    allFiles = getDirectoriesRecursive(path.join(path_, foundryOutDir), 0);
+  } else {
+    allFiles = getDirectoriesRecursive(path_, 0);
+  }
 
   const changedFiles = allFiles.filter((e: any) => {
     let fileName = path.parse(e).base;

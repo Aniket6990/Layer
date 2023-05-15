@@ -1,8 +1,11 @@
 import { ethers } from "ethers";
+import * as fs from "fs";
+import path from "path";
 import { ExtensionContext, Webview, WebviewPanel } from "vscode";
 import { exportPvtKeyPair, getSelectedNetworkProvider } from "../config";
 import { ReactPanel } from "../panels/ReactPanel";
 import { CompiledJSONOutput, FunctionObjectType, TxInterface } from "../types";
+import { load } from "js-toml";
 
 export const generateTxnInterface = async (props: {
   receipt: ethers.providers.TransactionReceipt;
@@ -200,4 +203,15 @@ export const getSignedContract = async (
     myContract = new ethers.Contract(contractAddress, abi, signingAccount);
   }
   return myContract;
+};
+
+export const getFoundryOutDir = (path_: string) => {
+  const data = fs.readFileSync(path.join(path_, "foundry.toml"), {
+    encoding: "utf-8",
+  });
+  const parsedToml: any = load(data);
+  const compiledOutputDir: string = parsedToml.profile.default.out
+    ? parsedToml.profile.default.out
+    : "out";
+  return compiledOutputDir;
 };

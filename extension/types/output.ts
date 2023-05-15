@@ -69,6 +69,12 @@ export const isHardhatProject = (path_: string) => {
   );
 };
 
+export const isFoundryProject = (path_: string) => {
+  return (
+    fs.readdirSync(path_).filter((file) => file === "foundry.toml").length > 0
+  );
+};
+
 export interface BytecodeObject {
   /** The bytecode as a hex string. */
   object: ethers.utils.BytesLike;
