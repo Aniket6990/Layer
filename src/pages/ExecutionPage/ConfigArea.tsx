@@ -457,67 +457,6 @@ const ConfigArea = () => {
       </ConfigWrapper>
       {/* dropdown for selecting a compiled contract */}
       <ConfigWrapper>
-        <span>Solidity contract</span>
-        <FullObjectWrapper>
-          <DropDown
-            value={selectedSolContract}
-            onChange={(e: any) => {
-              setSelectedSolContract(e.target.value);
-            }}
-          >
-            <VSCodeOption value="Select Contract">
-              {solidityContracts.length === 0
-                ? "No Contract"
-                : "Select Contract"}
-            </VSCodeOption>
-            {solidityContracts.map((contract, index) => {
-              return (
-                <VSCodeOption key={index} value={contract}>
-                  {getFileNameFromPath(contract)}
-                </VSCodeOption>
-              );
-            })}
-          </DropDown>
-          <RefreshIcon
-            onClick={(e) => {
-              loadSolidityContracts();
-            }}
-          ></RefreshIcon>
-        </FullObjectWrapper>
-      </ConfigWrapper>
-      <ConfigWrapper>
-        <span>Compiler version</span>
-        <FullObjectWrapper>
-          <DropDown
-            value={compilerVersion}
-            onChange={(e: any) => {
-              setCompilerVersion(e.target.value);
-            }}
-          >
-            {compilerVersions.map((compiler, index) => {
-              return (
-                <VSCodeOption key={index} value={compiler}>
-                  {compiler}
-                </VSCodeOption>
-              );
-            })}
-          </DropDown>
-        </FullObjectWrapper>
-      </ConfigWrapper>
-      <ConfigWrapper>
-        <FullObjectWrapper>
-          <ExtensionButton
-            onClick={(e: any) => {
-              handleCompileContract();
-            }}
-            title="Compile"
-          >
-            Compile
-          </ExtensionButton>
-        </FullObjectWrapper>
-      </ConfigWrapper>
-      {/* dropdown for selecting a compiled contract */}
-      <ConfigWrapper>
         <span>Compiled contract</span>
         <FullObjectWrapper>
           <DropDown
