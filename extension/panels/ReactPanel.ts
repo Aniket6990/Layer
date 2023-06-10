@@ -115,7 +115,7 @@ export class ReactPanel {
   private _getWebviewContent(context: ExtensionContext) {
     // The JS file from the React build output
     const scriptUri = this._panel.webview.asWebviewUri(
-      getUri(context, ["webview_build", "static", "js", "main.js"])
+      getUri(context, ["build", "webview", "main.js"])
     );
 
     return /*html*/ `

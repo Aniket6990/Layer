@@ -31,7 +31,7 @@
   "activationEvents": [
     "onCommand: layer.activate"
   ],
-  "main": "./build/extension/extension.js",
+  "main": "./build/extension.js",
   "extensionDependencies": [
     "ibm.output-colorizer"
   ],
@@ -116,16 +116,18 @@
     "@types/keythereum": "^1.2.1",
     "@types/node": "^18.0.0",
     "@types/vscode": "^1.38.1",
+    "esbuild": "^0.18.0",
     "prettier": "^2.1.2",
     "typescript": "^4.7.4",
     "vscode": "^1.1.37"
   },
   "scripts": {
-    "del:build": "rmdir /s /q build && rmdir /s /q webview_build",
-    "build:all": "node ./scripts/build-react-no-split.js && move build webview_build && yarn run build",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "build": "tsc -p tsconfig.json",
-    "watch": "tsc -watch -p ./"
+    "build": "yarn run vscode:prepublish",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "yarn run esbuild-base -- --minify && yarn run esbuild:webview",
+    "esbuild-base": "esbuild ./extension/extension.ts --bundle --outfile=build/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild-watch": "yarn run esbuild-base -- --sourcemap --watch",
+    "esbuild:webview": "./node_modules/.bin/esbuild src/index.tsx --bundle --outfile=build/webview/main.js"
   },
   "browserslist": {
     "production": [

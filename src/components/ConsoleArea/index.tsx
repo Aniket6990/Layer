@@ -93,14 +93,14 @@ const ConsoleArea = () => {
         ></ConsoleClearIcon>
       </ConsoleHeader>
       <EventContainer id="eventContainer">
-        {consoleMsg.map((message) => {
+        {consoleMsg.map((message, index) => {
           if (
             message.eventStatus === "success" &&
             (message.eventType === "layer_extensionCall" ||
               message.eventType === "layer_msg")
           ) {
             return (
-              <TransactionContainer>
+              <TransactionContainer key={index}>
                 <div
                   style={{
                     display: "flex",
@@ -128,6 +128,7 @@ const ConsoleArea = () => {
                 selectedNetwork={
                   homeNetwork === "Select Network" ? "Txn" : homeNetwork
                 }
+                key={index}
               />
             );
           } else if (message.eventType === "layer_solc_error") {
@@ -141,6 +142,7 @@ const ConsoleArea = () => {
                     alignItems: "center",
                     gap: "10px",
                   }}
+                  key={index}
                 >
                   <TransactionFailureIcon></TransactionFailureIcon>{" "}
                   <span>Error occured while compiling the contract:</span>
@@ -161,6 +163,7 @@ const ConsoleArea = () => {
                     alignItems: "center",
                     gap: "10px",
                   }}
+                  key={index}
                 >
                   <TransactionFailureIcon></TransactionFailureIcon>
                   <span>{message.eventResult as string}</span>
