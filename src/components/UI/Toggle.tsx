@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { MdArrowForwardIos, MdCancel } from "react-icons/md";
 import styled from "styled-components";
@@ -135,6 +135,7 @@ const Toggle = (props: {
 }) => {
   const { selectedNetwork, txn, txnStatus } = props;
   const [open, setOpen] = useState(false);
+
   return (
     <Container>
       <ToggleHeader
