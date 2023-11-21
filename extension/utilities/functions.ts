@@ -4,7 +4,12 @@ import path from "path";
 import { ExtensionContext, Webview, WebviewPanel } from "vscode";
 import { exportPvtKeyPair, getSelectedNetworkProvider } from "../config";
 import { ReactPanel } from "../panels/ReactPanel";
-import { CompiledJSONOutput, FunctionObjectType, TxInterface } from "../types";
+import {
+  CompiledJSONOutput,
+  ExtensionEventTypes,
+  FunctionObjectType,
+  TxInterface,
+} from "../types";
 import { load } from "js-toml";
 
 export const generateTxnInterface = async (props: {
@@ -214,4 +219,72 @@ export const getFoundryOutDir = (path_: string) => {
     ? parsedToml.profile.default.out
     : "out";
   return compiledOutputDir;
+};
+
+export const getErrorReason = async (
+  rpcUrl: string,
+  txnHash: string,
+  gasLimit: string
+) => {
+  let reason: string = "";
+  const provider = getSelectedNetworkProvider(rpcUrl);
+  const txnReceipt = await provider.getTransactionReceipt(txnHash);
+  const gasUsed = parseInt(ethers.utils.hexValue(txnReceipt.gasUsed));
+  if (gasUsed === parseInt(gasLimit)) {
+    reason = "This may be due to less gasLimit.";
+  }
+  if (reason !== "") {
+    ReactPanel.EmitExtensionEvent({
+      eventType: "layer_extensionCall",
+      eventStatus: "fail",
+      eventResult: reason,
+    });
+  }
+};
+
+export const getTransactionError = async (
+  err: any,
+  props: {
+    rpcUrl: string;
+    gasLimit: string;
+    params?: Array<string>;
+    contractName?: string;
+    functionObject?: FunctionObjectType;
+  }
+): Promise<ExtensionEventTypes> => {
+  let extensionEvent: ExtensionEventTypes = {
+    eventStatus: "fail",
+    eventType: "layer_mutableCall",
+    eventResult: "",
+  };
+  const txnHash: string | undefined =
+    err.body === undefined
+      ? JSON.parse(JSON.stringify(err)).transactionHash
+      : undefined;
+  if (txnHash !== undefined) {
+    const txnReceipt = await getSelectedNetworkProvider(
+      props.rpcUrl
+    ).getTransactionReceipt(txnHash);
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_mutableCall",
+      eventResult: await generateTxnInterface({
+        receipt: txnReceipt,
+        rpcUrl: props.rpcUrl,
+        gasLimit: props.gasLimit,
+        params: props.params,
+        contractName: props.contractName,
+      }),
+    };
+    getErrorReason(props.rpcUrl, txnHash, props.gasLimit);
+  } else {
+    extensionEvent = {
+      eventStatus: "fail",
+      eventType: "layer_extensionCall",
+      eventResult: `Error while deploying ${props.contractName} ${
+        err.body !== undefined ? err.body : err
+      }`,
+    };
+  }
+  return extensionEvent;
 };

@@ -20,8 +20,10 @@ import {
   getCallInterface,
   getContractByteCode,
   getContractFactoryWithParams,
+  getErrorReason,
   getFoundryOutDir,
   getSignedContract,
+  getTransactionError,
   isTestingNetwork,
 } from "../utilities/functions";
 import { JsonFragment } from "@ethersproject/abi";
@@ -235,13 +237,12 @@ export const deploySelectedContract = async (
       return extensionEvent;
     }
   } catch (err: any) {
-    extensionEvent = {
-      eventStatus: "fail",
-      eventType: "layer_extensionCall",
-      eventResult: `Error while deploying ${contractName} ${
-        err.body !== undefined ? err.body : err
-      }`,
-    };
+    extensionEvent = await getTransactionError(err, {
+      rpcUrl: rpcURL,
+      gasLimit: gasLimit,
+      params: params,
+      contractName: contractName,
+    });
     return extensionEvent;
   }
 };
@@ -442,7 +443,6 @@ export const executeContractFunction = async (
       functionObject.stateMutability === "view" ||
       functionObject.stateMutability === "pure"
     ) {
-      console.log("view executed");
       const contract = new ethers.Contract(
         contractAddress,
         abi,
@@ -513,11 +513,14 @@ export const executeContractFunction = async (
     }
     return extensionEvent;
   } catch (error: any) {
-    extensionEvent = {
-      eventStatus: "fail",
-      eventType: "layer_extensionCall",
-      eventResult: error.body,
-    };
+    const params_ = !!params.length ? params : [];
+    extensionEvent = await getTransactionError(error, {
+      rpcUrl: rpcUrl,
+      gasLimit: gasLimit,
+      contractName: contractName,
+      params: params_,
+      functionObject: functionObject,
+    });
     return extensionEvent;
   }
 };

@@ -106,7 +106,7 @@
     "react-router-dom": "^6.11.1",
     "react-scripts": "^5.0.1",
     "rewire": "^6.0.0",
-    "solc": "^0.8.19",
+    "solc": "0.8.22",
     "styled-components": "^5.3.6",
     "underscore": "^1.13.4",
     "utf8": "^3.0.0",

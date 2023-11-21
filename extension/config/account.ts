@@ -9,6 +9,7 @@ import { toChecksumAddress } from "../lib/hash/util";
 import { Account, LocalAddressType } from "../types";
 import {
   generateTxnInterface,
+  getTransactionError,
   isTestingNetwork,
   isValidHttpUrl,
 } from "../utilities/functions";
@@ -399,11 +400,10 @@ export const sendTransaction = async (
     }
     return extensionEvent;
   } catch (error: any) {
-    extensionEvent = {
-      eventStatus: "fail",
-      eventType: "layer_mutableCall",
-      eventResult: error.body,
-    };
+    extensionEvent = await getTransactionError(error, {
+      rpcUrl: txObject.selectedNetworkRpcUrl,
+      gasLimit: txObject.gasLimit,
+    });
     return extensionEvent;
   }
 };
