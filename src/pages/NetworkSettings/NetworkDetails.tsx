@@ -189,7 +189,6 @@ const NetworkDetails = () => {
           onClick={(e) => {
             handleSave();
           }}
-          disabled={networkInfo.isDefault}
         >
           Save
         </VSCodeButton>
