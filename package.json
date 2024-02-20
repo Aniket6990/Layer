@@ -2,7 +2,7 @@
   "name": "layer",
   "displayName": "Layer solidity",
   "description": "Extension to interact with smart contracts written in Solidity.",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "publisher": "Chaintown",
   "categories": [
     "Debuggers",
